@@ -6,6 +6,7 @@ import { AdminShell } from '@/components/admin/AdminShell'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { requerirSesion } from '@/lib/admin/session'
 import { formatearFecha } from '@/lib/format'
+import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 
 import {
@@ -179,7 +180,7 @@ export default async function NoticiasPage({ searchParams }: Props) {
                 {nota.status === 'published' ? (
                   <>
                     <Link
-                      href={`/articulo/${nota.slug}`}
+                      href={rutaNoticia(nota.slug)}
                       className="text-ink/60 hover:text-ink flex min-h-11 items-center text-xs font-medium"
                     >
                       Ver

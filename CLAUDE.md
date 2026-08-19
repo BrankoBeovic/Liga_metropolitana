@@ -46,7 +46,14 @@ Limpio, editorial, con motion design cuidado y rendimiento como prioridad.
 | Calidad | ESLint + Prettier |
 
 Bebas Neue se eligió sobre Cabinet Grotesk porque está en Google Fonts y se carga con `next/font/google` como el resto; Cabinet Grotesk habría exigido self-hosting.
-Bebas Neue tiene un solo peso (400) y es toda mayúsculas: no pedir `font-bold` en display, no existe.
+Bebas Neue tiene un solo peso (400): no pedir `font-bold` en display, no existe y el navegador lo sintetiza engordando los trazos.
+
+**Y va SIEMPRE con `uppercase`.**
+No tiene minúsculas de verdad: las mapea a versalitas, así que "Un cambio de era" sale con la U alta y el resto bajo, como si la tipografía estuviera rota.
+Todo lo que use `font-display` lleva `uppercase`, incluidos los `h2`/`h3` que salen del editor (por eso `.prose-editor` en `globals.css` también lo aplica).
+La única excepción del sitio es el título de las tarjetas de Reels, que es texto que escribió alguien en Instagram y en mayúsculas se lee como un grito: esas van en la tipografía de cuerpo.
+
+Y va con `tracking` positivo, nunca `tracking-tight`: la familia ya es condensada, y apretarla junta las astas verticales de las mayúsculas hasta que "METROPOLITANA" se lee como una reja.
 Plus Jakarta Sans es la misma tipografía de cuerpo de la fuente, ya probada con este sistema de diseño.
 
 ### Nota: las cookies de sesión NO son HttpOnly
@@ -89,9 +96,28 @@ Acá el fondo del sitio es oscuro y no hay modo claro ni toggle de tema.
 Para el glassmorphism de tarjetas se usa `rgba(21, 24, 30, 0.7)` con blur.
 
 **La tabla de contrastes de la fuente NO vale acá**: estaba medida para texto oscuro sobre blanco y texto blanco sobre `#0F1014`.
-Con la paleta nueva hay que volver a medir, y la regla de medición sigue vigente: componer los colores en un canvas, no a ojo y no parseando la cadena, porque Tailwind 4 emite `oklab()` y leerlo como RGB da números falsos.
-La lección general sí se conserva: las opacidades de texto por debajo de `/60` no suelen pasar AA, en ninguna dirección.
-La tabla nueva se completa en la Etapa 5, medida en el DOM.
+Esta se midió de nuevo en la Etapa 5, en el DOM, componiendo los colores en un canvas y no parseando la cadena, porque Tailwind 4 emite `oklab()` y leerlo como RGB da números falsos.
+
+| Texto | Sobre `canvas` | Sobre `editorial` |
+|---|---|---|
+| `ink` | 17.81:1 | 16.18:1 |
+| `ink/85` | - | 11.89:1 |
+| `ink/75` | 10.09:1 | 9.47:1 |
+| `ink/70` | 8.87:1 | 8.39:1 |
+| `ink/60` | 6.72:1 | 6.48:1 |
+| `ink/50` | 4.96:1 | 4.88:1 |
+| `ink/45` | **4.21:1** | **4.20:1** |
+| `accent` | 8.29:1 | 7.53:1 |
+
+**El piso práctico es `/60`.**
+`/50` pasa AA por poco (4.88:1 contra un mínimo de 4.5) y `/45` no pasa, igual que del lado claro en la fuente.
+
+**Sobre el dorado va texto oscuro, no blanco.**
+`canvas` sobre `accent` da 8.29:1; blanco sobre `accent` da 2.36:1 y no llega ni cerca.
+El acento es un color CLARO aunque el sitio sea oscuro, y eso invierte la intuición: los badges y los botones de acento llevan `text-canvas`.
+
+La tabla se verificó con un barrido que recorre cada elemento con texto propio de la portada y de la nota, calcula el fondo efectivo componiendo los `background-color` de todos sus ancestros y compara contra el mínimo que corresponde al tamaño.
+El caso especial es el texto del Hero, que va sobre el video: ahí se midió el píxel más claro del video bajo la bajada en nueve momentos del clip y se compuso con los dos scrims. El peor caso da 7.69:1.
 
 ### Superficies
 
@@ -110,8 +136,17 @@ La tabla nueva se completa en la Etapa 5, medida en el DOM.
 
 ### Nota: el hero de la landing lleva video
 
-`c:\Users\dell\Downloads\ligamefinaled.mp4` es la pieza original: 25,7 MB, demasiado pesado para servir tal cual.
-Antes de integrarlo en la Etapa 5 hay que comprimirlo (meta: menos de 5 MB, sin pista de audio), servirlo con `poster` para el primer render, `autoplay muted loop playsinline`, y quedarse en el póster cuando `prefers-reduced-motion` está activo.
+La pieza original (`ligamefinaled.mp4`, 1920x1080, 10,3 s) pesaba 25,7 MB y traía pista de audio.
+En `public/hero.mp4` va la versión que se sirve: H.264 CRF 25, sin audio, `+faststart`, **3,0 MB**.
+CRF 23 pesaba 4,0 MB y el SSIM contra el original subía de 0,9879 a 0,9896: un tercio más de peso por una diferencia que no se ve.
+El clip cierra donde abre, así que el `loop` no tiene costura.
+
+`public/hero-poster.jpg` es el primer cuadro **del archivo ya comprimido**, no del original: así el póster y el primer frame del video son el mismo píxel y no hay salto al arrancar.
+
+**El `<video>` NO lleva el atributo `autoplay`.**
+Con `autoplay` en el HTML no hay forma de respetar `prefers-reduced-motion`: el navegador arranca antes de que corra una línea de JavaScript, y quien pidió menos movimiento vería el video empezar y recién después frenarse.
+`HeroVideo` lo arranca desde un efecto, salteándolo si la consulta está activa, y así quien pide menos movimiento simplemente se queda en el póster.
+El póster además es lo que mide el LCP, y viaja en el HTML que manda el servidor.
 
 ### Accesibilidad
 
@@ -132,9 +167,33 @@ Vale para cualquier componente con máscara y animación.
 
 ### Assets de marca
 
-El logo es el escudo "Liga Metropolitana 1989 Maxi Basquetbol" (dorado y blanco sobre fondo oscuro).
-Los assets definitivos (logo para header, `icon.png`, `apple-icon.png`) se generan en la Etapa 5.
-La lección de la fuente que aplica igual: verificar el canal alfa mirando los píxeles de las esquinas, no a ojo sobre fondo claro, y comprobar el favicon sobre `#202124` (barra de navegador en modo oscuro).
+El logo es el escudo "Liga Metropolitana 1989 Maxi Basquetbol" (dorado y plateado sobre fondo negro).
+
+**Nunca llegó como archivo: se extrajo del video del hero.**
+El cuadro de t=1,4 s es el único plano donde el escudo entra entero en el encuadre; el de t=0 lo tiene cortado por el borde inferior.
+El canal alfa se derivó de la luminancia del render (el fondo está en `#0B0B0B`, con una rampa entre 16 y 46) y no con un `colorkey`: así se conservan los degradados del metal en vez de dejar el borde dentado.
+Verificado leyendo los píxeles, no a ojo: alfa 0 en las cuatro esquinas.
+La contra de derivar el alfa así es que las zonas oscuras internas del escudo -la placa negra del "1989"- quedan transparentes, así que **el escudo solo se puede apoyar sobre fondo oscuro**.
+En este sitio no hay otro; si algún día hace falta sobre claro, hay que pedir el archivo original.
+
+| Archivo | Qué es |
+|---|---|
+| `public/escudo.png` | Escudo completo, 900x554, con alfa. Header y footer. |
+| `public/og.jpg` | 1200x630 para compartir: el escudo centrado sobre el canvas. |
+| `public/hero.mp4`, `public/hero-poster.jpg` | El video del hero y su póster. |
+| `src/app/icon.png` | Favicon, 256x256, con las esquinas transparentes. |
+| `src/app/apple-icon.png` | 180x180, cuadrado y opaco: iOS aplica su propia máscara. |
+| `components/ui/Marca.tsx` | El isotipo, en SVG inline. |
+
+**El escudo completo no funciona chico, y por eso existe `Marca`.**
+Es un lockup ancho y con mucho detalle: a 48px de alto sus letras miden menos de cinco píxeles.
+En el header va acompañado del nombre escrito -el texto es lo que hace legible la marca, el escudo es lo que la hace reconocible- y para todo lo chico (favicon, estados vacíos, notas sin portada, perfil sin foto) va la pelota dorada del escudo, dibujada en SVG.
+
+`Marca`, `icon.png` y `apple-icon.png` son **el mismo dibujo** en un lienzo de 64 unidades: teja de radio 14, pelota de radio 21 centrada, dos costuras rectas de 2,6 de grosor.
+Si se cambia una hay que rehacer las otras dos, o el favicon deja de ser el dibujo del sitio.
+Las costuras curvas de una pelota de básquetbol de verdad se probaron y se descartaron: medidas a 32px se leían como los meridianos de un globo terráqueo.
+Comprobado sobre `#202124`, que es la barra del navegador en modo oscuro.
+
 Regla general: si el logo necesita que le hagan lugar, está mal ubicado.
 
 ## 4. Decisiones propias de este proyecto
@@ -177,6 +236,68 @@ Sin ninguna destacada, la principal pasa a ser la más reciente: degradación na
 ### La firma anónima no dice "Equipo HDB"
 
 `posts.is_anonymous` firma como "Equipo Liga Metropolitana".
+
+### La nota pública vive en `/noticia/[slug]`
+
+La fuente la tenía en `/articulo/`.
+Acá el CMS habla de noticias en todos lados, y la URL tiene que decir lo mismo.
+
+**La ruta se arma en un solo lugar**: `rutaNoticia(slug)` en `lib/site.ts`.
+La usan la portada, las tarjetas, el sitemap, el enlace "Ver" del CMS, la revalidación al publicar, la revalidación al editar el perfil y la vista previa de borradores.
+Cuando se cambió el segmento hubo que tocar seis archivos; la próxima vez es uno.
+
+### La columna de lectura mide 608px, y el número está medido
+
+La medida cómoda de lectura ronda los 70 caracteres por línea.
+Medido en el DOM con la tipografía real -Plus Jakarta Sans a 18px da 8,26px de ancho medio por carácter- el `max-w-3xl` (768px) que traía la fuente daba **93 caracteres**, bastante por encima de lo tolerable.
+608px dan 74.
+
+La portada de la nota sigue siendo más ancha (896px) a propósito: foto ancha sobre columna angosta es el ritmo editorial habitual.
+`ANCHO_LECTURA` en `ArticleContent` tiene que seguir a este número: de ahí sale el `sizes` de las imágenes del cuerpo.
+
+### Las migas no enlazan la categoría
+
+Este sitio no tiene páginas de categoría, así que la miga del medio se dibuja como texto.
+En el JSON-LD eso es un `ListItem` sin `item`, que es válido y describe exactamente lo que pasa: un escalón de la jerarquía que no tiene página propia.
+Enlazarla a una ruta inexistente sería peor que no tenerla.
+
+### Nota: `NEXT_PUBLIC_SITE_URL` está declarada pero vacía
+
+El dominio todavía no se conecta, así que `.env.local` la define sin valor.
+Eso llega al código como cadena vacía, **no** como `undefined`: con `??` el respaldo no se aplicaba, `new URL('')` tiraba `ERR_INVALID_URL` y el build moría al recolectar la portada, con un error que no nombra la variable por ningún lado.
+`lib/site.ts` usa `||`.
+
+Regla general para cualquier variable de entorno opcional de este proyecto: `||`, no `??`.
+
+### Nota: `priority` de `next/image` quedó obsoleta en Next 16
+
+Se reemplazó por `loading="eager"` (cuándo empieza a bajar) más `fetchPriority="high"` (con qué prioridad), que son dos cosas distintas y ahora se leen como lo que son.
+`preload` existe y mete un `<link>` en el `<head>`, pero es para una sola imagen por página y acá el LCP no es una imagen de `next/image`.
+
+**El LCP de la portada es el póster del video, no la nota destacada.**
+En la fuente la portada destacada era lo primero de la página; acá arriba hay un Hero de 70svh y, medido a 1280x900, la nota destacada nace en y=825, o sea debajo del pliegue.
+Por eso su portada NO se pide temprano: solo le robaría ancho de banda al Hero.
+En la página de la nota sí: ahí la portada nace en y=538 y es la que mide.
+
+### Nota: en una pestaña en segundo plano no corren ni `requestAnimationFrame` ni `IntersectionObserver`
+
+Medido: cero frames en dos segundos, y el observador no informa nunca mientras `document.hidden` es `true`.
+
+Esto rompió el Hero. La primera versión de `HeroVideo` dejaba que el `IntersectionObserver` diera la orden de arrancar, así que abrir el sitio en una pestaña nueva -clic con el botón del medio, que es de lo más común- dejaba el Hero congelado en el póster hasta que la pestaña se mirara por primera vez.
+Ahora `reproducir()` se llama de una, y el observador se queda solo con lo que sí es seguro diferir: apagar.
+
+Es el mismo principio que ya estaba escrito para el carrusel en la sección 7: **nada que ponga las cosas en movimiento puede depender de que llegue un evento**.
+Vale la pena releerlo antes de escribir cualquier componente que arranque una animación.
+
+### La portada, en orden
+
+Hero a pantalla casi completa (video + bajada + dos botones), "Lo último" (destacada grande más dos laterales), Reels de Instagram, "Más noticias" (grilla de cinco) y los logos de los sponsors.
+
+Las tres secciones del medio desaparecen enteras si no tienen contenido, y ese es el estado normal hoy: sin token de Instagram no hay Reels.
+Solo "Lo último" se queda, con un estado vacío explícito, porque una portada de un medio sin ni un hueco donde diga "acá van las noticias" parece rota.
+
+El `h1` de la portada es `sr-only`.
+La portada de un medio no tiene titular propio, y el nombre de la Liga ya está dicho en letras de tres metros en el video: escribirlo encima sería decirlo dos veces y pelearle el centro a la imagen.
 
 ### Pendientes que bloquean la Etapa 6
 

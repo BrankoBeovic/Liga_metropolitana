@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { ArticleForm } from '@/components/admin/ArticleForm'
 import { requerirSesion } from '@/lib/admin/session'
+import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 
 import { borrarArticulo } from '../actions'
@@ -49,7 +50,7 @@ export default async function EditarNotaPage({ params }: Props) {
       acciones={
         nota.status === 'published' ? (
           <Link
-            href={`/articulo/${nota.slug}`}
+            href={rutaNoticia(nota.slug)}
             className="font-display text-ink flex h-11 items-center rounded-lg px-4 text-sm font-bold ring-1 ring-black/10"
           >
             Ver en el sitio

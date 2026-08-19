@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { requerirSesion } from '@/lib/admin/session'
 import { borrarImagen, subirImagen } from '@/lib/admin/storage'
+import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/database.types'
 
@@ -50,7 +51,7 @@ function calcularLectura(doc: unknown): number {
 
 function refrescar(slug: string) {
   revalidatePath('/')
-  revalidatePath(`/articulo/${slug}`)
+  revalidatePath(rutaNoticia(slug))
   revalidatePath('/admin/noticias')
   // El sitemap lista las notas publicadas, asi que tambien queda viejo.
   revalidatePath('/sitemap.xml')

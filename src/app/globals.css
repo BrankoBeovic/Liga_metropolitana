@@ -121,7 +121,17 @@
     font-family: var(--font-display);
     font-weight: 400;
     line-height: 1.15;
-    letter-spacing: 0.01em;
+    /*
+      Mayusculas y algo de espaciado, igual que en `ArticleContent`.
+
+      Bebas Neue no tiene minusculas de verdad: las mapea a versalitas. Sin
+      `uppercase`, un subtitulo escrito "Un cambio de era" sale con la U alta y
+      el resto bajo, como si la tipografia estuviera rota. El espaciado va
+      positivo porque la familia ya es condensada y apretarla junta las astas
+      de las mayusculas.
+    */
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
   }
 
   /* Un titulo necesita mas aire ARRIBA que abajo: es lo que lo despega de la

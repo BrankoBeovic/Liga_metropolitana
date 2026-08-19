@@ -3,7 +3,49 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
-## Etapa actual: 4 (CMS) - cerrada
+## Etapa actual: 5 (Sitio público) - cerrada
+
+### Hecho
+
+- Layout público: header flotante de vidrio con el escudo más el nombre escrito, barra fija de `lib/navigation.ts` desde `md`, panel lateral Radix debajo, `PanelLink` y footer editorial.
+- Portada: Hero con video, "Lo último" (destacada grande más dos laterales), carrusel de Reels, "Más noticias" (grilla de cinco) y logos de sponsors.
+- Página de la nota en `/noticia/[slug]` (la fuente la tenía en `/articulo/`), a una sola columna, con migas, JSON-LD `NewsArticle`, tarjeta de autor, relacionadas y el aviso de vista previa de borradores.
+- `robots.ts`, `sitemap.ts`, `/salir-vista-previa` y la metadata completa (canónica, OpenGraph, Twitter Card, `metadataBase`, `themeColor`, `colorScheme`).
+- Componentes copiados y re-teñidos a la paleta oscura: `Carousel` (verbatim), `Badge`, `MotionCard`, `RevealText`, `SectionHeading`, `SpotlightCard`, `EmptyState`, las tarjetas de nota, `ReelCard` y los de sponsors.
+- Assets de marca generados desde el video, porque el escudo nunca llegó como archivo: `escudo.png` con alfa, `og.jpg`, `hero.mp4` (3,0 MB, sin audio), `hero-poster.jpg`, `icon.png`, `apple-icon.png` y el isotipo `components/ui/Marca.tsx`.
+- Se descartó YouTube, `CategoryColumns`, `/nosotros`, `/multimedia` y `/categoria/[slug]`, como estaba acordado.
+- El CMS quedó alineado con la ruta nueva: las seis referencias a `/articulo/` pasan por `rutaNoticia()` de `lib/site.ts`.
+
+### Verificado
+
+- Las cuatro compuertas pasaron. El build lista `/` como `○ (Static)` con revalidación de 5m, `/noticia/[slug]` como `● (SSG)`, y `/robots.txt`, `/sitemap.xml`, `/icon.png` y `/apple-icon.png` como estáticas.
+- Contraste: barrido por cada elemento con texto propio de la portada y de la nota, componiendo el fondo efectivo en un canvas. Cero incumplimientos de AA a 360px y a 1280px. La tabla quedó en `CLAUDE.md` sección 3.
+- El texto del Hero sobre el video: medido el píxel más claro bajo la bajada en nueve momentos del clip, compuesto con los dos scrims. Peor caso 7.69:1.
+- CLS 0, y el LCP cae en el póster del video (616 ms en dev).
+- A 360px no hay scroll horizontal y todos los objetivos táctiles llegan a 44px. El único que no llegaba era el enlace de marca del header, que se ajustaba al alto del escudo (36px); se le puso `min-h-11`.
+- Columna de lectura medida: 74 caracteres por línea. Los 768px de la fuente daban 93.
+- `robots.txt` y `sitemap.xml` con el contenido correcto; `/salir-vista-previa` devuelve 307 a `/admin/noticias` y borra la cookie `__prerender_bypass`.
+- El CMS sigue entero: `/admin/noticias` sin sesión redirige al login con `x-robots-tag: noindex`, y el layout conserva `.tema-claro`.
+- Estados vacíos probados de verdad (sin notas y sin Reels): la sección de Reels desaparece entera y "Lo último" muestra el recuadro con la marca.
+- `prefers-reduced-motion` en el Hero: probado invirtiendo la guarda, el video se queda pausado en el cuadro 0 y a la vista queda el póster.
+
+### Dos bugs encontrados midiendo, no leyendo
+
+- **El build moría por `NEXT_PUBLIC_SITE_URL` vacía.** `.env.local` la declara sin valor, y `??` no atrapa la cadena vacía: `new URL('')` reventaba al recolectar la portada. Ahora `lib/site.ts` usa `||`.
+- **El Hero no arrancaba en una pestaña en segundo plano.** Ni `requestAnimationFrame` ni `IntersectionObserver` corren mientras `document.hidden` es `true` (medido: cero frames en dos segundos). `HeroVideo` dejaba el arranque en manos del observador, así que abrir el sitio en una pestaña nueva dejaba el video congelado hasta mirarla. Ahora arranca de una y el observador solo apaga.
+
+### Lo que no se pudo probar en esta máquina
+
+- El movimiento del carrusel, el fade up de las tarjetas y el reveal de los títulos: el panel del navegador no compone cuadros, así que no corren ni `rAF` ni las animaciones de Framer Motion. La estructura sí quedó verificada (tres copias, `inert` más `aria-hidden` en la segunda y la tercera).
+- El recorrido con sesión del CMS y la vista previa de borradores: no hay credenciales en esta máquina.
+
+### Pendiente conocido, no es un bug
+
+- Los cuatro enlaces de la barra (Historia, Documentos, Inscríbete, Contacto) apuntan a páginas que todavía no existen: dan 404 hasta la Etapa 6.
+- Sin `INSTAGRAM_ACCESS_TOKEN` la sección de Reels no se dibuja. El build lo avisa por consola.
+- `NEXT_PUBLIC_SITE_URL` sigue vacía: hasta que se conecte el dominio, las canónicas y el sitemap salen con `https://ligametropolitana.cl`, que es un respaldo y no una confirmación.
+
+## Etapa 4 (CMS) - cerrada
 
 ### Hecho
 
@@ -97,6 +139,6 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 | 2. Base de datos | Cerrada |
 | 3. Supabase, proxy y tipos | Cerrada |
 | 4. CMS | Cerrada |
-| 5. Sitio público | Pendiente |
+| 5. Sitio público | Cerrada |
 | 6. Lo nuevo (historia, documentos, inscríbete, contacto) | Pendiente |
 | 7. Documentación | Pendiente |

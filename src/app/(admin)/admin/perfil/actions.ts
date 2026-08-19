@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requerirSesion } from '@/lib/admin/session'
 import { borrarImagen, subirImagen } from '@/lib/admin/storage'
+import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 import { urlValida } from '@/lib/url'
 
@@ -111,7 +112,7 @@ export async function guardarPerfil(
     .eq('author_id', sesion.userId)
     .eq('status', 'published')
 
-  for (const nota of notas ?? []) revalidatePath(`/articulo/${nota.slug}`)
+  for (const nota of notas ?? []) revalidatePath(rutaNoticia(nota.slug))
   revalidatePath('/admin/perfil')
 
   return { error: null, ok: 'Perfil actualizado.' }

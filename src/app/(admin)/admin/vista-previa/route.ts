@@ -1,13 +1,14 @@
 import { draftMode } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 
 /**
  * Enciende el modo borrador y manda a ver la nota.
  *
  * El listado del CMS no tenia "Ver" en los borradores porque
- * `/articulo/[slug]` filtra por publicadas y ese enlace daba 404. La unica
+ * `/noticia/[slug]` filtra por publicadas y ese enlace daba 404. La unica
  * forma de revisar como queda una nota antes de publicarla era publicarla.
  *
  * Vive bajo `/admin/` a proposito, no en `(admin)/api/`. El grupo entre
@@ -65,9 +66,6 @@ export async function GET(request: NextRequest) {
   // `nota.slug` y no el parametro crudo: lo que se redirige es un valor que ya
   // volvio de la base, no una cadena que llego por la query string.
   return NextResponse.redirect(
-    new URL(
-      `/articulo/${encodeURIComponent(nota.slug)}`,
-      request.nextUrl.origin
-    )
+    new URL(rutaNoticia(encodeURIComponent(nota.slug)), request.nextUrl.origin)
   )
 }

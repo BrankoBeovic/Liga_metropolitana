@@ -192,6 +192,15 @@ Sin ninguna destacada, la principal pasa a ser la más reciente: degradación na
 - Se usa `getUser()` y no `getSession()`: aquel valida contra el servidor de Auth, este solo lee la cookie.
 - **Signup público deshabilitado en Supabase Auth.** Usuarios solo por invitación. No negociable.
 - Revalidación on-demand: al publicar/editar se llama a `revalidatePath`, y `/api/revalidate` queda protegida por `REVALIDATION_SECRET` en el header `Authorization`.
+- El CMS vive en el grupo de rutas `(admin)` y el sitio en `(public)`: son dos layouts raíz hermanos.
+  El admin no hereda header flotante ni footer editorial.
+
+### Nota: el CMS se queda claro aunque el sitio es oscuro
+
+Los componentes del admin vienen de la fuente medidos sobre blanco (`ring-black/5`, `bg-white`, badges verdes y ambar).
+Re-teñirlos al paleta oscura no aporta nada a una herramienta interna.
+La clase `.tema-claro` en el `<body>` del layout de `(admin)` redefine `--color-canvas` y `--color-ink` con ámbito (`#ffffff` / `#0B0C0E`).
+Las utilidades de Tailwind 4 emiten `var()`, así que la cascada resuelve el resto sin duplicar componentes.
 
 ### Nota: TipTap 3 no vuelve a renderizar React al escribir
 

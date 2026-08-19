@@ -3,7 +3,27 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
-## Etapa actual: 3 (Supabase, proxy y tipos) - cerrada
+## Etapa actual: 4 (CMS) - cerrada
+
+### Hecho
+
+- Copiado de la fuente y adaptado al esquema recortado: login, dashboard, noticias (antes `articulos`), categorias, sponsors, perfil, vista previa y `/api/revalidate`.
+- Dos layouts raiz hermanos: `(admin)` con `.tema-claro` (CMS claro) y `(public)` con la paleta oscura.
+  Se borraron `src/app/layout.tsx` y `src/app/page.tsx` de la Etapa 1 para que no choquen con los grupos.
+- Recortes: sin selector de sponsor en notas, categorias solo nombre/bajada/orden, sponsors solo logo/nombre/url/orden/activo, sin `NavbarPreview`.
+- Menu del CMS: Inicio, Noticias, Categorias, Sponsors, Documentos, Mi perfil.
+  `/admin/documentos` es una pagina provisoria; la subida de PDFs entra en la Etapa 6.
+- Logo de la fuente quitado de login, shell, EmptyState y perfil (placeholder de inicial si no hay avatar).
+- Se adelanto `lib/instagram.ts` (titulo fallback "Reel de la Liga Metropolitana") y `lib/navigation.ts` (barra fija + `FIRMA_EQUIPO`).
+
+### Verificado
+
+- Las cuatro compuertas pasaron.
+- El build lista `/` como `○ (Static)` y todas las rutas `/admin/*` como `ƒ (Dynamic)`, mas `/api/revalidate` y `ƒ Proxy (Middleware)`.
+- El type-check fallo una vez por tipos stale de `.next` (`src/app/page.js` / `layout.js` viejos); se resolvio borrando `.next`.
+- El recorrido con sesion lo prueba el equipo: no hay credenciales del CMS en esta maquina.
+
+## Etapa 3 (Supabase, proxy y tipos) - cerrada
 
 ### Hecho
 
@@ -76,7 +96,7 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 | 1. Infraestructura y memoria | Cerrada |
 | 2. Base de datos | Cerrada |
 | 3. Supabase, proxy y tipos | Cerrada |
-| 4. CMS | Pendiente |
+| 4. CMS | Cerrada |
 | 5. Sitio público | Pendiente |
 | 6. Lo nuevo (historia, documentos, inscríbete, contacto) | Pendiente |
 | 7. Documentación | Pendiente |

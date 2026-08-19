@@ -1,0 +1,239 @@
+@import 'tailwindcss';
+
+/*
+  Tokens del sistema de diseno (CLAUDE.md seccion 3).
+
+  Tailwind 4 es CSS-first: esta es la configuracion del tema, no existe
+  tailwind.config.ts. Cada token declarado aca genera sus utilidades
+  (bg-canvas, text-accent, font-display, etc.) y ademas queda disponible
+  como custom property para valores arbitrarios.
+
+  El sitio publico es de fondo OSCURO, al reves que la fuente de la que se
+  copio este proyecto: canvas es casi negro y la tinta es casi blanca.
+  `editorial` es el fondo de tarjetas y bloques glass, apenas mas claro que
+  el canvas.
+*/
+@theme {
+  /* Obsidian Court Black */
+  --color-canvas: #0b0c0e;
+  /* Graphite Glass */
+  --color-editorial: #15181e;
+  /* Vintage Chalk White */
+  --color-ink: #f4f4f6;
+  /* Metropolitana Amber Gold */
+  --color-accent: #d4a03d;
+  /* Variante clara del acento, para hovers y estados activos. */
+  --color-accent-light: #e5b84b;
+}
+
+/*
+  Las familias se resuelven en runtime: next/font define
+  --font-bebas-neue y --font-plus-jakarta sobre el <html>.
+  `inline` hace que las utilidades emitan la referencia var() en vez de
+  congelar el valor al compilar el tema.
+
+  Bebas Neue tiene un solo peso (400) y es toda mayusculas: `font-bold`
+  sobre display no agrega nada, el navegador sintetiza si se lo pide.
+*/
+@theme inline {
+  --font-display: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    /* Alias con el nombre exacto que usa CLAUDE.md seccion 3. */
+    --accent: var(--color-accent);
+  }
+
+  /*
+    El CMS se queda claro, el sitio publico es oscuro.
+
+    Los componentes del admin vienen de la fuente con fondo claro
+    (`ring-black/5`, `bg-white`, badges verdes y ambar medidos sobre blanco) y
+    re-teñirlos no aporta nada a una herramienta interna. El layout de
+    `(admin)` aplica esta clase en el <body> y los tokens se redefinen con
+    ambito: las utilidades de Tailwind 4 emiten var(), asi que la cascada
+    resuelve el resto.
+  */
+  .tema-claro {
+    --color-canvas: #ffffff;
+    --color-ink: #0b0c0e;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /*
+    Las micro-interacciones de la seccion 3 son decorativas. Quien pide
+    menos movimiento no deberia recibirlas.
+  */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /*
+    Contenido del editor del CMS (`prose-editor`).
+
+    Estas reglas espejan a `ArticleContent`, que es el renderizador de la nota
+    publicada. El objetivo no es decorar el editor: es que escribir se parezca
+    a lo que sale, porque quien titula necesita ver que eso es un titulo.
+
+    Hacen falta porque Preflight, el reset de Tailwind, borra los estilos por
+    defecto del navegador. Sin reponerlos, TODO el cuerpo se dibuja igual:
+    medido en el DOM, un `h2` salia a 17px con peso 400 -o sea identico a un
+    parrafo-, las listas sin viñeta ni sangria, las citas sin borde, y cada
+    bloque con `margin-top: 0`, asi que los parrafos quedaban pegados unos a
+    otros. El editor se veia como un muro de texto plano.
+
+    Las medidas siguen a las del sitio y no al azar: 18px de cuerpo, titulos en
+    la familia display, y los mismos margenes entre bloques.
+
+    OJO: una utilidad de Tailwind le gana a estas reglas, porque la capa
+    `utilities` va despues de `components`. Si una regla de aca no se ve,
+    buscar primero la utilidad que la esta pisando.
+  */
+  .prose-editor {
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
+
+  .prose-editor > * + * {
+    margin-top: 1.25rem;
+  }
+
+  .prose-editor h2,
+  .prose-editor h3,
+  .prose-editor h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+  }
+
+  /* Un titulo necesita mas aire ARRIBA que abajo: es lo que lo despega de la
+     seccion anterior y lo pega a lo que introduce. */
+  .prose-editor > :is(h2, h3, h4) + * {
+    margin-top: 0.5rem;
+  }
+
+  .prose-editor > * + :is(h2, h3, h4) {
+    margin-top: 2.5rem;
+  }
+
+  .prose-editor h2 {
+    font-size: 1.875rem;
+  }
+
+  .prose-editor h3 {
+    font-size: 1.25rem;
+  }
+
+  .prose-editor h4 {
+    font-size: 1.125rem;
+  }
+
+  .prose-editor ul,
+  .prose-editor ol {
+    padding-left: 1.5rem;
+  }
+
+  .prose-editor ul {
+    list-style-type: disc;
+  }
+
+  .prose-editor ol {
+    list-style-type: decimal;
+  }
+
+  .prose-editor li + li {
+    margin-top: 0.5rem;
+  }
+
+  /* El parrafo que ProseMirror mete adentro de cada item no debe separarse:
+     sin esto cada viñeta arranca una linea mas abajo que su punto. */
+  .prose-editor li > p {
+    margin: 0;
+  }
+
+  .prose-editor blockquote {
+    border-left: 4px solid var(--color-accent);
+    padding-left: 1.25rem;
+    font-style: italic;
+    color: color-mix(in oklab, var(--color-ink) 75%, transparent);
+  }
+
+  .prose-editor code {
+    border-radius: 0.25rem;
+    background: color-mix(in oklab, var(--color-ink) 5%, transparent);
+    padding: 0.125rem 0.375rem;
+    font-size: 0.9em;
+  }
+
+  .prose-editor pre {
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    background: var(--color-editorial);
+    padding: 1.25rem;
+    font-size: 0.875rem;
+    color: #fff;
+  }
+
+  .prose-editor pre code {
+    background: none;
+    padding: 0;
+  }
+
+  .prose-editor hr {
+    border-color: color-mix(in oklab, var(--color-ink) 10%, transparent);
+  }
+
+  .prose-editor a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /*
+    Sin esto, una imagen recien insertada se dibuja a su tamaño real y se
+    lleva puesto el formulario entero. En el sitio no pasa porque ahi la
+    dibuja `next/image`, que ya recibe su ancho.
+  */
+  .prose-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    /* Se puede hacer clic para corregirle el epigrafe y el credito. */
+    cursor: pointer;
+  }
+
+  /* La imagen es un bloque y necesita respirar, igual que el `my-8` del
+     `figure` en la nota publicada. */
+  .prose-editor > img {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /*
+    ProseMirror marca con esta clase el nodo seleccionado. Sin un contorno
+    visible no hay forma de saber que la imagen quedo seleccionada y que
+    Suprimir la va a borrar.
+  */
+  .prose-editor img.ProseMirror-selectednode {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}

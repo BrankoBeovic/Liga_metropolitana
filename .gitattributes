@@ -1,0 +1,22 @@
+# El repositorio guarda y hace checkout con LF en todas las plataformas.
+#
+# Sin esto, en Windows `core.autocrlf=true` entrega los archivos con CRLF en
+# el checkout mientras Prettier los escribe con LF, y `pnpm format:check`
+# empieza a fallar en un clon nuevo por una diferencia que nadie introdujo.
+* text=auto eol=lf
+
+# El lockfile lo maneja pnpm, no interesa verlo en los diffs de las PR.
+pnpm-lock.yaml -diff linguist-generated=true
+
+# Generado por `pnpm supabase:types`.
+src/types/database.types.ts -diff linguist-generated=true
+
+# Binarios: sin conversion de fin de linea.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
+*.ico binary

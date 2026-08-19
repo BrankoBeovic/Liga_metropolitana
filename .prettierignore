@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+pnpm-lock.yaml
+supabase/.temp/
+
+# Generado por `pnpm supabase:types`.
+src/types/database.types.ts
+
+# Markdown queda fuera de Prettier a proposito. AGENTS.md pide una oracion
+# completa por linea en los documentos largos, y el formateador no entiende
+# esa regla: reacomoda tablas y saltos y termina peleando con el estilo
+# escrito a mano. El Markdown se cuida en la revision, no con --write.
+*.md

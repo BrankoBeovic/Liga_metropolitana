@@ -1,0 +1,41 @@
+# Dependencias
+node_modules/
+
+# Next.js
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Variables de entorno (mantener .env.example versionado)
+.env
+.env*.local
+!.env.example
+
+# Vercel
+.vercel/
+
+# Supabase
+supabase/.temp/
+
+# Tests
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Grafo de conocimiento generado por graphify.
+# Se regenera con `/graphify .`. Queda fuera del repo porque son artefactos
+# derivados y porque .graphify_python guarda una ruta absoluta de la maquina.
+graphify-out/
+
+# Artefactos de revision de lavish-axi.
+.lavish/

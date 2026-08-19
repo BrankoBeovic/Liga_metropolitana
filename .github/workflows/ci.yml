@@ -1,0 +1,116 @@
+# Integración continua: los mismos chequeos que se corren a mano, pero solos.
+#
+# Antes lo único que separaba un error de producción era acordarse de correr
+# `type-check`, `lint`, `format:check` y `build` antes de pushear. Eso falla de
+# tres maneras: si se pushea desde otra máquina, si se edita un archivo desde la
+# web de GitHub, o si entra otra persona al repo.
+#
+# Vercel no cubre este hueco: construye igual, así que un fallo se descubre
+# cuando el deploy ya falló, y el lint no lo mira nunca.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Un push encima de otro cancela el anterior: no tiene sentido gastar minutos
+# revisando un commit que ya quedó viejo. El grupo es por rama, así que dos
+# ramas distintas no se pisan entre sí.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Solo lectura. Este workflow no escribe nada en el repo, y el token por
+# defecto no tiene por qué poder hacerlo.
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    name: Tipos, lint, formato y build
+    runs-on: ubuntu-latest
+    # Corre en unos 3 minutos. El tope es para que un cuelgue no se coma la
+    # cuota de Actions esperando seis horas, que es el default.
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # `corepack enable` va ANTES de setup-node, y el orden no es casual: el
+      # `cache: pnpm` de abajo necesita que el binario de pnpm ya exista para
+      # calcular la clave de caché, y si no lo encuentra el paso falla con un
+      # "Unable to locate executable file: pnpm" que no se entiende.
+      #
+      # Corepack toma la versión de `packageManager` en package.json
+      # (pnpm@11.22.0), así que CI usa exactamente la misma que local.
+      - name: Habilitar corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          # `engines` pide >=20.9.0. Se fija 22, que es LTS: con `node-version`
+          # suelto, una versión nueva de Node podría romper el build sin que
+          # nadie haya tocado el repo.
+          node-version: 22
+          cache: pnpm
+
+      # Sin este chequeo, la primera corrida de alguien que no cargó los
+      # secretos falla recién en el build, con un error sobre variables de
+      # entorno que parece un problema del código.
+      - name: Revisar que estén los secretos
+        env:
+          URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          faltan=""
+          [ -z "$URL" ] && faltan="$faltan NEXT_PUBLIC_SUPABASE_URL"
+          [ -z "$KEY" ] && faltan="$faltan NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+          if [ -n "$faltan" ]; then
+            echo "::error::Faltan secretos del repositorio:$faltan"
+            echo "Se cargan en Settings -> Secrets and variables -> Actions."
+            echo "Las dos son públicas por diseño (viajan al navegador), así que"
+            echo "no hace falta la clave secreta ni el token de Instagram."
+            exit 1
+          fi
+
+      # `--frozen-lockfile` es lo que hace que esto sea una verificación y no
+      # una instalación cualquiera: si el lockfile no coincide con
+      # package.json, falla en vez de resolver versiones distintas de las que
+      # se probaron en local.
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # Los tres rápidos llevan `!cancelled()` para que corran aunque uno falle
+      # y se vean TODOS los errores en una sola pasada, en vez de arreglar uno,
+      # pushear, y descubrir el siguiente cinco minutos después.
+      - name: Tipos
+        if: ${{ !cancelled() }}
+        run: pnpm type-check
+
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: pnpm lint
+
+      - name: Formato
+        if: ${{ !cancelled() }}
+        run: pnpm format:check
+
+      # El build NO lleva `!cancelled()`: es el paso caro y si los tipos ya
+      # fallaron va a fallar por lo mismo. Sin la condición, GitHub lo saltea
+      # solo cuando algo anterior falló.
+      #
+      # Necesita las dos variables porque el build no es estático del todo:
+      # `generateStaticParams` consulta Supabase para prerenderizar las notas
+      # publicadas. Son lecturas públicas, las mismas que hace cualquier
+      # visitante, y pasan por RLS igual.
+      #
+      # No hacen falta SUPABASE_SECRET_KEY, REVALIDATION_SECRET ni
+      # INSTAGRAM_ACCESS_TOKEN: los dos primeros solo se usan en runtime, y sin
+      # el tercero `lib/instagram.ts` avisa y devuelve una lista vacía.
+      - name: Build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+        run: pnpm build

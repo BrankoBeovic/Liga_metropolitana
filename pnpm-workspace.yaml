@@ -1,0 +1,12 @@
+# Configuracion de pnpm. Desde pnpm 10 estos ajustes ya no se leen desde el
+# campo "pnpm" de package.json.
+
+# Scripts de instalacion aprobados explicitamente. pnpm los bloquea por
+# defecto para que ningun paquete transitivo ejecute codigo durante el
+# install sin que lo hayamos revisado. Agregar una entrada aca es una
+# decision consciente, no un tramite.
+#
+# - unrs-resolver: binario nativo (napi-rs) que usa eslint-config-next para
+#   resolver imports. Sin su build, `pnpm lint` falla.
+allowBuilds:
+  unrs-resolver: true

@@ -3,7 +3,27 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
-## Etapa actual: 1 (Infraestructura y memoria) - cerrada
+## Etapa actual: 2 (Base de datos) - cerrada
+
+### Hecho
+
+- `supabase init` y `link` contra el proyecto nuevo (`cvmhjzwrzahpbsogrhbc`).
+- Migración inicial consolidada (`20260819000000_esquema_inicial.sql`): `profiles`, `categories`, `posts`, `sponsors`, `documents`, 20 políticas RLS más 4 de Storage, 5 funciones, triggers y 4 buckets (`article-covers`, `avatars`, `sponsor-logos`, `documents`).
+- Recortes acordados: sin `media_items` ni `newsletter_subscribers`, sin columnas de navegación en `categories`, sin espacios de publicidad en `sponsors` ni `sponsor_id` en `posts`.
+- `seed.sql` con Novedades e Institucional, aplicado con `--include-seed`.
+
+### Verificado
+
+- `supabase migration list`: local = remoto.
+- Lectura anónima por REST: las 2 categorías del seed visibles; `posts` y `documents` responden vacíos.
+- Insert anónimo en `categories` rechazado con 401 (RLS).
+- Buckets verificados por respuesta pública: los 4 existen ("Object not found") y `media-thumbnails` no ("Bucket not found").
+
+### Pendiente de configuración manual en el dashboard
+
+- Deshabilitar el registro público en Authentication (no se controla por SQL). Sin esto, cualquiera puede crearse un usuario editor.
+
+## Etapa 1 (Infraestructura y memoria) - cerrada
 
 ### Hecho
 
@@ -38,7 +58,7 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 | Etapa | Estado |
 |---|---|
 | 1. Infraestructura y memoria | Cerrada |
-| 2. Base de datos | Pendiente |
+| 2. Base de datos | Cerrada |
 | 3. Supabase, proxy y tipos | Pendiente |
 | 4. CMS | Pendiente |
 | 5. Sitio público | Pendiente |

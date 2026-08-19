@@ -151,7 +151,8 @@ Se ahorran las dos columnas, `NavbarPreview` y toda la maquinaria de medición.
 
 No hay publicidad lateral (el 160x600 de la fuente) ni la grilla de tres columnas que la acompañaba.
 Los sponsors se muestran solo como logos en la landing.
-El recorte exacto del esquema de `sponsors` (banners y espacios vendidos) se propone en la Etapa 2, antes de aplicar la migración.
+El recorte del esquema quedó aplicado en la migración inicial: `sponsors` no tiene `is_featured`, `is_side_banner` ni los dos banners (con sus índices únicos parciales), y `posts` no tiene `sponsor_id` (el agradecimiento al pie tampoco va).
+Si algún día se venden espacios, la maquinaria completa está documentada en la fuente.
 
 ### Se conserva la maquinaria de nota destacada
 
@@ -282,9 +283,10 @@ Tocar cookies saca a la ruta del render estático: una sola llamada en un layout
 | `profiles` | Solo el suyo, sin poder cambiarse el rol | Todos, incluido el rol |
 | `sponsors` | Todo | Todo |
 | `categories` | Solo lectura | Todo |
-| `documents` | Se define en la Etapa 2 | Todo |
+| `documents` | Todo | Todo |
 
 El criterio: lo estructural es del admin, el resto lo trabaja el equipo.
+`documents` sigue el reparto de `sponsors`: borrar un documento es reversible (se vuelve a subir el PDF), a diferencia de borrar la nota de otra persona.
 `posts` es la excepción deliberada: corregir un logo mal cargado es reversible, borrar la nota publicada de otra persona no.
 
 ### Sistema de claves

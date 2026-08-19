@@ -2,7 +2,8 @@ import Link from 'next/link'
 
 import { Badge } from '@/components/ui/Badge'
 import { formatearFecha } from '@/lib/format'
-import { firmaDe, type PostWithRelations } from '@/lib/posts'
+import { firmaDe } from '@/lib/firma'
+import type { PostWithRelations } from '@/lib/posts'
 import { rutaNoticia } from '@/lib/site'
 
 import { ArticleCover } from './ArticleCover'

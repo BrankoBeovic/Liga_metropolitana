@@ -28,7 +28,15 @@ export const metadata: Metadata = {
 
 export default function HistoriaPage() {
   return (
-    <div className="mx-auto max-w-[1400px] px-5 pt-10 pb-20 sm:px-8 lg:px-10">
+    <div className="mx-auto max-w-[1400px] px-5 pt-28 pb-20 sm:px-8 lg:px-10">
+      {/*
+        `pt-28` reserva a mano el espacio de la barra flotante.
+
+        La barra es `fixed`, o sea que esta fuera del flujo y no empuja nada
+        hacia abajo. En la portada eso es lo que se busca -el video llega al
+        borde de la pantalla- pero en una pagina interior el titulo nacia
+        debajo de la pildora. Medido: la barra ocupa hasta 71px desde arriba.
+      */}
       <PageHeader titulo="Historia" bajada={BAJADA} />
 
       {/*

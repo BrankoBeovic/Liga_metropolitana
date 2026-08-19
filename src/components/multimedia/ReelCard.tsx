@@ -32,9 +32,8 @@ type ReelCardProps = {
  *
  * **El titulo va en la tipografia de cuerpo y no en la display**, al reves que
  * el resto de las tarjetas del sitio. Sale de un `caption` de Instagram, o sea
- * texto que escribio alguien y no un titular compuesto: Bebas Neue obligaria a
- * ponerlo en mayusculas -no tiene minusculas de verdad- y eso convierte
- * cualquier pie de Reel en un grito.
+ * texto que escribio alguien y no un titular compuesto, y el sitio pone en
+ * mayusculas todo lo que va en display: un pie de Reel gritado se lee mal.
  *
  * La miniatura viene firmada por Instagram y caduca, pero el lector nunca le
  * pega a Meta: `next/image` la descarga en el servidor y la sirve desde nuestra

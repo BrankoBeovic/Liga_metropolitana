@@ -34,9 +34,9 @@ const VARIANTS: Record<BadgeVariant, string> = {
  *
  * Server Component: no tiene estado ni interaccion.
  *
- * Sin `font-bold`: Bebas Neue tiene un solo peso (400). Pedir negrita hace que
- * el navegador la sintetice engordando los trazos, que en una tipografia ya
- * condensada cierra los contraformas y ensucia el texto en mayusculas.
+ * Sin `font-bold`, aunque ahora se podria: Exo es variable y tiene pesos
+ * reales. Se deja en 400 para no cambiar el peso visual que el sitio traia con
+ * las familias anteriores, que eran de un solo peso.
  */
 export function Badge({ children, variant = 'accent', className }: BadgeProps) {
   return (

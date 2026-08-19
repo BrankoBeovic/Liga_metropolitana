@@ -54,7 +54,7 @@ export function PanelLink() {
   return (
     <Link
       href="/admin/dashboard"
-      className="font-display bg-accent/15 text-accent hover:bg-accent/25 focus-visible:ring-accent flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs tracking-[0.12em] uppercase transition-colors focus-visible:ring-2 focus-visible:outline-none"
+      className="font-display bg-canvas/70 text-accent focus-visible:ring-accent flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs tracking-[0.12em] uppercase ring-1 ring-white/15 backdrop-blur-xl transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:outline-none"
     >
       <LayoutDashboard aria-hidden className="size-4" />
       <span className="hidden sm:inline">Panel</span>

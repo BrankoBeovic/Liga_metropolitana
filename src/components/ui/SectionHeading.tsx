@@ -29,9 +29,9 @@ type SectionHeadingProps = {
  * Sin la variante `dark` de la fuente: aca todo el sitio es oscuro, asi que no
  * hay dos juegos de color que elegir.
  *
- * El titulo lleva `tracking-wide` y no `tracking-tight`: Bebas Neue ya es una
- * condensada, y apretarla ademas junta las astas verticales de las mayusculas
- * hasta que "METROPOLITANA" se lee como una reja.
+ * El titulo no lleva `tracking` propio: en mayusculas, el espaciado que trae
+ * Exo alcanza, y sumarle mas separa las palabras hasta que un titulo de dos
+ * partes deja de leerse como una unidad.
  */
 export function SectionHeading({
   id,

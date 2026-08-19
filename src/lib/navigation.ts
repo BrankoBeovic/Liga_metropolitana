@@ -13,8 +13,17 @@ export type NavLink = {
   label: string
 }
 
-/** La barra de navegacion completa, en su orden. */
+/**
+ * La barra de navegacion completa, en su orden.
+ *
+ * "Inicio" esta primero porque la barra flotante NO lleva logo ni nombre del
+ * sitio: el video del hero ya hace ese trabajo en la portada. Sin este enlace,
+ * desde `/documentos` o `/contacto` no habria ninguna forma de volver al
+ * inicio, que es justo lo que el logo resolvia sin que nadie lo notara.
+ */
 export const NAV_LINKS: readonly NavLink[] = [
+  { href: '/', label: 'Inicio' },
+  { href: '/noticias', label: 'Noticias' },
   { href: '/historia', label: 'Historia' },
   { href: '/documentos', label: 'Documentos' },
   { href: '/inscribete', label: 'Inscríbete' },

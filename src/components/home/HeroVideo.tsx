@@ -13,6 +13,11 @@ import { useEffect, useRef } from 'react'
  * queda en el poster, que es el primer cuadro del video: no ve una animacion
  * que se corta, ve una foto.
  *
+ * **El loop es el nativo del navegador.** Hubo una version que lo reiniciaba a
+ * mano con el evento `ended` para dejar el ultimo cuadro quieto un rato; se
+ * saco porque la pausa cortaba el ritmo del clip. El atributo `loop` encadena
+ * sin costura y sin JavaScript en el medio.
+ *
  * El poster hace ademas todo el trabajo de LCP. Va en el HTML que manda el
  * servidor -este componente es cliente, pero igual se renderiza en el
  * servidor- asi que el navegador lo descubre y lo empieza a bajar en el primer
@@ -101,6 +106,15 @@ export function HeroVideo() {
       // bajada. Fuera del arbol de accesibilidad y fuera del tabulador.
       aria-hidden
       tabIndex={-1}
+      /*
+        `object-cover` a secas, y el escudo se recorta en los bordes.
+
+        Se probo reencuadrar el video y cambiar a `object-contain` fuera de la
+        franja donde el recorte no lo respeta. Funcionaba -el escudo entraba
+        entero- pero `contain` deja bandas a los costados en cuanto la ventana
+        es mas ancha que 16:9, y esas bandas se ven. Entre un escudo completo
+        con bandas y uno recortado a sangre, se eligio lo segundo.
+      */
       className="absolute inset-0 size-full object-cover"
     >
       <source src="/hero.mp4" type="video/mp4" />

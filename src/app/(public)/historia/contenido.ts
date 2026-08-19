@@ -26,6 +26,18 @@ export const ES_RELLENO = true
 export const BAJADA =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio praesent libero sed cursus ante dapibus diam, desde 1989.'
 
+/**
+ * El resumen que se muestra en el bloque "Legado" de la portada.
+ *
+ * Vive en este archivo y no al lado del componente para que TODO el texto de
+ * historia -el largo y el corto- se reemplace en un solo lugar el dia que
+ * llegue el de verdad.
+ */
+export const RESUMEN = [
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.',
+  'Maecenas ligula massa, varius a, semper congue, euismod non mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.',
+] as const
+
 export const INTRO = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
   'Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor.',

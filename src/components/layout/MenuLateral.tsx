@@ -16,35 +16,41 @@ import {
 } from '@/lib/navigation'
 
 /**
- * Navegacion en panel lateral, para los anchos donde la barra no se muestra.
+ * El menú de las pantallas angostas: un panel lateral.
  *
- * Se esconde desde `md`, que es donde `DesktopNav` ya lista las cuatro
- * secciones: tener barra y boton de menu al mismo tiempo ofrece dos caminos al
- * mismo lugar.
+ * **La píldora que se despliega en horizontal no sirve acá, y está medido**: en
+ * una pantalla de 360px los seis enlaces se dibujaban entre x=290 y x=970, o sea
+ * los seis fuera de la pantalla. Necesitan 736px de ancho y no hay forma de que
+ * entren.
  *
- * El panel es Radix y no un div con `useState`: trae cierre con Escape, foco
- * atrapado dentro del panel, `aria-modal` y el scroll de la pagina bloqueado
- * mientras esta abierto. Un panel hecho a mano casi siempre se olvida de
- * alguna de esas.
+ * Por eso el corte es `lg` y no `md`: a 768px el header deja 704px útiles y la
+ * píldora pide 736. Recién a partir de 1024 entra con aire.
  *
- * Sin estado propio: se cierra porque cada enlace esta envuelto en un
- * `Dialog.Close`. La alternativa era un efecto que llamara a setState al
- * cambiar el pathname, que dispara un render en cascada y que ademas la regla
+ * El panel es Radix y no un `div` con `useState`: trae cierre con Escape, foco
+ * atrapado adentro, el resto de la página marcado como oculto para el lector de
+ * pantalla y el scroll bloqueado mientras está abierto. Un panel hecho a mano
+ * casi siempre se olvida de alguna de esas.
+ *
+ * Sin estado propio: se cierra porque cada enlace está envuelto en un
+ * `Dialog.Close`. La alternativa era un efecto que llamara a `setState` al
+ * cambiar el pathname, que dispara un render en cascada y que además la regla
  * del React Compiler marca como error.
  */
-export function SiteNav() {
+export function MenuLateral() {
   const pathname = usePathname()
 
   return (
     <Dialog.Root>
+      {/*
+        El disparador es la misma pastilla de vidrio que el botón de escritorio:
+        la barra flota sobre el video y necesita su propio fondo para no perderse
+        contra un cuadro claro.
+      */}
       <Dialog.Trigger
         aria-label="Abrir menú"
-        className="text-ink flex min-h-11 items-center gap-2 rounded-full px-3 transition-colors hover:bg-white/10 md:hidden"
+        className="bg-canvas/70 text-ink focus-visible:ring-accent flex size-12 items-center justify-center rounded-full ring-1 ring-white/15 backdrop-blur-xl transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:outline-none lg:hidden"
       >
         <Menu className="size-6" aria-hidden />
-        <span className="font-display hidden text-sm tracking-[0.1em] uppercase sm:inline">
-          Menú
-        </span>
       </Dialog.Trigger>
 
       <Dialog.Portal>
@@ -81,6 +87,8 @@ export function SiteNav() {
                 <NavItem
                   key={link.href}
                   href={link.href}
+                  // Comparación exacta: con `startsWith`, "Inicio" quedaría
+                  // marcado como activo en todas las páginas del sitio.
                   activo={pathname === link.href}
                 >
                   {link.label}
@@ -89,10 +97,10 @@ export function SiteNav() {
             </ul>
 
             {/*
-              Instagram cierra el panel porque es el canal donde la Liga
-              publica a diario: en la practica es una seccion mas, aunque viva
-              fuera del sitio. Va con su handle a la vista y no solo con el
-              icono, que aca hay ancho de sobra para escribirlo.
+              Instagram cierra el panel porque es el canal donde la Liga publica
+              a diario: en la práctica es una sección más, aunque viva fuera del
+              sitio. Va con su handle a la vista y no solo con el icono, que acá
+              hay ancho de sobra para escribirlo.
             */}
             <a
               href={INSTAGRAM_URL}
@@ -127,14 +135,14 @@ function NavItem({
     <li>
       {/*
         `asChild` hace que Radix use el Link como disparador de cierre en vez de
-        envolverlo en un boton, asi el panel se cierra al navegar sin duplicar
+        envolverlo en un botón, así el panel se cierra al navegar sin duplicar
         elementos interactivos.
       */}
       <Dialog.Close asChild>
         <Link
           href={href}
           aria-current={activo ? 'page' : undefined}
-          // min-h-11: los 44px de area tactil que pide CLAUDE.md.
+          // min-h-11: los 44px de área táctil que pide CLAUDE.md.
           className={cn(
             'font-display flex min-h-11 items-center rounded-lg px-3 text-xl tracking-[0.06em] uppercase transition-colors',
             activo ? 'text-accent' : 'text-ink hover:bg-white/10'

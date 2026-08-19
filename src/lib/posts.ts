@@ -2,7 +2,6 @@ import 'server-only'
 
 import type { Database } from '@/types/database.types'
 
-import { FIRMA_EQUIPO } from './navigation'
 import { supabasePublic } from './supabase/public'
 
 type PostRow = Database['public']['Tables']['posts']['Row']
@@ -25,22 +24,6 @@ export type PostWithRelations = Pick<
 > & {
   category: Pick<CategoryRow, 'name' | 'slug'> | null
   author: Pick<ProfileRow, 'full_name' | 'avatar_url'> | null
-}
-
-/**
- * Como se firma una nota de cara al lector.
- *
- * Un solo lugar decide esto, para que la portada, las tarjetas, la pagina de
- * la nota y el JSON-LD no puedan discrepar. Que la Home diga "Equipo Liga
- * Metropolitana" y el articulo muestre el nombre real seria una filtracion,
- * no una inconsistencia de diseño.
- */
-export function firmaDe(post: {
-  is_anonymous: boolean
-  author: { full_name: string } | null
-}): string {
-  if (post.is_anonymous) return FIRMA_EQUIPO
-  return post.author?.full_name ?? FIRMA_EQUIPO
 }
 
 /**

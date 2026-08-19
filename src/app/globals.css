@@ -28,15 +28,17 @@
 
 /*
   Las familias se resuelven en runtime: next/font define
-  --font-bebas-neue y --font-plus-jakarta sobre el <html>.
+  --font-exo y --font-plus-jakarta sobre el <html>.
   `inline` hace que las utilidades emitan la referencia var() en vez de
   congelar el valor al compilar el tema.
 
-  Bebas Neue tiene un solo peso (400) y es toda mayusculas: `font-bold`
-  sobre display no agrega nada, el navegador sintetiza si se lo pide.
+  Exo es variable (100 a 900) y tiene minusculas de verdad, al reves que las
+  dos familias display que hubo antes. O sea que `font-bold` ahora es un peso
+  real, y el `uppercase` de los titulos es una decision de diseño y no una
+  obligacion de la tipografia.
 */
 @theme inline {
-  --font-display: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-exo), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -86,6 +88,49 @@
 
 @layer components {
   /*
+    La bajada del Hero, que aparece en dos segundos.
+
+    Va en CSS y no en Framer Motion porque asi corre sin esperar la
+    hidratacion: con un componente cliente el texto se quedaria invisible hasta
+    que baje el bundle, que es bastante peor que aparecer despacio.
+
+    `both` en el fill-mode es lo que la mantiene invisible en el primer cuadro
+    -sin eso hay un parpadeo antes de que arranque- y lo que la deja fija al
+    terminar.
+
+    La curva importa tanto como la duracion. Una primera version uso la salida
+    rapida del resto del sitio, y medida daba 96% de opacidad al primer segundo:
+    la animacion duraba dos segundos pero el texto aparecia en medio. Con esta el
+    reparto es parejo.
+
+    El retraso de 1,5s es la parte "dramatica" del pedido: durante ese rato la
+    pantalla es solo el video, sin nada que compita por la mirada. Recien despues
+    entra el texto, en tres segundos. Termina de aparecer a los 4,5s.
+
+    Ese retraso NO pone en riesgo el LCP, aunque parezca: el elemento mas grande
+    de la pantalla es el poster del video, que ocupa el viewport entero y se
+    pinta de inmediato, asi que es el que marca la medicion. Este texto no llega
+    ni cerca de ese tamaño.
+
+    No hace falta una regla para `prefers-reduced-motion`: la de `@layer base`
+    lleva toda animacion a 0.01ms, y con `forwards` el texto queda visible.
+  */
+  .eslogan-hero {
+    animation: eslogan-aparece 3s cubic-bezier(0.4, 0, 0.2, 1) 1.5s both;
+  }
+
+  @keyframes eslogan-aparece {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /*
     Contenido del editor del CMS (`prose-editor`).
 
     Estas reglas espejan a `ArticleContent`, que es el renderizador de la nota
@@ -124,11 +169,10 @@
     /*
       Mayusculas y algo de espaciado, igual que en `ArticleContent`.
 
-      Bebas Neue no tiene minusculas de verdad: las mapea a versalitas. Sin
-      `uppercase`, un subtitulo escrito "Un cambio de era" sale con la U alta y
-      el resto bajo, como si la tipografia estuviera rota. El espaciado va
-      positivo porque la familia ya es condensada y apretarla junta las astas
-      de las mayusculas.
+      Mayusculas por decision de diseño, no por obligacion: Exo tiene
+      minusculas de verdad. Se mantiene el tratamiento que traian los titulos
+      del sitio con las familias anteriores, para que el editor siga
+      pareciendose a lo que sale publicado.
     */
     text-transform: uppercase;
     letter-spacing: 0.025em;

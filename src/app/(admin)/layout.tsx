@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
-import { Bebas_Neue, Plus_Jakarta_Sans } from 'next/font/google'
+import { Exo, Plus_Jakarta_Sans } from 'next/font/google'
 import type { ReactNode } from 'react'
 
 import '../globals.css'
 
-// Bebas Neue tiene un solo peso: no existe la variante bold.
-const bebasNeue = Bebas_Neue({
-  weight: '400',
+// Exo es variable (100 a 900): a diferencia de las familias anteriores, aca
+// `font-bold` si es un peso real y no una negrita sintetica.
+const exo = Exo({
   subsets: ['latin'],
-  variable: '--font-bebas-neue',
+  variable: '--font-exo',
   display: 'swap',
 })
 
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
  */
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es" className={`${bebasNeue.variable} ${plusJakarta.variable}`}>
+    <html lang="es" className={`${exo.variable} ${plusJakarta.variable}`}>
       <body className="tema-claro bg-canvas text-ink min-h-dvh">
         {children}
       </body>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Bebas_Neue, Plus_Jakarta_Sans } from 'next/font/google'
+import { Exo, Plus_Jakarta_Sans } from 'next/font/google'
 import type { ReactNode } from 'react'
 
 import { Footer } from '@/components/layout/Footer'
@@ -12,18 +12,25 @@ import '../globals.css'
 /**
  * Tipografia display.
  *
- * Bebas Neue tiene un solo peso (400) y no tiene minusculas de verdad: las
- * mapea a versalitas. Por eso en todo el sitio va acompañada de `uppercase` y
- * nunca de `font-bold`; pedir negrita hace que el navegador la sintetice
- * engordando los trazos, y en una condensada eso cierra las contraformas.
+ * Exo, que reemplazo a Julius Sans One. **Cambia dos reglas que venian de las
+ * dos familias anteriores**, porque Exo no tiene sus limitaciones:
+ *
+ * - **Tiene pesos de verdad** (es variable, de 100 a 900), asi que `font-bold`
+ *   ya no es una negrita sintetica del navegador. Hoy no se usa en ningun lado
+ *   y los titulos siguen en 400, pero es una puerta que antes estaba cerrada.
+ * - **Tiene minusculas de verdad**, no versalitas. El `uppercase` que llevan
+ *   todos los titulos ya no es una obligacion tecnica sino una decision de
+ *   diseño: sacarlo ahora es valido y no rompe nada.
+ *
+ * Se carga como fuente variable -sin `weight`- para tener todo el rango sin
+ * pedir varios archivos.
  *
  * `display: swap` para que el texto sea legible mientras baja la fuente, en vez
  * de dejar el hueco en blanco que penaliza el LCP.
  */
-const bebasNeue = Bebas_Neue({
-  weight: '400',
+const exo = Exo({
   subsets: ['latin'],
-  variable: '--font-bebas-neue',
+  variable: '--font-exo',
   display: 'swap',
 })
 
@@ -90,10 +97,7 @@ export const viewport: Viewport = {
  */
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="es-CL"
-      className={`${bebasNeue.variable} ${plusJakarta.variable}`}
-    >
+    <html lang="es-CL" className={`${exo.variable} ${plusJakarta.variable}`}>
       <body className="bg-canvas text-ink flex min-h-dvh flex-col">
         {/* Primer tabulador de la pagina: deja saltar la navegacion. */}
         <a

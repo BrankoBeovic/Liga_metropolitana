@@ -219,11 +219,10 @@ function renderNodo(node: TipTapNode, key: number): ReactNode {
             ? 'text-2xl'
             : 'text-xl'
       /*
-        `uppercase` no es un capricho de diseño: Bebas Neue no tiene
-        minusculas de verdad, las mapea a versalitas. Un subtitulo escrito
-        "Un cambio de era" saldria con la U alta y el resto bajo, como si la
-        tipografia estuviera rota. En mayusculas es la unica forma en que la
-        familia se ve pareja.
+        `uppercase` es decision de diseño y ya no una obligacion: Exo tiene
+        minusculas de verdad, a diferencia de las dos familias display que
+        hubo antes. Se mantiene para que los subtitulos del cuerpo sigan el
+        mismo tratamiento que los titulos de seccion del sitio.
       */
       return (
         <Tag

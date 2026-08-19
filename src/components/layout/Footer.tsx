@@ -31,19 +31,50 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             {/*
-              Ancho fijo por `sizes` en pixeles y no en `vw`: la imagen tiene
-              ancho maximo propio (`max-w-[260px]`), asi que un `sizes` en
-              unidades de viewport haria elegir variantes mucho mas grandes de
-              lo que se dibuja.
+              El escudo recortado que entrego el equipo: version frontal, con
+              la pelota entera y transparencia real (verificado en los pixeles,
+              alfa 0 en las cuatro esquinas y en los cuatro bordes).
+
+              Se dibuja a 220px como maximo y no mas, y ese numero sale del
+              archivo: el original mide 439px de ancho, asi que 220 es lo que
+              deja la imagen nitida en una pantalla de densidad doble. Pedirle
+              260 la obligaria a estirarse.
+
+              El `sizes` va en pixeles y no en `vw` porque el ancho maximo lo
+              fija la clase, no el viewport: con `vw` el navegador elegiria
+              variantes mucho mas grandes de lo que se dibuja.
             */}
-            <Image
-              src="/escudo.png"
-              alt={SITE_NAME}
-              width={900}
-              height={554}
-              sizes="260px"
-              className="h-auto w-full max-w-[260px]"
-            />
+            {/*
+              El escudo lleva al inicio.
+
+              `alt` con el nombre del sitio y no vacio: al estar dentro de un
+              enlace, ese texto ES el nombre accesible del enlace. Con `alt=""`
+              el lector de pantalla anunciaria un enlace sin nombre.
+
+              `w-fit` en el enlace para que el area clickeable termine donde
+              termina el escudo: sin eso ocupa todo el ancho de la columna y
+              quedan cientos de pixeles invisibles que navegan al inicio.
+            */}
+            <Link
+              href="/"
+              className="focus-visible:ring-accent focus-visible:ring-offset-editorial block w-fit rounded-lg focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:outline-none"
+            >
+              <Image
+                src="/escudo.png"
+                alt={SITE_NAME}
+                width={439}
+                height={278}
+                sizes="220px"
+                /*
+                  Ancho explicito y no `w-full max-w-[220px]`: dentro de un
+                  contenedor `w-fit` el porcentaje no tiene contra que resolver
+                  -el padre se dimensiona por el hijo y el hijo por el padre- y
+                  medido colapsaba el enlace entero a 0x0.
+                */
+                className="h-auto w-[220px]"
+              />
+              <span className="sr-only"> - ir al inicio</span>
+            </Link>
 
             <p className="text-ink/70 mt-5 max-w-sm text-sm leading-relaxed">
               {SITE_TAGLINE}

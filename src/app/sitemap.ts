@@ -41,6 +41,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      // El listado completo de noticias. Cambia cada vez que se publica una.
+      url: urlAbsoluta('/noticias'),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
       // Cambia cuando la Liga sube o saca un PDF, no todos los dias.
       url: urlAbsoluta('/documentos'),
       changeFrequency: 'weekly',

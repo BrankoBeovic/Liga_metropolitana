@@ -11,8 +11,8 @@ import { Badge } from '@/components/ui/Badge'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { formatearFecha, formatearLectura } from '@/lib/format'
 import { FIRMA_EQUIPO, SITE_NAME } from '@/lib/navigation'
+import { firmaDe } from '@/lib/firma'
 import {
-  firmaDe,
   getPostBorrador,
   getPostBySlug,
   getPublishedSlugs,
@@ -164,7 +164,15 @@ export default async function NoticiaPage({ params }: Props) {
   }
 
   return (
-    <article className="mx-auto max-w-[1400px] px-5 pt-6 pb-20 sm:px-8 lg:px-10">
+    <article className="mx-auto max-w-[1400px] px-5 pt-24 pb-20 sm:px-8 lg:px-10">
+      {/*
+        `pt-28` reserva a mano el espacio de la barra flotante.
+
+        La barra es `fixed`, o sea que esta fuera del flujo y no empuja nada
+        hacia abajo. En la portada eso es lo que se busca -el video llega al
+        borde de la pantalla- pero en una pagina interior el titulo nacia
+        debajo de la pildora. Medido: la barra ocupa hasta 71px desde arriba.
+      */}
       {/*
         Aviso de vista previa.
 

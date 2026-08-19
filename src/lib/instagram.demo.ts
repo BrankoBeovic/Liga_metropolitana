@@ -17,8 +17,8 @@ import type { ReelInstagram } from './instagram'
  * no tener carrusel.
  *
  * Las miniaturas son recortes 9:16 del video de marca, generados en
- * `public/demo/`, que está fuera de git. Si no están, las tarjetas salen con el
- * hueco de la imagen rota: es contenido de prueba local, no un asset del sitio.
+ * `public/demo/`. Van en git para que el deploy las sirva: sin ellas las
+ * tarjetas salen con el hueco de la imagen rota.
  */
 const TITULOS = [
   'Resumen de la fecha en dos minutos',

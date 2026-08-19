@@ -40,6 +40,7 @@ graphify-out/
 # Artefactos de revision de lavish-axi.
 .lavish/
 
-# Imagenes de contenido de prueba, generadas del video de marca para poder
-# mirar la portada llena en local. No son assets del sitio.
-/public/demo/
+# Imagenes de contenido de prueba (portadas, logos y recortes de Reels).
+# Se versionan para que el deploy de Vercel las sirva: en la base las notas
+# demo apuntan a /demo/..., y sin estos archivos el sitio publicado se ve
+# con imagenes rotas. Siguen siendo material de prueba, no assets de marca.

@@ -39,3 +39,7 @@ graphify-out/
 
 # Artefactos de revision de lavish-axi.
 .lavish/
+
+# Imagenes de contenido de prueba, generadas del video de marca para poder
+# mirar la portada llena en local. No son assets del sitio.
+/public/demo/

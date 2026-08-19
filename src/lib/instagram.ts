@@ -132,6 +132,23 @@ type MediaCrudo = {
 export async function getReelsInstagram(
   limite: number
 ): Promise<ReelInstagram[]> {
+  /*
+    Interruptor de contenido de prueba, para poder mirar el carrusel sin token.
+
+    Las dos condiciones hacen falta. `REELS_DEMO` es la que se enciende a mano
+    en `.env.local`; el chequeo de `NODE_ENV` es el que garantiza que esto no
+    pueda pasar a produccion por una variable mal puesta en el panel del
+    hosting. Un carrusel de contenido inventado en el sitio publicado seria
+    bastante peor que no tener carrusel.
+
+    El import es dinamico para que el modulo de muestra no entre en el camino
+    normal del servidor.
+  */
+  if (process.env.NODE_ENV !== 'production' && process.env.REELS_DEMO === '1') {
+    const { reelsDeMuestra } = await import('./instagram.demo')
+    return reelsDeMuestra(limite)
+  }
+
   if (!TOKEN) {
     console.error(
       'Falta INSTAGRAM_ACCESS_TOKEN: la seccion de Reels no se va a dibujar.'

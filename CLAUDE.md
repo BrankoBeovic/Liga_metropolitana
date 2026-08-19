@@ -15,7 +15,7 @@ Bajada: "El maxibásquetbol chileno desde 1989".
 
 - Instagram: [@ligametromaxibasquet](https://www.instagram.com/ligametromaxibasquet/)
 - Dominio: pendiente, se conecta después.
-- Correo para formularios: pendiente, el equipo lo entrega más adelante.
+- Correo para formularios: llega a `brankobeovic24@gmail.com`, que es **provisorio** hasta que exista la casilla del equipo. Se cambia en `CORREO_DESTINO`, sin tocar código.
 - Token de la API de Instagram: pendiente, la sección de Reels queda vacía sin romper nada hasta que llegue.
 
 Las categorías de las noticias son dos: **Novedades** e **Institucional**.
@@ -41,6 +41,7 @@ Limpio, editorial, con motion design cuidado y rendimiento como prioridad.
 | Tipografía Display | **Bebas Neue** (headings, H1, badges) |
 | Tipografía Body | **Plus Jakarta Sans** (cuerpo de texto, metadatos) |
 | Editor CMS | **TipTap** (JSON como formato de almacenamiento de `content`) |
+| Correo | **Resend**, solo para los formularios de `/contacto` e `/inscribete` |
 | Paquetes | pnpm |
 | Lenguaje | TypeScript estricto |
 | Calidad | ESLint + Prettier |
@@ -299,10 +300,89 @@ Solo "Lo último" se queda, con un estado vacío explícito, porque una portada 
 El `h1` de la portada es `sr-only`.
 La portada de un medio no tiene titular propio, y el nombre de la Liga ya está dicho en letras de tres metros en el video: escribirlo encima sería decirlo dos veces y pelearle el centro a la imagen.
 
-### Pendientes que bloquean la Etapa 6
+### Los formularios mandan un correo y nada más
 
-- Proveedor de correo y protección antispam para los formularios: la fuente no tiene formularios a propósito, uno que no manda nada es peor que no tenerlo.
-- Si un PDF puede superar los 16 MB del tope de Server Actions, la subida va contra Storage con URL firmada, sin que el archivo cruce por la Server Action.
+`/contacto` e `/inscribete` no guardan en ninguna tabla ni tienen bandeja de entrada en el CMS.
+Mandan un correo con Resend y ahí termina el circuito.
+Un formulario que escribe en una tabla que nadie mira es lo mismo que uno que no manda nada, que es justo lo que la fuente evitaba no teniendo formularios.
+
+Tres variables de entorno, todas server-only: `RESEND_API_KEY`, `CORREO_DESTINO` y `CORREO_REMITENTE`.
+Si falta alguna de las dos primeras, el formulario **lo dice en pantalla** en vez de fingir que salió, y registra cuál falta en el log.
+
+**El remitente es el punto delicado.** Resend exige que el dominio del `from` esté verificado en su panel.
+Mientras la Liga no tenga dominio, `CORREO_REMITENTE` va vacía y el código cae en `onboarding@resend.dev`, que Resend permite sin verificar nada **pero solo entrega a la casilla dueña de la cuenta de Resend**.
+Sirve para probar el circuito completo; no sirve para producción con otra dirección.
+
+El correo de quien escribe va en `replyTo` y nunca en `from`: mandar con el dominio de otro es exactamente lo que SPF y DMARC existen para frenar.
+Los mensajes se arman en texto plano, no en HTML: el cuerpo lo escribe un desconocido y en texto plano no existe la posibilidad de inyectar markup.
+
+### El antispam es un par de trampas, y conviene saber hasta dónde llega
+
+Sin captcha y sin servicio externo.
+Lo que más protege no está en `lib/antispam.ts`: es que los formularios se mandan con Server Actions, así que en el HTML no hay ninguna URL de destino a la que un bot de catálogo pueda postear.
+Para llegar a la acción hay que hablar el protocolo de Next, mandar su id y pasar el chequeo de `Origin`.
+
+Encima de eso van dos trampas, las dos verificadas contra el log del servidor:
+
+- **Campo trampa** (`apellido_materno`), escondido con CSS y no con `type="hidden"`: un input oculto por tipo no lo completa ningún bot, porque es evidente que no es para el usuario.
+  Lleva `aria-hidden`, `tabIndex={-1}` y `autoComplete="off"`, esto último para que el gestor de contraseñas no convierta a una persona real en un falso positivo.
+- **Trampa de tiempo**: menos de 2,5 segundos entre que el formulario se dibuja y se envía.
+
+**Un envío detectado devuelve éxito, no error.**
+Decirle "parece spam" le da al que automatiza la señal que necesita para ajustar y volver a probar.
+El mensaje no se manda y queda registrado en el log.
+
+**Un `formulario_ts` ausente NO se rechaza**: lo completa JavaScript al montar, y las Server Actions funcionan sin JavaScript.
+Rechazar por su ausencia dejaría afuera a alguien real para atajar a un bot que igual puede mandar el campo con cualquier valor.
+
+Si algún día entra spam de verdad, el paso siguiente es Cloudflare Turnstile: gratis, sin puzzles y sin rastreo, y se enchufa en `revisarTrampas`.
+No se hizo ahora porque exige dos claves que la Liga no tiene, y una integración a medias con claves inexistentes es peor que ninguna.
+
+### Nota: el PDF no cruza por la Server Action
+
+Next limita el cuerpo de una Server Action y este proyecto lo tiene en 16 MB.
+Para una portada de nota alcanza y sobra; para un reglamento escaneado no, y el error en ese caso es un 413 que se ve **solo en los logs del servidor**: al usuario le llega un guardado que no hace nada, sin mensaje.
+
+Por eso los PDF van del navegador a Storage con una URL firmada (`crearSubidaFirmada`), y ese tope deja de existir.
+El costo es que **la validación real de tipo y peso tiene que ocurrir después**: el servidor nunca ve el archivo.
+`confirmarSubidaPdf` lee el `metadata` que Storage guardó al recibirlo -tamaño y mimetype reales, sin bajar los megas de vuelta- y si algo no cuadra **borra el objeto antes de devolver el error**, porque un archivo rechazado que se queda en el bucket es basura que nadie va a encontrar.
+
+Lo que revisa el navegador en `revisarPdf` es una cortesía para avisar temprano, no una defensa: quien sube podría saltearla entera.
+
+La consecuencia a tener presente: **`DocumentForm` necesita JavaScript**, a diferencia del resto de los formularios del CMS.
+Es una herramienta interna detrás de sesión, así que el costo es aceptable; la alternativa era un tope de peso que la Liga no controla.
+
+### Nota: React vacía el formulario al terminar la acción
+
+Un `<form action={accion}>` se resetea solo cuando la acción termina: los campos no controlados vuelven a su valor por defecto.
+Para un envío que salió bien es justo lo que se quiere.
+Para un error de validación es un desastre: la persona pierde todo lo que escribió y encima lee que corrija algo que ya no está en pantalla.
+Encontrado midiendo, no leyendo.
+
+La solución está en `lib/formularios.ts`: la acción devuelve lo enviado en `valores` y un `nonce` distinto en cada respuesta.
+Devolver los valores no alcanza -cambiar un `defaultValue` no toca un input ya montado- así que el `nonce` va como `key` del `<form>` y React monta uno nuevo, donde los `defaultValue` sí se aplican.
+Con éxito los valores vuelven vacíos y el formulario queda limpio.
+Funciona igual sin JavaScript.
+
+### Nota: `?download` para los PDF
+
+El atributo `download` de un enlace **se ignora cuando el archivo es de otro origen**, y los PDF viven en el dominio de Supabase.
+Sin `urlDeDescarga`, tocar "Descargar" abre el visor del navegador, que no es lo que dice el botón.
+Supabase resuelve el caso con `?download`, que le hace mandar `Content-Disposition: attachment`.
+
+### `/historia` está maquetada con texto de relleno
+
+Decisión del equipo: la página se armó antes de tener el texto.
+Todo el contenido vive en `(public)/historia/contenido.ts` y **nada** está escrito en el JSX, así que cargar la historia de verdad es editar un archivo.
+
+Mientras `ES_RELLENO` sea `true`, la página lleva `noindex`, muestra un aviso y no aparece en el sitemap: un sitio con una página de relleno indexada le dice a Google que su contenido es de baja calidad, y esa señal cuesta más de remontar de lo que cuesta esperar el texto.
+**Al cargar el texto hay que hacer tres cosas**: reemplazar el contenido, poner `ES_RELLENO` en `false` y agregar `/historia` a `src/app/sitemap.ts`.
+
+### Las categorías del formulario de inscripción no son las oficiales
+
+`lib/inscripcion.ts` ofrece los tramos habituales del maxibásquetbol (+30 a +70, cada cinco años) más "Todavía no lo sé".
+**Nadie confirmó que sean las divisiones de esta Liga.**
+Cuando el equipo las defina se corrige esa lista y nada más: el selector se arma desde ahí y la validación del servidor también.
 
 ## 5. CMS / Admin (`/admin`)
 
@@ -370,7 +450,7 @@ Las dos cifras están atadas y se mueven juntas.
 
 ### Nota: al reemplazar una imagen, la vieja se borra
 
-`borrarImagen` en `lib/admin/storage.ts` corre al reemplazar una portada, un avatar o un logo, y al borrar la fila que los usaba.
+`borrarDeStorage` en `lib/admin/storage.ts` (se llamaba `borrarImagen` hasta que empezó a borrar PDF también) corre al reemplazar una portada, un avatar, un logo o un documento, y al borrar la fila que los usaba.
 Tres propiedades que lo hacen seguro: corre después de que la escritura en la base salió bien; si la escritura falla se borra lo recién subido; nunca tira ni devuelve error (es limpieza, no puede voltear un guardado que sí se hizo).
 El bucket se valida contra la lista de permitidos y la ruta vacía se rechaza.
 Cada subida genera nombre con `crypto.randomUUID()`, así que dos filas nunca comparten archivo.

@@ -35,5 +35,20 @@ declare namespace NodeJS {
 
     /** Publica. El dominio real del sitio, para canonicas y sitemap. */
     readonly NEXT_PUBLIC_SITE_URL?: string
+
+    /** Server-only. API key de Resend, para los formularios del sitio. */
+    readonly RESEND_API_KEY?: string
+
+    /** Server-only. A donde llegan los mensajes de los formularios. */
+    readonly CORREO_DESTINO?: string
+
+    /**
+     * Server-only. Remitente de esos correos.
+     *
+     * Resend exige el dominio verificado en su panel. Vacia mientras no haya
+     * dominio propio: el codigo cae en onboarding@resend.dev, que solo entrega
+     * a la casilla dueña de la cuenta de Resend.
+     */
+    readonly CORREO_REMITENTE?: string
   }
 }

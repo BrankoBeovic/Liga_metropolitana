@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 
 import { requerirSesion } from '@/lib/admin/session'
-import { borrarImagen, subirImagen } from '@/lib/admin/storage'
+import { borrarDeStorage, subirImagen } from '@/lib/admin/storage'
 import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 import { urlValida } from '@/lib/url'
@@ -54,7 +54,7 @@ export async function guardarPerfil(
 
   let avatarUrl = avatarActual
   // El avatar anterior y el recien subido. El primero se borra al terminar
-  // bien; el segundo, si la escritura falla. Ver `borrarImagen`.
+  // bien; el segundo, si la escritura falla. Ver `borrarDeStorage`.
   let avatarAReemplazar: string | null = null
   let subidaNueva: string | null = null
 
@@ -94,11 +94,11 @@ export async function guardarPerfil(
 
   if (error) {
     console.error('No se pudo guardar el perfil:', error.message)
-    await borrarImagen(subidaNueva)
+    await borrarDeStorage(subidaNueva)
     return { error: 'No se pudo guardar. Intenta de nuevo.', ok: null }
   }
 
-  await borrarImagen(avatarAReemplazar)
+  await borrarDeStorage(avatarAReemplazar)
 
   /*
     El perfil se ve en el sitio publico en la firma al pie de cada nota propia.

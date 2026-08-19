@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 
 import { requerirSesion } from '@/lib/admin/session'
-import { borrarImagen, subirImagen } from '@/lib/admin/storage'
+import { borrarDeStorage, subirImagen } from '@/lib/admin/storage'
 import { createClient } from '@/lib/supabase/server'
 import { urlValida } from '@/lib/url'
 
@@ -87,7 +87,7 @@ export async function guardarSponsor(
   if (error) {
     console.error('No se pudo guardar el sponsor:', error.message)
     // Lo que se subio en esta pasada no quedo referenciado por ninguna fila.
-    await borrarImagen(logoSubido)
+    await borrarDeStorage(logoSubido)
     return {
       error: 'No se pudo guardar. Revisa los datos e intenta de nuevo.',
       ok: null,
@@ -95,7 +95,7 @@ export async function guardarSponsor(
   }
 
   // Recien con la fila guardada se suelta el archivo que quedo sin uso.
-  await borrarImagen(logoAReemplazar)
+  await borrarDeStorage(logoAReemplazar)
 
   refrescarSitio()
   return { error: null, ok: id ? 'Sponsor actualizado.' : 'Sponsor creado.' }
@@ -141,7 +141,7 @@ export async function borrarSponsor(formData: FormData): Promise<void> {
   if (error) {
     console.error('No se pudo borrar el sponsor:', error.message)
   } else if (antes) {
-    await borrarImagen(antes.logo_url)
+    await borrarDeStorage(antes.logo_url)
   }
 
   refrescarSitio()

@@ -25,9 +25,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     aparece como "URL enviada no encontrada" en Search Console, asi que cada
     ruta entra aca recien cuando la pagina esta hecha.
 
-    Hoy es una sola. `/historia`, `/documentos`, `/inscribete` y `/contacto`
-    estan en la barra de navegacion pero todavia no tienen pagina: entran en la
-    Etapa 6, y ese es el momento de sumarlas a esta lista.
+    **Falta `/historia` a proposito.** La pagina existe pero su texto todavia
+    es relleno, y va con `noindex` hasta que llegue el de verdad (ver
+    `(public)/historia/contenido.ts`). Declarar en el sitemap una URL que ademas
+    pedimos no indexar es una señal contradictoria; entra cuando se saque el
+    `noindex`.
 
     Las categorias no van a entrar nunca: este sitio no tiene paginas de
     categoria, las categorias solo clasifican noticias (CLAUDE.md seccion 4).
@@ -37,6 +39,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: urlAbsoluta('/'),
       changeFrequency: 'daily',
       priority: 1,
+    },
+    {
+      // Cambia cuando la Liga sube o saca un PDF, no todos los dias.
+      url: urlAbsoluta('/documentos'),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      // La pagina que convierte: es la que la Liga quiere que se encuentre.
+      url: urlAbsoluta('/inscribete'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      // Cambia poco y no es una pagina de trafico, pero si de confianza: es la
+      // que responde "como los contacto" cuando alguien evalua a la Liga.
+      url: urlAbsoluta('/contacto'),
+      changeFrequency: 'yearly',
+      priority: 0.4,
     },
   ]
 

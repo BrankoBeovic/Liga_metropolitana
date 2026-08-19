@@ -43,3 +43,19 @@ export function formatearLectura(minutos: number | null): string {
   if (!minutos || minutos < 1) return ''
   return `${minutos} min de lectura`
 }
+
+/**
+ * Peso de un archivo, en texto.
+ *
+ * Va junto al boton de descarga de cada PDF: quien esta con datos moviles
+ * merece saber si va a bajar 300 KB o 22 MB antes de tocar.
+ *
+ * Redondea a un decimal desde 1 MB y a entero abajo, porque "0,4 MB" se lee
+ * peor que "412 KB" y "1.024 KB" peor que "1 MB". Cadena vacia si no hay dato,
+ * para que quien lo use pueda omitir el separador en vez de mostrar "· ".
+ */
+export function formatearPeso(bytes: number | null): string {
+  if (!bytes || bytes <= 0) return ''
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`
+}

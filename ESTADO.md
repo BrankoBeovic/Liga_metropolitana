@@ -3,7 +3,47 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
-## Etapa actual: 5 (Sitio público) - cerrada
+## Etapa actual: 6 (Historia, documentos, inscríbete y contacto) - cerrada
+
+### Hecho
+
+- `/documentos` público con buscador (filtra en memoria, sin tilde y sin distinguir mayúsculas) y `/admin/documentos` completo: alta, edición, ocultar y borrar.
+- **El PDF sube directo a Storage con URL firmada**, sin cruzar por la Server Action: un reglamento escaneado pasa los 16 MB del cuerpo de una acción, y ese error solo se ve en los logs del servidor. La validación real de tipo y peso ocurre después, leyendo el `metadata` del objeto ya subido.
+- `/contacto` e `/inscribete` con formularios que mandan correo por Resend. Destino provisorio: `brankobeovic24@gmail.com`.
+- Antispam sin captcha: campo trampa escondido con CSS más una trampa de tiempo de 2,5 segundos. Un envío detectado devuelve éxito y no se manda.
+- `/historia` maquetada con texto de relleno, por pedido del equipo. Va con `noindex`, con un aviso en pantalla y fuera del sitemap hasta que llegue el texto real.
+- `lib/admin/storage.ts` reescrito: la lista de buckets ya no dice `media-thumbnails` (nunca existió en este proyecto) y ahora incluye `documents`. `borrarImagen` pasó a llamarse `borrarDeStorage`, porque también borra PDF.
+- `/documentos`, `/inscribete` y `/contacto` entraron al sitemap. `/historia` no, mientras sea relleno.
+- Encabezado común de páginas interiores (`PageHeader`) y campos de formulario propios del sitio oscuro, aparte de los del CMS.
+
+### Verificado
+
+- Las cuatro compuertas pasaron. El build lista las cuatro páginas nuevas como estáticas.
+- Contraste, desborde horizontal y objetivos táctiles: barrido elemento por elemento en las cuatro páginas, a 360px y a 1265px. Cero incumplimientos.
+- **Las dos trampas del antispam disparan de verdad**, confirmado contra el log del servidor: `Contacto descartado (campo trampa completado)` y `Contacto descartado (enviado en 28 ms)`. En los dos casos la pantalla dice "Mensaje enviado" y el correo no sale.
+- Un formulario que se envía a los 9 segundos NO dispara la trampa de tiempo: no hay falso positivo.
+- El envío sin `RESEND_API_KEY` avisa en pantalla ("El envío de correos no está configurado todavía") en vez de fingir que salió.
+- La lista de documentos, con datos de prueba: pesos en castellano (2,3 MB / 313 KB / 39,1 MB), fechas en `es-CL` y el `?download` en cada enlace de descarga.
+- El buscador: sin tilde encuentra "inscripción", ignora mayúsculas y muestra su propio mensaje cuando no hay coincidencias.
+- `/historia` sirve `noindex, nofollow` y muestra el aviso de página en preparación.
+
+### Un bug encontrado midiendo, no leyendo
+
+- **Un error de validación vaciaba el formulario entero.** React resetea solo un `<form action={accion}>` cuando la acción termina, así que quien se equivocaba en un campo perdía todo lo que había escrito y encima leía que corrigiera algo que ya no estaba en pantalla. La acción ahora devuelve lo enviado más un `nonce` que remonta el formulario con esos valores; verificado enviando un mensaje demasiado corto y comprobando que los cuatro campos siguen ahí.
+
+### Lo que no se pudo probar en esta máquina
+
+- **La subida de PDF de punta a punta.** Firmar la URL exige sesión y no hay credenciales del CMS acá; Storage rechaza la firma para un anónimo. El código compila y está revisado, pero el circuito completo -firmar, subir, verificar, guardar, reemplazar, borrar- lo tiene que probar el equipo con un PDF real.
+- **El envío real de un correo**: falta la `RESEND_API_KEY`. Sí quedó probado todo lo anterior al envío y la rama de configuración incompleta.
+
+### Pendiente conocido, no es un bug
+
+- `RESEND_API_KEY`: la genera el equipo en resend.com y va en `.env.local` y en el entorno de producción.
+- Con `CORREO_REMITENTE` vacía el remitente es `onboarding@resend.dev`, que **solo entrega a la casilla dueña de la cuenta de Resend**. Para mandar a otra dirección hace falta dominio propio verificado.
+- El texto real de `/historia`, y con él las tres cosas anotadas en `contenido.ts`.
+- Las categorías de `/inscribete` son los tramos habituales del maxibásquetbol, no la lista oficial de la Liga.
+
+## Etapa 5 (Sitio público) - cerrada
 
 ### Hecho
 
@@ -140,5 +180,5 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 | 3. Supabase, proxy y tipos | Cerrada |
 | 4. CMS | Cerrada |
 | 5. Sitio público | Cerrada |
-| 6. Lo nuevo (historia, documentos, inscríbete, contacto) | Pendiente |
+| 6. Lo nuevo (historia, documentos, inscríbete, contacto) | Cerrada |
 | 7. Documentación | Pendiente |

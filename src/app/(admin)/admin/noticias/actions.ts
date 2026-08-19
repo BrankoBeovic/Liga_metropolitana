@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { requerirSesion } from '@/lib/admin/session'
-import { borrarImagen, subirImagen } from '@/lib/admin/storage'
+import { borrarDeStorage, subirImagen } from '@/lib/admin/storage'
 import { rutaNoticia } from '@/lib/site'
 import { createClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/database.types'
@@ -155,7 +155,7 @@ export async function guardarArticulo(
 
     if (error) {
       console.error('No se pudo actualizar la nota:', error.message)
-      await borrarImagen(subidaNueva)
+      await borrarDeStorage(subidaNueva)
       return { error: 'No se pudo guardar. Intenta de nuevo.', ok: null }
     }
 
@@ -172,7 +172,7 @@ export async function guardarArticulo(
       usado de los tres.
     */
     if (!data) {
-      await borrarImagen(subidaNueva)
+      await borrarDeStorage(subidaNueva)
       return {
         error:
           'Esta nota es de otra persona y solo su autor o un admin pueden editarla. No se guardó ningún cambio.',
@@ -180,7 +180,7 @@ export async function guardarArticulo(
       }
     }
 
-    await borrarImagen(portadaAReemplazar)
+    await borrarDeStorage(portadaAReemplazar)
 
     refrescar(data.slug)
     // Al listado, no de vuelta al formulario. Guardar es el final de la tarea:
@@ -205,7 +205,7 @@ export async function guardarArticulo(
 
   if (error) {
     console.error('No se pudo crear la nota:', error.message)
-    await borrarImagen(subidaNueva)
+    await borrarDeStorage(subidaNueva)
     const duplicado = error.code === '23505'
     return {
       error: duplicado
@@ -219,7 +219,7 @@ export async function guardarArticulo(
   // el alta, RLS rechaza con error en vez de filtrar, asi que esto no deberia
   // pasar; queda igual para no volver a redirigir con un exito inventado.
   if (!data) {
-    await borrarImagen(subidaNueva)
+    await borrarDeStorage(subidaNueva)
     return { error: 'No se pudo crear la nota. Intenta de nuevo.', ok: null }
   }
 
@@ -348,7 +348,7 @@ export async function borrarArticulo(formData: FormData): Promise<void> {
   if (!borradas || borradas.length === 0) volverAlListado('sin-permiso')
 
   // La portada muere con la nota: nadie mas la referencia.
-  await borrarImagen(antes?.cover_image_url)
+  await borrarDeStorage(antes?.cover_image_url)
 
   if (antes) refrescar(antes.slug)
   volverAlListado('borrada')

@@ -3,7 +3,23 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
-## Etapa actual: 2 (Base de datos) - cerrada
+## Etapa actual: 3 (Supabase, proxy y tipos) - cerrada
+
+### Hecho
+
+- Copiados tal cual: los cinco clientes de `src/lib/supabase/`, `src/lib/admin/session.ts`, `src/lib/admin/storage.ts`, `src/proxy.ts`, `src/types/env.d.ts` y `src/types/server-only.d.ts`.
+- `src/lib/imagenes.ts` se adelantó de la Etapa 4: `storage.ts` lo importa y sin él no compila. Copiado tal cual.
+- `src/types/database.types.ts` generado con `corepack pnpm supabase:types` contra el proyecto nuevo.
+- Pendiente anotado para la Etapa 6: la lista de buckets de `storage.ts` todavía dice `media-thumbnails`; se reescribe cuando entre la subida de PDFs (`documents`).
+
+### Verificado
+
+- Los tipos generados describen exactamente las 5 tablas nuevas (sin `media_items` ni `newsletter_subscribers`): el project-id corregido funcionó.
+- Con el servidor levantado: `/admin/dashboard` sin sesión responde 307 a `/admin/login?redirectTo=%2Fadmin%2Fdashboard` con `x-robots-tag: noindex, nofollow`; `/` responde 200 sin ese header.
+- En el build aparece `ƒ Proxy (Middleware)` y `/` sigue `○ (Static)`: el proxy no saca al sitio público del render estático.
+- Las cuatro compuertas pasaron.
+
+## Etapa 2 (Base de datos) - cerrada
 
 ### Hecho
 
@@ -59,7 +75,7 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 |---|---|
 | 1. Infraestructura y memoria | Cerrada |
 | 2. Base de datos | Cerrada |
-| 3. Supabase, proxy y tipos | Pendiente |
+| 3. Supabase, proxy y tipos | Cerrada |
 | 4. CMS | Pendiente |
 | 5. Sitio público | Pendiente |
 | 6. Lo nuevo (historia, documentos, inscríbete, contacto) | Pendiente |

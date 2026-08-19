@@ -487,6 +487,10 @@ La combinación correcta ahí es `aria-hidden` en el contenedor más `tabIndex={
 ## 9. Entorno de esta máquina
 
 - **`pnpm` no está en el PATH**: usar `corepack pnpm ...` o correr `corepack enable` primero.
+- **`ffmpeg` tampoco está en el PATH**, pero está instalado (winget, Gyan build):
+  `C:\Users\dell\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0-full_build\bin`.
+  Con eso se comprimió el video del hero y se sacaron el escudo y el póster.
+  No hay Pillow instalado; sí hay numpy, y ffmpeg lee y escribe `rawvideo` por stdin/stdout, que alcanza para todo lo que hizo falta.
 - **Nunca editar archivos con reemplazos de PowerShell**: lee como ANSI y corrompe los acentos.
 - **Para mensajes de commit largos usar `git commit -F archivo`**: los here-strings de PowerShell se rompen con acentos.
 - Proyecto Supabase: "liga metropolitana", ref `cvmhjzwrzahpbsogrhbc`, región `sa-east-1`.

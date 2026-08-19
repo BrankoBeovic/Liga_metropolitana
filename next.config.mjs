@@ -87,6 +87,15 @@ const nextConfig = {
     minimumCacheTTL: CACHE_IMAGENES_SEGUNDOS,
     remotePatterns: [...supabaseImagePatterns(), ...INSTAGRAM_IMAGE_PATTERNS],
   },
+  async redirects() {
+    return [
+      {
+        source: '/inscribete',
+        destination: '/jugadores',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig

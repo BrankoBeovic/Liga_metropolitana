@@ -1,7 +1,7 @@
 /**
  * El estado que devuelven los formularios publicos, y sus dos constructores.
  *
- * Lo comparten `/contacto` e `/inscribete`. Vive en un modulo neutro y no en
+ * Lo comparten `/contacto` y `/jugadores`. Vive en un modulo neutro y no en
  * uno de los dos `actions.ts` por dos razones: de un archivo `'use server'`
  * solo se pueden exportar funciones async -una constante ahi rompe el build- y
  * ademas los formularios, que son componentes cliente, necesitan el tipo y el

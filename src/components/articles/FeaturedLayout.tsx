@@ -17,12 +17,13 @@ type FeaturedLayoutProps = {
 /**
  * Portada destacada con barra lateral.
  *
- * 2fr / 1fr en escritorio, una sola columna abajo de `lg`. Sin espacio de
- * sponsor en la barra: aca los sponsors son solo logos en la landing (CLAUDE.md
- * seccion 4), asi que la columna se reparte entre las dos notas secundarias.
+ * Mitad y mitad en escritorio: la card grande a 2fr se comia la seccion y
+ * dejaba las laterales como un recorte. Con tres notas a la derecha, las dos
+ * columnas terminan a la misma altura (`items-stretch`) y la foto de la
+ * principal rellena lo que sobre, sin un `h-[32.5rem]` fijo que la inflaba.
  *
- * `items-start` en la grilla: sin eso la barra lateral se estira hasta igualar
- * la altura de la portada y las tarjetas chicas quedan separadas por huecos.
+ * Una sola columna abajo de `lg`. Sin espacio de sponsor en la barra: aca los
+ * sponsors son solo logos en la landing (CLAUDE.md seccion 4).
  *
  * El scrim inferior sobre la portada no es decorado: el badge y, en pantallas
  * chicas, el borde del titular se apoyan ahi. Sin el, una foto clara deja el
@@ -33,8 +34,14 @@ export function FeaturedLayout({ posts }: FeaturedLayoutProps) {
   if (!principal) return null
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[2fr_1fr]">
-      <article className="group bg-editorial relative overflow-hidden rounded-2xl ring-1 ring-white/10">
+    <div
+      className={
+        secundarias.length > 0
+          ? 'grid items-stretch gap-6 lg:grid-cols-2'
+          : 'grid gap-6'
+      }
+    >
+      <article className="group bg-editorial relative flex h-full flex-col overflow-hidden rounded-2xl ring-1 ring-white/10">
         {/*
           Sin carga anticipada, y esto cambio respecto de la fuente.
 
@@ -44,16 +51,16 @@ export function FeaturedLayout({ posts }: FeaturedLayoutProps) {
           Pedirla temprano solo le robaria ancho de banda al video del Hero,
           que si es el elemento que mide el LCP.
 
-          Lo que si se conserva es la altura fija, para que no haya salto de
-          layout cuando la imagen llega.
+          Abajo de `lg` la altura es fija para que no haya salto cuando llega
+          la imagen. En escritorio `flex-1` la iguala a las tres laterales.
         */}
-        <div className="relative h-64 w-full overflow-hidden bg-white/5 sm:h-96 lg:h-[32.5rem]">
+        <div className="relative h-64 w-full overflow-hidden bg-white/5 sm:h-80 lg:h-auto lg:min-h-[16rem] lg:flex-1">
           <ArticleCover
             src={principal.cover_image_url}
             alt={principal.cover_image_alt}
             title={principal.title}
-            sizes="(max-width: 1024px) 100vw, 66vw"
-            className="h-full w-full transition-transform duration-500 group-hover:scale-[1.02]"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           />
           <div
             aria-hidden
@@ -66,8 +73,8 @@ export function FeaturedLayout({ posts }: FeaturedLayoutProps) {
           </div>
         </div>
 
-        <div className="p-5 sm:p-6">
-          <h3 className="font-display text-ink text-3xl leading-[1.05] tracking-wide text-balance uppercase sm:text-[40px]">
+        <div className="shrink-0 p-5 sm:p-6">
+          <h3 className="font-display text-ink text-2xl leading-[1.05] tracking-wide text-balance uppercase sm:text-[32px]">
             <Link
               href={rutaNoticia(principal.slug)}
               className="before:absolute before:inset-0"

@@ -53,8 +53,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      // La pagina que convierte: es la que la Liga quiere que se encuentre.
-      url: urlAbsoluta('/inscribete'),
+      // Quienes buscan equipo. Cambia cuando alguien se inscribe, no todos los dias.
+      url: urlAbsoluta('/jugadores'),
       changeFrequency: 'monthly',
       priority: 0.8,
     },

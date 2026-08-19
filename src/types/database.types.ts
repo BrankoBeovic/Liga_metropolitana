@@ -77,6 +77,48 @@ export type Database = {
         }
         Relationships: []
       }
+      players: {
+        Row: {
+          age: number
+          bio: string
+          created_at: string
+          email: string
+          first_name: string
+          id: number
+          last_name: string
+          phone: string | null
+          position: string
+          rut: string
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          bio: string
+          created_at?: string
+          email: string
+          first_name: string
+          id?: never
+          last_name: string
+          phone?: string | null
+          position: string
+          rut: string
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          bio?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: never
+          last_name?: string
+          phone?: string | null
+          position?: string
+          rut?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string

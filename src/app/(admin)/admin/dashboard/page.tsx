@@ -22,7 +22,7 @@ export default async function DashboardPage() {
 
   // Las consultas pasan por RLS con la identidad del usuario: un editor cuenta
   // solo lo suyo y un admin cuenta todo, sin que haya que filtrar aca.
-  const [publicados, borradores, reels, sponsors, documentos] =
+  const [publicados, borradores, reels, sponsors, documentos, jugadores] =
     await Promise.all([
       supabase
         .from('posts')
@@ -43,6 +43,7 @@ export default async function DashboardPage() {
         .from('documents')
         .select('id', { count: 'exact', head: true })
         .eq('is_active', true),
+      supabase.from('players').select('id', { count: 'exact', head: true }),
     ])
 
   return (
@@ -88,6 +89,11 @@ export default async function DashboardPage() {
           titulo="Documentos"
           valor={documentos.count}
           href="/admin/documentos"
+        />
+        <Tarjeta
+          titulo="Jugadores"
+          valor={jugadores.count}
+          href="/admin/jugadores"
         />
       </ul>
     </AdminShell>

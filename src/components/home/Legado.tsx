@@ -7,7 +7,7 @@ import { ES_RELLENO, RESUMEN } from '@/app/(public)/historia/contenido'
  *
  * Va inmediatamente después del hero y antes de todo lo demás. Es lo que
  * responde "qué es esto" a alguien que llegó por primera vez, antes de pedirle
- * que lea noticias o que inscriba un equipo.
+ * que lea noticias o que deje su ficha de jugador.
  *
  * **El texto no está escrito acá.** Sale de `(public)/historia/contenido.ts`,
  * el mismo archivo que alimenta la página `/historia`: así el día que llegue la

@@ -75,7 +75,7 @@ function soloPublicados<
  * reciente.
  *
  * Antes esto ordenaba por `is_featured desc, published_at desc` y cortaba en
- * tres, y esa sola linea hacia que el bloque llamado "Lo ultimo" mostrara
+ * tres, y esa sola linea hacia que el bloque de noticias de portada mostrara
  * cosas que no eran lo ultimo: una nota destacada no se quedaba solo con la
  * foto grande, tambien empujaba a las dos tarjetas laterales. Con dos
  * destacadas del 17 de agosto, la nota del 18 -la mas reciente del sitio-
@@ -97,7 +97,7 @@ function soloPublicados<
  * dos cosas: la principal se define por una condicion y las laterales por otra.
  * Van en paralelo, asi que cuestan un round-trip, no dos.
  */
-export async function getHeroPosts(limit = 3): Promise<PostWithRelations[]> {
+export async function getHeroPosts(limit = 4): Promise<PostWithRelations[]> {
   const [destacada, recientes] = await Promise.all([
     soloPublicados(supabasePublic.from('posts').select(CARD_COLUMNS))
       .eq('is_featured', true)

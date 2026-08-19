@@ -1,5 +1,5 @@
 import { FeaturedLayout } from '@/components/articles/FeaturedLayout'
-import { InscripcionForm } from '@/components/forms/InscripcionForm'
+import { JugadorForm } from '@/components/forms/JugadorForm'
 import { Hero } from '@/components/home/Hero'
 import { Legado } from '@/components/home/Legado'
 import { ReelsCarousel } from '@/components/multimedia/ReelsCarousel'
@@ -20,16 +20,16 @@ import { getHeroPosts } from '@/lib/posts'
  */
 export const revalidate = 300
 
-/** Cuantas notas entran en el bloque destacado: 1 grande + 2 en la barra. */
-const DESTACADAS = 3
+/** Cuantas notas entran en el bloque destacado: 1 grande + 3 en la barra. */
+const DESTACADAS = 4
 
 /**
  * Portada.
  *
  * El orden de los bloques es una decision editorial y no el orden en que se
  * fueron escribiendo: hero, quienes somos, lo que publicamos a diario, las
- * noticias, quienes nos apoyan y recien al final el pedido de inscripcion.
- * Primero se explica la Liga y despues se le pide algo a quien llego.
+ * noticias, quienes nos apoyan y recien al final el llamado a jugadores sin
+ * equipo. Primero se explica la Liga y despues se le pide algo a quien llego.
  */
 export default async function Portada() {
   const [destacadas, reels] = await Promise.all([
@@ -86,8 +86,8 @@ export default async function Portada() {
           */}
           <SectionHeading
             id="destacadas-titulo"
-            title="Lo"
-            accent="último"
+            title="Solo"
+            accent="noticias"
             href="/noticias"
             hrefLabel="Ver todas"
           />
@@ -106,29 +106,32 @@ export default async function Portada() {
         </div>
 
         {/*
-          El formulario de inscripcion cierra la portada.
+          El formulario de jugadores cierra la portada.
 
-          Es el mismo `InscripcionForm` de `/inscribete`, sin duplicar nada: la
+          Es el mismo `JugadorForm` de `/jugadores`, sin duplicar nada: la
           Server Action, la validacion y el antispam son los de alla. Lo unico
           que cambia es el envoltorio, porque aca no van los tres pasos ni el
           encabezado de pagina.
 
-          Va ultimo a proposito: pedirle a alguien que inscriba un equipo tiene
+          Va ultimo a proposito: pedirle a alguien que deje su ficha tiene
           sentido despues de haberle mostrado que es la Liga, que publica y
           quien la apoya, no antes.
         */}
-        <section aria-labelledby="inscripcion-titulo" className="mt-20">
+        <section aria-labelledby="jugadores-titulo" className="mt-20">
           <SectionHeading
-            id="inscripcion-titulo"
-            title="Súmate a la"
-            accent="Liga"
+            id="jugadores-titulo"
+            title="¿Quieres jugar pero no tienes"
+            accent="equipo?"
+            href="/jugadores"
+            hrefLabel="Ver la página"
           />
           <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,38rem)] lg:gap-16">
             <p className="text-ink/75 text-lg leading-relaxed text-pretty">
-              Déjanos los datos de tu equipo y la Liga se contacta contigo para
-              contarte fechas, sedes y qué necesitas para competir.
+              Si quieres jugar y no tienes club, déjanos tus datos. La Liga te
+              contacta cuando un equipo esté buscando gente en tu puesto. El RUT
+              no se publica: lo ve solo el equipo de la Liga.
             </p>
-            <InscripcionForm />
+            <JugadorForm />
           </div>
         </section>
       </div>

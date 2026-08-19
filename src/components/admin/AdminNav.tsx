@@ -24,6 +24,7 @@ const ENLACES = [
   { href: '/admin/sponsors', label: 'Sponsors', soloAdmin: false },
   // Los PDFs de /documentos. Tambien los administra todo el equipo.
   { href: '/admin/documentos', label: 'Documentos', soloAdmin: false },
+  { href: '/admin/jugadores', label: 'Jugadores', soloAdmin: false },
   /*
     "Mi perfil" va en la barra y no colgado del nombre del usuario, que seria
     el lugar habitual: ese nombre esta oculto abajo de `sm`, y un unico camino

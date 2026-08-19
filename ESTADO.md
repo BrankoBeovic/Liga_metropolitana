@@ -3,6 +3,20 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: Inscríbete pasa a Jugadores
+
+### Hecho
+
+- La barra, el sitemap y la portada dicen **Jugadores**, no Inscríbete.
+  `/inscribete` redirige 301 a `/jugadores`.
+- El formulario ya no pide un equipo: pide nombre, apellido, edad, RUT, posición, bio, correo y teléfono (el teléfono es opcional).
+  Correo y teléfono no estaban en el pedido original; sin un dato de contacto la ficha no sirve.
+- Tabla `players` con RLS: el sitio publico no lee nada (el RUT no sale).
+  El alta lo hace la Server Action con la clave secreta, despues del antispam.
+  El CMS lista y borra (`/admin/jugadores`).
+- Si el correo de aviso no sale, la fila igual queda: la ficha es la fuente de verdad.
+- `SUPABASE_SECRET_KEY` tiene que estar en `.env.local`: sin ella el formulario no puede insertar (bypassea RLS a proposito). Hoy esta vacia en esta maquina.
+
 ## Etapa actual: 6 (Historia, documentos, inscríbete y contacto) - cerrada
 
 ### Hecho

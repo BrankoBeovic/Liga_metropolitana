@@ -7,7 +7,7 @@ import { CAMPO_TIEMPO, CAMPO_TRAMPA } from '@/lib/antispam'
  *
  * Es cliente por una sola razon: el momento en que se dibujo el formulario
  * tiene que ser el del navegador, no el del servidor. `/contacto` e
- * `/inscribete` son paginas estaticas, asi que un `Date.now()` en el servidor
+ * `/jugadores` son paginas estaticas, asi que un `Date.now()` en el servidor
  * seria la hora del build y la trampa de tiempo no dispararia nunca.
  */
 export function CamposAntispam() {

@@ -9,7 +9,7 @@ type SectionHeadingProps = {
   id?: string
   /** Primera parte del titulo, en color de texto normal. */
   title: string
-  /** Segunda parte, en color de acento. "Lo" + "último". */
+  /** Segunda parte, en color de acento. "Solo" + "noticias". */
   accent?: string
   subtitle?: string
   /** Nota al margen derecho: "Actualizado hoy". */

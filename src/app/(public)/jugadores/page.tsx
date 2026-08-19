@@ -2,53 +2,52 @@ import { ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { InscripcionForm } from '@/components/forms/InscripcionForm'
+import { JugadorForm } from '@/components/forms/JugadorForm'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { urlAbsoluta } from '@/lib/site'
 
-const TITULO = 'Inscríbete'
+const TITULO = 'Jugadores'
 const BAJADA =
-  'Suma a tu equipo a la Liga Metropolitana. Déjanos tus datos y te contamos cómo sigue: categorías, fechas y lo que necesitas para competir.'
+  '¿Quieres jugar pero no tienes equipo? Déjanos tus datos y la Liga te contacta cuando un club busque gente.'
 
 export const metadata: Metadata = {
   title: TITULO,
   description: BAJADA,
-  alternates: { canonical: urlAbsoluta('/inscribete') },
+  alternates: { canonical: urlAbsoluta('/jugadores') },
   openGraph: {
     type: 'website',
     title: TITULO,
     description: BAJADA,
-    url: urlAbsoluta('/inscribete'),
+    url: urlAbsoluta('/jugadores'),
   },
 }
 
 /**
  * Los tres pasos que se explican arriba del formulario.
  *
- * Estan escritos con lo que el circuito de verdad hace hoy -mandar un correo y
- * esperar respuesta- y no con un proceso administrativo que nadie confirmo. En
- * cuanto la Liga defina plazos, cuotas o documentacion, esto es lo primero que
- * hay que actualizar.
+ * Estan escritos con lo que el circuito de verdad hace hoy: guardar la ficha
+ * y avisar por correo. No hay matching automatico ni publicacion publica de
+ * los datos (el RUT no sale al sitio).
  */
 const PASOS = [
   {
     titulo: 'Completa el formulario',
     detalle:
-      'Con el nombre del equipo, la categoría en la que quieren jugar y a quién contactar.',
+      'Nombre, apellido, edad, RUT, posición y una bio corta de cómo juegas. Con eso un club te puede ubicar.',
   },
   {
-    titulo: 'Te respondemos',
+    titulo: 'Quedas en la lista',
     detalle:
-      'La Liga se contacta por correo para contarte fechas, sedes y qué documentación hace falta.',
+      'La Liga guarda tu ficha y te contacta cuando un equipo esté buscando gente en tu puesto.',
   },
   {
     titulo: 'A la cancha',
     detalle:
-      'Confirmado el cupo, el equipo entra en la programación de la temporada.',
+      'El club se pone en contacto contigo. De ahí en adelante la conversación es entre ustedes.',
   },
 ] as const
 
-export default function InscribetePage() {
+export default function JugadoresPage() {
   return (
     <div className="mx-auto max-w-[1400px] px-5 pt-28 pb-20 sm:px-8 lg:px-10">
       {/*
@@ -59,12 +58,12 @@ export default function InscribetePage() {
         borde de la pantalla- pero en una pagina interior el titulo nacia
         debajo de la pildora. Medido: la barra ocupa hasta 71px desde arriba.
       */}
-      <PageHeader titulo="Inscríbete" bajada={BAJADA} />
+      <PageHeader titulo={TITULO} bajada={BAJADA} />
 
       {/*
         Los pasos van ANTES del formulario a proposito: quien llega no sabe si
-        completarlo lo compromete a algo. Decirle primero que esto abre una
-        conversacion y no una inscripcion definitiva baja bastante la barrera.
+        completarlo lo publica en internet. Decirle primero que la ficha es
+        interna baja la barrera, sobre todo con un RUT de por medio.
       */}
       <ol className="mt-12 grid gap-4 sm:grid-cols-3">
         {PASOS.map((paso, i) => (
@@ -90,18 +89,19 @@ export default function InscribetePage() {
 
       <div className="mt-14 max-w-[38rem]">
         <h2 className="font-display text-ink text-3xl tracking-wide uppercase">
-          Datos del equipo
+          Tus datos
         </h2>
         <p className="text-ink/70 mt-2 text-sm">
           Los campos con{' '}
           <span aria-hidden className="text-accent">
             *
           </span>
-          <span className="sr-only">asterisco</span> son obligatorios.
+          <span className="sr-only">asterisco</span> son obligatorios. El RUT no
+          se publica en el sitio: lo ve solo el equipo de la Liga.
         </p>
 
         <div className="mt-6">
-          <InscripcionForm />
+          <JugadorForm />
         </div>
 
         {/*
@@ -113,13 +113,13 @@ export default function InscribetePage() {
           corrido (CLAUDE.md seccion 3).
         */}
         <p className="text-ink/60 mt-8 text-sm">
-          ¿Buscas las bases o el reglamento?
+          ¿Tienes equipo y quieres sumarte a la Liga?
         </p>
         <Link
-          href="/documentos"
+          href="/contacto"
           className="text-accent hover:text-accent-light focus-visible:ring-accent focus-visible:ring-offset-canvas -mx-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm underline underline-offset-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          Están en Documentos
+          Escríbenos por Contacto
           <ArrowRight aria-hidden className="size-3.5" />
         </Link>
       </div>

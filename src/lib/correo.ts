@@ -5,10 +5,9 @@ import { Resend } from 'resend'
 /**
  * Envio de los correos que generan los formularios del sitio.
  *
- * Es lo unico que hace de verdad `/contacto` e `/inscribete`: no hay tabla, no
- * hay panel de mensajes recibidos. Un formulario que guarda en una base que
- * nadie mira es lo mismo que uno que no manda nada, y CLAUDE.md ya dice que eso
- * es peor que no tenerlo.
+ * Es lo unico que hace de verdad `/contacto`. `/jugadores` tambien manda un
+ * aviso, pero ahi la fuente de verdad es la fila en `players`: si el correo
+ * no sale, la ficha igual queda.
  *
  * **Los mensajes se mandan en texto plano, no en HTML.** No es un descuido: el
  * cuerpo lo escribe un desconocido en un `<textarea>` publico, y en texto plano

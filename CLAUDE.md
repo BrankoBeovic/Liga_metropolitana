@@ -41,7 +41,7 @@ Limpio, editorial, con motion design cuidado y rendimiento como prioridad.
 | Tipografía Display | **Bebas Neue** (headings, H1, badges) |
 | Tipografía Body | **Plus Jakarta Sans** (cuerpo de texto, metadatos) |
 | Editor CMS | **TipTap** (JSON como formato de almacenamiento de `content`) |
-| Correo | **Resend**, solo para los formularios de `/contacto` e `/inscribete` |
+| Correo | **Resend**, para `/contacto` y el aviso de `/jugadores` |
 | Paquetes | pnpm |
 | Lenguaje | TypeScript estricto |
 | Calidad | ESLint + Prettier |
@@ -203,7 +203,7 @@ Regla general: si el logo necesita que le hagan lugar, está mal ubicado.
 
 Decidido antes de la Etapa 1.
 La fuente configuraba la barra desde la tabla `categories` (`nav_label`, `show_in_navbar`) porque tenía nueve secciones que no cabían.
-Acá los enlaces de la barra son páginas fijas (Historia, Documentos, Inscríbete, Contacto), no categorías, y son 4 o 5.
+Acá los enlaces de la barra son páginas fijas (Historia, Documentos, Jugadores, Contacto), no categorías, y son 4 o 5.
 Se ahorran las dos columnas, `NavbarPreview` y toda la maquinaria de medición.
 `categories` queda solo para clasificar noticias.
 
@@ -231,8 +231,9 @@ Sin ninguna destacada, la principal pasa a ser la más reciente: degradación na
 ### Qué se sumó
 
 - Tabla `documents` con sus 4 políticas RLS y un bucket de Storage para PDFs.
-- Páginas `/historia`, `/documentos`, `/inscribete`, `/contacto`.
-- Sección Documentos en el CMS.
+- Páginas `/historia`, `/documentos`, `/jugadores`, `/contacto`.
+- Sección Documentos y Jugadores en el CMS.
+- Tabla `players` para quienes buscan equipo.
 
 ### La firma anónima no dice "Equipo HDB"
 
@@ -292,22 +293,41 @@ Vale la pena releerlo antes de escribir cualquier componente que arranque una an
 
 ### La portada, en orden
 
-Hero a pantalla casi completa (video + bajada + dos botones), "Lo último" (destacada grande más dos laterales), Reels de Instagram, "Más noticias" (grilla de cinco) y los logos de los sponsors.
+Hero a pantalla casi completa (video + bajada), legado, Reels, "Solo noticias" (destacada a media columna mas tres laterales), sponsors y al cierre el formulario de jugadores ("¿Quieres jugar pero no tienes equipo?").
 
 Las tres secciones del medio desaparecen enteras si no tienen contenido, y ese es el estado normal hoy: sin token de Instagram no hay Reels.
-Solo "Lo último" se queda, con un estado vacío explícito, porque una portada de un medio sin ni un hueco donde diga "acá van las noticias" parece rota.
+Esa sección se queda, con un estado vacío explícito, porque una portada de un medio sin ni un hueco donde diga "acá van las noticias" parece rota.
 
 El `h1` de la portada es `sr-only`.
 La portada de un medio no tiene titular propio, y el nombre de la Liga ya está dicho en letras de tres metros en el video: escribirlo encima sería decirlo dos veces y pelearle el centro a la imagen.
 
-### Los formularios mandan un correo y nada más
+### Los formularios: contacto manda correo, jugadores además se guardan
 
-`/contacto` e `/inscribete` no guardan en ninguna tabla ni tienen bandeja de entrada en el CMS.
-Mandan un correo con Resend y ahí termina el circuito.
-Un formulario que escribe en una tabla que nadie mira es lo mismo que uno que no manda nada, que es justo lo que la fuente evitaba no teniendo formularios.
+`/contacto` sigue el circuito original: manda un correo con Resend y no escribe en ninguna tabla.
+No hay bandeja de mensajes en el CMS.
 
-Tres variables de entorno, todas server-only: `RESEND_API_KEY`, `CORREO_DESTINO` y `CORREO_REMITENTE`.
-Si falta alguna de las dos primeras, el formulario **lo dice en pantalla** en vez de fingir que salió, y registra cuál falta en el log.
+`/jugadores` es la excepción deliberada.
+Era `/inscribete` y pedía un equipo; ahora es para quien quiere jugar y no tiene club.
+Guarda la ficha en `players` **y** manda un aviso por correo.
+La fila es la fuente de verdad: si Resend falla, la inscripción igual queda y se ve en `/admin/jugadores`.
+`/inscribete` redirige 301 a `/jugadores`.
+
+El alta no la hace `anon`.
+La Server Action inserta con `SUPABASE_SECRET_KEY` (bypassea RLS) después de las trampas antispam.
+Si `anon` pudiera insertar, un bot publicaría filas directo contra el REST y se saltaría el formulario.
+Por eso las políticas de INSERT y UPDATE de `players` están declaradas en `false` para `authenticated`: nadie escribe por RLS, y el listado del CMS solo lee y borra.
+
+El RUT no se publica en el sitio.
+Solo lo ve el equipo autenticado.
+
+El formulario pide **nombre y apellido por separado**, más edad, RUT, posición y bio.
+También **correo** (obligatorio) y **teléfono** (opcional).
+Sin un dato de contacto la ficha no sirve: la Liga no tiene otro canal para devolverle la llamada.
+El campo de apellido se llama `apellido` a propósito: `apellido_materno` es la trampa antispam, y si se mezclan un envío real se descarta como bot.
+
+Tres variables de entorno para el correo, todas server-only: `RESEND_API_KEY`, `CORREO_DESTINO` y `CORREO_REMITENTE`.
+Si falta alguna de las dos primeras, `/contacto` **lo dice en pantalla** en vez de fingir que salió.
+`/jugadores` no: guarda igual y registra el fallo del correo en el log.
 
 **El remitente es el punto delicado.** Resend exige que el dominio del `from` esté verificado en su panel.
 Mientras la Liga no tenga dominio, `CORREO_REMITENTE` va vacía y el código cae en `onboarding@resend.dev`, que Resend permite sin verificar nada **pero solo entrega a la casilla dueña de la cuenta de Resend**.
@@ -378,11 +398,11 @@ Todo el contenido vive en `(public)/historia/contenido.ts` y **nada** está escr
 Mientras `ES_RELLENO` sea `true`, la página lleva `noindex`, muestra un aviso y no aparece en el sitemap: un sitio con una página de relleno indexada le dice a Google que su contenido es de baja calidad, y esa señal cuesta más de remontar de lo que cuesta esperar el texto.
 **Al cargar el texto hay que hacer tres cosas**: reemplazar el contenido, poner `ES_RELLENO` en `false` y agregar `/historia` a `src/app/sitemap.ts`.
 
-### Las categorías del formulario de inscripción no son las oficiales
+### Las posiciones del formulario de jugadores
 
-`lib/inscripcion.ts` ofrece los tramos habituales del maxibásquetbol (+30 a +70, cada cinco años) más "Todavía no lo sé".
-**Nadie confirmó que sean las divisiones de esta Liga.**
-Cuando el equipo las defina se corrige esa lista y nada más: el selector se arma desde ahí y la validación del servidor también.
+`lib/jugadores.ts` ofrece las cinco de la cancha (Base, Escolta, Alero, Ala-pívot, Pívot) más "Varias".
+El selector se arma desde ahí, la validación del servidor también, y la columna `players.position` tiene el mismo CHECK.
+Si la Liga quiere otra lista, se corrigen los tres lugares.
 
 ## 5. CMS / Admin (`/admin`)
 
@@ -465,7 +485,7 @@ La salida (`/salir-vista-previa`) vive fuera de `/admin` a propósito: quien nec
 
 ## 6. Base de datos
 
-### Los cuatro clientes de Supabase y cuál usar dónde
+### Los cinco clientes de Supabase y cuál usar dónde
 
 | Archivo | Para qué | Lee cookies |
 |---|---|---|
@@ -473,6 +493,7 @@ La salida (`/salir-vista-previa`) vive fuera de `/admin` a propósito: quien nec
 | `lib/supabase/server.ts` | Server Components y Actions con sesión | Sí |
 | `lib/supabase/client.ts` | Navegador | Sí |
 | `lib/supabase/middleware.ts` | Refresco del token, desde el proxy | Sí |
+| `lib/supabase/admin.ts` | Escrituras que bypassean RLS (alta de jugadores) | **No** |
 
 **La regla que importa**: para leer contenido público desde el servidor se usa `supabasePublic`, nunca el de `server.ts`.
 Tocar cookies saca a la ruta del render estático: una sola llamada en un layout pasa todo el sitio público a dinámico y mata el ISR.
@@ -494,9 +515,12 @@ Tocar cookies saca a la ruta del render estático: una sola llamada en un layout
 | `sponsors` | Todo | Todo |
 | `categories` | Solo lectura | Todo |
 | `documents` | Todo | Todo |
+| `players` | Lectura y borrar | Lectura y borrar |
 
 El criterio: lo estructural es del admin, el resto lo trabaja el equipo.
 `documents` sigue el reparto de `sponsors`: borrar un documento es reversible (se vuelve a subir el PDF), a diferencia de borrar la nota de otra persona.
+`players` igual: sacar a alguien de la lista es reversible (se vuelve a inscribir).
+El alta de `players` no la hace el CMS: viene del formulario público, con la clave secreta.
 `posts` es la excepción deliberada: corregir un logo mal cargado es reversible, borrar la nota publicada de otra persona no.
 
 ### Sistema de claves

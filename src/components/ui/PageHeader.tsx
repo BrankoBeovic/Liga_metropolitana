@@ -35,6 +35,13 @@ type PageHeaderProps = {
  * el escudo apilado arriba del titulo empujaria la bajada fuera de la primera
  * pantalla.
  *
+ * **El `mr-28` lo separa del borde derecho a pedido del equipo.** Pegado al
+ * margen del contenedor quedaba demasiado al filo de la pantalla; corrido 112px
+ * hacia adentro respira y deja de competir con el borde. Va como margen y no
+ * como `translate` justamente para que el grid lo tenga en cuenta: asi el
+ * espacio se le descuenta a la columna del texto y el escudo nunca puede
+ * terminar encima del titulo en una ventana angosta.
+ *
  * **Sin animacion de entrada.** Es el primer bloque de la pagina y por lo tanto
  * el candidato natural a LCP en las paginas sin foto grande. Un `opacity: 0`
  * inicial corre esa medicion, que es justo lo que CLAUDE.md pide cuidar en el
@@ -80,7 +87,7 @@ export function PageHeader({
         width={439}
         height={278}
         sizes="300px"
-        className="hidden w-[300px] justify-self-end lg:block"
+        className="hidden w-[300px] justify-self-end lg:mr-28 lg:block"
       />
     </header>
   )

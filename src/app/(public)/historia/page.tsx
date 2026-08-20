@@ -1,11 +1,12 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { PageHeader } from '@/components/ui/PageHeader'
 import { urlAbsoluta } from '@/lib/site'
 
-import { BAJADA, CIERRE, ES_RELLENO, HITOS, INTRO } from './contenido'
+import { ACTA, BAJADA, CIERRE, ES_RELLENO, HITOS, INTRO } from './contenido'
 
 const TITULO = 'Historia'
 
@@ -77,28 +78,89 @@ export default function HistoriaPage() {
         </h2>
 
         {/*
-          Linea de tiempo con un solo carril.
+          La linea de tiempo a la izquierda y el acta a la derecha.
 
-          El borde vertical vive en el `<ol>` y no en cada `<li>`: puesto en los
-          items, el ultimo dejaba el trazo colgando debajo de su punto. Los
-          puntos se dibujan con `before` sobre ese borde.
+          La columna de la izquierda queda topada en 38rem, que es la medida de
+          lectura del sitio (CLAUDE.md seccion 4): la linea de tiempo es texto y
+          no puede ensancharse solo porque al lado haya una foto.
+
+          Recien desde `lg` se ponen lado a lado. Abajo de eso el acta va
+          debajo, porque en un telefono una foto vertical al lado de un texto
+          deja las dos cosas ilegibles.
         */}
-        <ol className="border-ink/15 mt-8 max-w-[38rem] border-l pl-8">
-          {HITOS.map((hito) => (
-            <li
-              key={hito.anio}
-              className="relative mt-10 before:absolute before:top-2 before:-left-[calc(2rem+5px)] before:size-2.5 before:rounded-full before:bg-[var(--color-accent)] first:mt-8"
+        <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,38rem)_minmax(0,1fr)] lg:gap-16">
+          {/*
+            Linea de tiempo con un solo carril.
+
+            El borde vertical vive en el `<ol>` y no en cada `<li>`: puesto en
+            los items, el ultimo dejaba el trazo colgando debajo de su punto.
+            Los puntos se dibujan con `before` sobre ese borde.
+          */}
+          <ol className="border-ink/15 border-l pl-8">
+            {HITOS.map((hito) => (
+              <li
+                key={hito.anio}
+                className="relative mt-10 before:absolute before:top-2 before:-left-[calc(2rem+5px)] before:size-2.5 before:rounded-full before:bg-[var(--color-accent)] first:mt-8"
+              >
+                <p className="font-display text-accent text-2xl tracking-wide">
+                  {hito.anio}
+                </p>
+                <h3 className="font-display text-ink mt-1 text-xl tracking-wide uppercase">
+                  {hito.titulo}
+                </h3>
+                <p className="text-ink/75 mt-2 leading-relaxed">{hito.texto}</p>
+              </li>
+            ))}
+          </ol>
+
+          {/*
+            El acta acompaña el recorrido: `sticky` desde `lg`, para que siga
+            en pantalla mientras se baja por los hitos. `self-start` es lo que
+            lo hace posible; sin eso el item del grid se estira a lo alto de la
+            fila y un elemento tan alto como su contenedor nunca se pega.
+
+            `top-24` deja libre la barra flotante, que ocupa hasta 71px.
+          */}
+          <figure className="mx-auto max-w-md lg:sticky lg:top-24 lg:mx-0 lg:max-w-none lg:self-start">
+            {/*
+              La foto entera es el enlace, y va a la imagen original.
+
+              El acta es un manuscrito: al ancho de la columna no se alcanza a
+              leer, y la unica forma de leerla de verdad es abrirla en grande.
+              Un enlace al archivo hace eso sin lightbox, sin JavaScript y sin
+              romper el "abrir en otra pestaña" del navegador.
+
+              `<a>` y no `<Link>`: apunta a un archivo, no a una ruta de la
+              aplicacion, igual que los PDF del CMS.
+            */}
+            <a
+              href={ACTA.src}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group focus-visible:ring-accent focus-visible:ring-offset-canvas block rounded-2xl focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:outline-none"
             >
-              <p className="font-display text-accent text-2xl tracking-wide">
-                {hito.anio}
-              </p>
-              <h3 className="font-display text-ink mt-1 text-xl tracking-wide uppercase">
-                {hito.titulo}
-              </h3>
-              <p className="text-ink/75 mt-2 leading-relaxed">{hito.texto}</p>
-            </li>
-          ))}
-        </ol>
+              <Image
+                src={ACTA.src}
+                alt={ACTA.alt}
+                width={ACTA.ancho}
+                height={ACTA.alto}
+                sizes="(min-width: 1024px) 40rem, (min-width: 640px) 28rem, 100vw"
+                className="w-full rounded-2xl ring-1 ring-white/10 transition-[box-shadow,transform] duration-300 group-hover:scale-[1.01] group-hover:ring-white/25"
+              />
+
+              <span className="font-display text-ink/70 group-hover:text-accent mt-4 inline-flex min-h-11 items-center gap-1.5 text-xs tracking-[0.14em] uppercase transition-colors">
+                {ACTA.enlace}
+                <ArrowUpRight aria-hidden className="size-3.5" />
+                <span className="sr-only"> (se abre en otra pestaña)</span>
+              </span>
+            </a>
+
+            <figcaption className="text-ink/60 mt-2 max-w-sm text-sm leading-relaxed">
+              <b className="text-ink/85 font-normal">{ACTA.epigrafe}</b>{' '}
+              {ACTA.detalle}
+            </figcaption>
+          </figure>
+        </div>
       </section>
 
       <section

@@ -23,6 +23,38 @@
 /** Cambiar a `false` cuando el texto sea el de verdad. */
 export const ES_RELLENO = true
 
+/**
+ * El acta de la primera reunión, y **lo único de esta página que NO es
+ * relleno**.
+ *
+ * La entregó el equipo: es la foto de la primera hoja del libro de actas, del
+ * 16 de mayo de 1989, donde ocho instituciones acordaron organizar el
+ * campeonato que dio origen a la Liga. Se muestra al costado de la línea de
+ * tiempo.
+ *
+ * Que sea contenido real no cambia `ES_RELLENO`: la página sigue con `noindex`
+ * mientras el texto que la rodea sea lorem ipsum. Una foto verdadera adentro de
+ * una página de relleno sigue siendo una página de relleno.
+ *
+ * El `alt` describe qué es el documento, no lo que dice. El texto es manuscrito
+ * y no hay transcripción todavía; cuando la haya, el lugar donde ponerla es
+ * acá, y conviene que sea el texto de verdad y no un resumen.
+ *
+ * Las medidas son las del archivo, leídas con `ffprobe` y no del nombre del
+ * archivo, que decía otra cosa. Si se reemplaza la foto hay que actualizarlas:
+ * `next/image` las usa para reservar el espacio antes de que la imagen baje.
+ */
+export const ACTA = {
+  src: '/acta-1989.jpg',
+  ancho: 752,
+  alto: 1114,
+  alt: 'Primera hoja del acta de la Liga, manuscrita, con fecha 16 de mayo de 1989 en Santiago y la lista de las instituciones fundadoras y sus delegados.',
+  epigrafe: 'Acta N° 1, 16 de mayo de 1989.',
+  detalle:
+    'La reunión en la sede de Unión Española donde ocho instituciones acordaron formar la Liga y organizar el campeonato.',
+  enlace: 'Ver el acta completa',
+} as const
+
 export const BAJADA =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio praesent libero sed cursus ante dapibus diam, desde 1989.'
 

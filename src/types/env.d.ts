@@ -29,7 +29,7 @@ declare namespace NodeJS {
      *
      * Dura 60 dias y hay que refrescarlo antes de que venza: vencido no se
      * puede refrescar y hay que rehacer la autorizacion entera. Sin el, la
-     * seccion de Reels no se dibuja.
+     * seccion de Reels muestra contenido de muestra.
      */
     readonly INSTAGRAM_ACCESS_TOKEN?: string
 

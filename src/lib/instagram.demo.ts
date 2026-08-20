@@ -7,14 +7,11 @@ import type { ReelInstagram } from './instagram'
  *
  * Existe por un problema concreto: los Reels son lo único de la portada que no
  * sale de la base, así que no se pueden cargar de prueba como una noticia o un
- * sponsor. Sin token, la sección no se dibuja y no hay forma de ver cómo queda
- * el carrusel mientras se trabaja en él.
+ * sponsor. Sin token, este modulo arma el carrusel con recortes del video de
+ * marca para poder mostrarlo (local y deploy) hasta que llegue la API.
  *
- * **Nunca se enciende solo.** Hace falta `REELS_DEMO=1`, y aun así
- * `getReelsInstagram` no lo mira si el build es de producción: son dos
- * condiciones y la segunda no se puede desactivar por configuración. Un
- * carrusel de contenido inventado en el sitio publicado sería bastante peor que
- * no tener carrusel.
+ * Entra cuando falta `INSTAGRAM_ACCESS_TOKEN`, también en el deploy.
+ * Con token, `getReelsInstagram` habla con Instagram y este módulo no se usa.
  *
  * Las miniaturas son recortes 9:16 del video de marca, generados en
  * `public/demo/`. Van en git para que el deploy las sirva: sin ellas las

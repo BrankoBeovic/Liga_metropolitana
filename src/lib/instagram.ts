@@ -133,27 +133,23 @@ export async function getReelsInstagram(
   limite: number
 ): Promise<ReelInstagram[]> {
   /*
-    Interruptor de contenido de prueba, para poder mirar el carrusel sin token.
+    Sin token se muestran Reels de muestra, tambien en produccion.
 
-    Las dos condiciones hacen falta. `REELS_DEMO` es la que se enciende a mano
-    en `.env.local`; el chequeo de `NODE_ENV` es el que garantiza que esto no
-    pueda pasar a produccion por una variable mal puesta en el panel del
-    hosting. Un carrusel de contenido inventado en el sitio publicado seria
-    bastante peor que no tener carrusel.
+    Era un interruptor solo de desarrollo (`REELS_DEMO` mas `NODE_ENV`), y en
+    Vercel el carrusel desaparecia: ahi `NODE_ENV` es `production` y no habia
+    token. Para poder mostrarle el bloque al cliente, el respaldo de muestra
+    corre siempre que falte `INSTAGRAM_ACCESS_TOKEN`. Cuando llegue el token
+    real, esta rama deja de ejecutarse sola.
 
     El import es dinamico para que el modulo de muestra no entre en el camino
-    normal del servidor.
+    que habla con Instagram.
   */
-  if (process.env.NODE_ENV !== 'production' && process.env.REELS_DEMO === '1') {
+  if (!TOKEN) {
+    console.warn(
+      'Falta INSTAGRAM_ACCESS_TOKEN: se muestran Reels de muestra.'
+    )
     const { reelsDeMuestra } = await import('./instagram.demo')
     return reelsDeMuestra(limite)
-  }
-
-  if (!TOKEN) {
-    console.error(
-      'Falta INSTAGRAM_ACCESS_TOKEN: la seccion de Reels no se va a dibujar.'
-    )
-    return []
   }
 
   const url =

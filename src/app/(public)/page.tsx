@@ -57,8 +57,9 @@ export default async function Portada() {
         <Legado />
 
         {/*
-          La seccion entera desaparece si no hay Reels, que es el estado normal
-          mientras no llegue el token de Instagram: un encabezado sobre un
+          Sin token de Instagram igual hay Reels de muestra, para que el
+          carrusel se pueda mostrar. Si la lista llegara vacia (un fallo al
+          armar la muestra), el encabezado no se dibuja: un titulo sobre un
           carrusel vacio se lee como una parte rota del sitio.
         */}
         {reels.length > 0 ? (

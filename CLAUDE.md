@@ -16,7 +16,7 @@ Bajada: "El maxibásquetbol chileno desde 1989".
 - Instagram: [@ligametromaxibasquet](https://www.instagram.com/ligametromaxibasquet/)
 - Dominio: pendiente, se conecta después.
 - Correo para formularios: llega a `brankobeovic24@gmail.com`, que es **provisorio** hasta que exista la casilla del equipo. Se cambia en `CORREO_DESTINO`, sin tocar código.
-- Token de la API de Instagram: pendiente, la sección de Reels queda vacía sin romper nada hasta que llegue.
+- Token de la API de Instagram: pendiente. Mientras falte, la portada muestra Reels de muestra (recortes del video de marca). Con token, esa rama no corre.
 
 Las categorías de las noticias son dos: **Novedades** e **Institucional**.
 En el CMS se llaman "categorías".
@@ -295,7 +295,8 @@ Vale la pena releerlo antes de escribir cualquier componente que arranque una an
 
 Hero a pantalla casi completa (video + bajada), legado, Reels, "Solo noticias" (destacada a media columna mas tres laterales), sponsors y al cierre el formulario de jugadores ("¿Quieres jugar pero no tienes equipo?").
 
-Las tres secciones del medio desaparecen enteras si no tienen contenido, y ese es el estado normal hoy: sin token de Instagram no hay Reels.
+Las secciones de Reels y sponsors desaparecen si no tienen contenido.
+Sin token de Instagram la de Reels igual se dibuja, con piezas de muestra, para poder mostrar el carrusel.
 Esa sección se queda, con un estado vacío explícito, porque una portada de un medio sin ni un hueco donde diga "acá van las noticias" parece rota.
 
 El `h1` de la portada es `sr-only`.

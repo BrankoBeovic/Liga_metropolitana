@@ -146,22 +146,30 @@ export default async function Portada() {
                 formulario, y ademas hace un trabajo concreto: muestra a que se
                 esta apuntando uno cuando deja sus datos.
 
-                **Se recorta a 4:3 y el original es vertical.** El recorte se
-                corre al 30% de la altura y no al centro, porque la copa esta
-                arriba: centrado, la ventana visible la dejaba fuera y quedaba
-                un grupo de gente mirando hacia arriba a nada.
+                **El archivo mide 1600px de ancho, y el numero no es al azar.**
+                El hueco llega a 648px, o sea 1296 en una pantalla de densidad
+                doble. La primera version de esta foto tenia 617px de ancho y el
+                navegador la estiraba un 60% para llenarlo: se veia blanda.
+                1600 cubre el peor caso con margen y pesa 294 KB.
+
+                **Se recorta a 4:3 y el original es vertical (1600x1999).** El
+                recorte va centrado, y eso no es la opcion por descarte: con
+                estas medidas el centro deja justo la copa completa arriba y a
+                todo el equipo, cortando a la altura de las rodillas.
+                Verificado generando el recorte exacto y mirandolo, no a ojo
+                sobre la pagina.
 
                 `loading` queda en el `lazy` por defecto: esta seccion cierra la
                 portada, muy por debajo del pliegue, y pedirla temprano solo le
                 robaria ancho de banda al video del Hero (CLAUDE.md seccion 4).
               */}
               <Image
-                src="/campeones.jpg"
-                alt="Jugadores de la Liga celebrando con la copa en alto en el centro de la cancha."
-                width={617}
-                height={771}
+                src="/campeones-2025.jpg"
+                alt="El equipo campeón de la Liga celebrando con la copa en alto en el centro de la cancha."
+                width={1600}
+                height={1999}
                 sizes="(min-width: 1024px) 40rem, 100vw"
-                className="mt-8 aspect-[4/3] w-full rounded-2xl object-cover object-[center_30%] ring-1 ring-white/10"
+                className="mt-8 aspect-[4/3] w-full rounded-2xl object-cover object-center ring-1 ring-white/10"
               />
             </div>
             <JugadorForm />

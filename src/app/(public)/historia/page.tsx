@@ -40,24 +40,6 @@ export default function HistoriaPage() {
       */}
       <PageHeader titulo="Historia" bajada={BAJADA} />
 
-      {/*
-        El aviso solo aparece con el texto de relleno puesto, y desaparece solo
-        al cambiar la bandera. Sin el, cualquiera que abra la pagina en una
-        vista previa va a creer que asi va a salir publicada.
-      */}
-      {ES_RELLENO ? (
-        <p
-          role="status"
-          className="border-accent/40 bg-accent/10 text-ink mt-8 max-w-3xl rounded-xl border px-4 py-3 text-sm"
-        >
-          <b className="font-display tracking-wide uppercase">
-            Página en preparación.
-          </b>{' '}
-          Buena parte del texto que sigue es de relleno mientras la Liga prepara
-          su historia. La página no está indexada en buscadores.
-        </p>
-      ) : null}
-
       <div className="mt-12 max-w-[38rem]">
         {INTRO.map((parrafo) => (
           <p

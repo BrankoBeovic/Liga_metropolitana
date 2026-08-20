@@ -1,6 +1,6 @@
 import { SectionHeading } from '@/components/ui/SectionHeading'
 
-import { ES_RELLENO, RESUMEN } from '@/app/(public)/historia/contenido'
+import { RESUMEN } from '@/app/(public)/historia/contenido'
 
 /**
  * Bloque "Legado" de la portada: un resumen corto de la historia de la Liga.
@@ -22,24 +22,6 @@ export function Legado() {
   return (
     <section aria-labelledby="legado-titulo">
       <SectionHeading id="legado-titulo" title="Nuestro" accent="legado" />
-
-      {/*
-        El aviso solo aparece mientras el texto sea de relleno, y desaparece
-        solo al cambiar la bandera en `contenido.ts`. Sin él, cualquiera que
-        mire la portada va a creer que así va a salir publicada.
-      */}
-      {ES_RELLENO ? (
-        <p
-          role="status"
-          className="border-accent/40 bg-accent/10 text-ink mb-6 max-w-3xl rounded-xl border px-4 py-3 text-sm"
-        >
-          <b className="font-display tracking-wide uppercase">
-            Texto de relleno.
-          </b>{' '}
-          Se reemplaza en <code>historia/contenido.ts</code> cuando la Liga
-          entregue su reseña.
-        </p>
-      ) : null}
 
       <div className="grid gap-x-10 gap-y-5 md:grid-cols-2">
         {RESUMEN.map((parrafo) => (

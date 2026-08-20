@@ -445,8 +445,11 @@ Supabase resuelve el caso con `?download`, que le hace mandar `Content-Dispositi
 Decisión del equipo: la página se armó antes de tener el texto.
 Todo el contenido vive en `(public)/historia/contenido.ts` y **nada** está escrito en el JSX, así que cargar la historia de verdad es editar un archivo.
 
-Mientras `ES_RELLENO` sea `true`, la página lleva `noindex`, muestra un aviso y no aparece en el sitemap: un sitio con una página de relleno indexada le dice a Google que su contenido es de baja calidad, y esa señal cuesta más de remontar de lo que cuesta esperar el texto.
+Mientras `ES_RELLENO` sea `true`, la página lleva `noindex` y no aparece en el sitemap: un sitio con una página de relleno indexada le dice a Google que su contenido es de baja calidad, y esa señal cuesta más de remontar de lo que cuesta esperar el texto.
 **Al cargar el texto hay que hacer tres cosas**: reemplazar el contenido, poner `ES_RELLENO` en `false` y agregar `/historia` a `src/app/sitemap.ts`.
+
+Los dos avisos en pantalla que anunciaban el relleno -uno en el bloque Legado de la portada y otro arriba de `/historia`- se sacaron a pedido del equipo, para poder mostrar el sitio sin carteles.
+La consecuencia hay que tenerla presente: el lorem ipsum sigue ahí y ya no se anuncia solo, así que lo único que queda avisando es esta nota y el `noindex`.
 
 ### Las posiciones del formulario de jugadores
 

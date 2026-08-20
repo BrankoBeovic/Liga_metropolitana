@@ -103,9 +103,15 @@
     la animacion duraba dos segundos pero el texto aparecia en medio. Con esta el
     reparto es parejo.
 
-    El retraso de 1,5s es la parte "dramatica" del pedido: durante ese rato la
-    pantalla es solo el video, sin nada que compita por la mirada. Recien despues
-    entra el texto, en tres segundos. Termina de aparecer a los 4,5s.
+    Los tiempos se acortaron a pedido del equipo, mirando el sitio en el
+    telefono: el texto tardaba demasiado en estar. Eran 1,5s de retraso mas 3s
+    de animacion, o sea que terminaba de aparecer a los 4,5s, y quien llega y
+    baja enseguida no alcanzaba a leerlo nunca.
+
+    Ahora son 0,3s de retraso y 1s de animacion: termina a los 1,3s. El retraso
+    corto se conserva porque hace la diferencia entre un texto que estaba ahi y
+    uno que entra despues del video, que es la intencion original; lo que se fue
+    es la espera.
 
     Ese retraso NO pone en riesgo el LCP, aunque parezca: el elemento mas grande
     de la pantalla es el poster del video, que ocupa el viewport entero y se
@@ -116,7 +122,7 @@
     lleva toda animacion a 0.01ms, y con `forwards` el texto queda visible.
   */
   .eslogan-hero {
-    animation: eslogan-aparece 3s cubic-bezier(0.4, 0, 0.2, 1) 1.5s both;
+    animation: eslogan-aparece 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
   }
 
   @keyframes eslogan-aparece {

@@ -16,7 +16,7 @@ import { HeroVideo } from './HeroVideo'
  * El h1 de la página existe, vive en `page.tsx` y es `sr-only`: buscadores y
  * lectores de pantalla lo reciben igual.
  *
- * **La bajada aparece en dos segundos, y es la única excepción a la regla del
+ * **La bajada termina de aparecer a 1,3s, y es la única excepción a la regla del
  * `opacity: 0` en el Hero.** CLAUDE.md sección 3 la prohíbe porque el Hero es
  * lo que mide el LCP. Acá no aplica: el elemento más grande de la pantalla es
  * el póster del video, que ocupa el viewport entero y se pinta de inmediato, así

@@ -3,7 +3,7 @@
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { cn } from '@/lib/cn'
 import { NAV_LINKS } from '@/lib/navigation'
@@ -52,25 +52,86 @@ import { NAV_LINKS } from '@/lib/navigation'
  *
  * Plegado, el bloque de enlaces lleva `inert`: sin eso el tabulador entra en
  * secciones que no se ven y el foco desaparece de la pantalla.
+ *
+ * **Al salir el mouse, el menú espera un segundo antes de cerrarse.** Pedido
+ * del equipo, y además arregla algo que molestaba: la píldora se despliega
+ * hacia la izquierda, o sea que los enlaces aparecen lejos del botón que los
+ * abrió, y el camino del puntero hasta ellos pasa cerca del borde. Cerrando al
+ * instante, un desvío mínimo del mouse plegaba el menú en la cara y había que
+ * volver a empezar. La espera solo corre al salir: entrar abre de inmediato, y
+ * volver a entrar antes del segundo cancela el cierre, así que ir y venir no
+ * hace parpadear nada.
+ *
+ * El cierre por teclado no espera. Cuando el foco se va del bloque, la persona
+ * ya está en otra parte de la página y dejar el menú abierto un segundo más
+ * solo taparía lo que acaba de enfocar.
  */
+
+/**
+ * Cuánto espera el menú antes de plegarse al salir el mouse, en milisegundos.
+ *
+ * Un segundo es lo que se pidió y funciona bien: alcanza para corregir el rumbo
+ * del puntero sin que el menú quede colgado cuando alguien de verdad se fue.
+ */
+const MS_ANTES_DE_CERRAR = 1000
+
 export function MenuFlotante() {
   const pathname = usePathname()
   const [abierto, setAbierto] = useState(false)
   const idPanel = useId()
 
+  /*
+    El cierre pendiente.
+
+    Va en una ref y no en el estado a propósito: cambiarlo no tiene que
+    redibujar nada, y ademas los manejadores necesitan leer el valor actual sin
+    quedar atados al que existía cuando se creó el closure.
+  */
+  const cierrePendiente = useRef<number | null>(null)
+
+  const cancelarCierre = () => {
+    if (cierrePendiente.current !== null) {
+      window.clearTimeout(cierrePendiente.current)
+      cierrePendiente.current = null
+    }
+  }
+
+  const abrir = () => {
+    cancelarCierre()
+    setAbierto(true)
+  }
+
+  /** Cierre inmediato: el teclado y el botón no esperan. */
+  const cerrarYa = () => {
+    cancelarCierre()
+    setAbierto(false)
+  }
+
+  const cerrarDespues = () => {
+    cancelarCierre()
+    cierrePendiente.current = window.setTimeout(() => {
+      cierrePendiente.current = null
+      setAbierto(false)
+    }, MS_ANTES_DE_CERRAR)
+  }
+
+  // Un temporizador vivo despues de desmontar llamaria a `setAbierto` sobre un
+  // componente que ya no esta.
+  useEffect(() => cancelarCierre, [])
+
   return (
     <div
       // `focus`/`blur` de React son `focusin`/`focusout`: burbujean, así que
       // puestos acá cubren al botón y a todos los enlaces de adentro.
-      onFocus={() => setAbierto(true)}
+      onFocus={abrir}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setAbierto(false)
+        if (!e.currentTarget.contains(e.relatedTarget)) cerrarYa()
       }}
       onPointerEnter={(e) => {
-        if (e.pointerType === 'mouse') setAbierto(true)
+        if (e.pointerType === 'mouse') abrir()
       }}
       onPointerLeave={(e) => {
-        if (e.pointerType === 'mouse') setAbierto(false)
+        if (e.pointerType === 'mouse') cerrarDespues()
       }}
       className="bg-canvas/70 hidden items-center rounded-full p-1.5 ring-1 ring-white/15 backdrop-blur-xl lg:flex"
     >
@@ -116,7 +177,13 @@ export function MenuFlotante() {
         aria-expanded={abierto}
         aria-controls={idPanel}
         aria-label={abierto ? 'Cerrar menú' : 'Abrir menú'}
-        onClick={() => setAbierto((v) => !v)}
+        // Cancela cualquier cierre pendiente: si alguien toca el botón para
+        // cerrar, el menú no puede volver a plegarse un segundo después sobre
+        // una decisión que ya se tomó.
+        onClick={() => {
+          cancelarCierre()
+          setAbierto((v) => !v)
+        }}
         className="text-ink focus-visible:ring-accent flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:outline-none"
       >
         {/*

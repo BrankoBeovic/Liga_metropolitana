@@ -53,8 +53,15 @@ import { useEffect, useRef } from 'react'
  *
  * La respuesta a los tres es la misma: `reproducir()` no se llama una vez, se
  * llama en cada oportunidad nueva -datos listos, pestaña que vuelve al frente,
- * pagina restaurada del bfcache, primer toque de la persona, pausa que no
+ * pagina restaurada del bfcache, primer gesto de la persona, pausa que no
  * pedimos nosotros- y es barata cuando no hay nada que hacer.
+ *
+ * **Lo que ningun sitio puede hacer es saltarse el bloqueo.** Con Bajo Consumo
+ * o Modo de datos reducidos activados, iOS no deja arrancar nada hasta que la
+ * persona toque la pantalla, y eso vale para este video igual que para
+ * cualquier otro. Por eso el poster es el primer cuadro exacto del clip: cuando
+ * el sistema dice que no, lo que queda en pantalla es una foto que se ve
+ * deliberada, no un hueco.
  *
  * **La bandera `bloqueado` existe para no entrar en bucle.** Si el navegador
  * rechaza la reproduccion, reintentar desde el evento `pause` seria pedirla
@@ -140,7 +147,12 @@ export function HeroVideo() {
     /*
       El video volvio a tener con que reproducir. Es la red respondiendo, que en
       un telefono llega bastante despues del montaje.
+
+      Van los dos eventos y no solo `canplay`: `loadeddata` llega antes -apenas
+      hay un cuadro decodificado- y en una conexion lenta esa diferencia es de
+      varios segundos de poster quieto.
     */
+    video.addEventListener('loadeddata', reproducir)
     video.addEventListener('canplay', reproducir)
 
     /*
@@ -170,16 +182,30 @@ export function HeroVideo() {
     window.addEventListener('pageshow', reintentar)
 
     /*
-      El primer toque de la persona.
+      El primer gesto de la persona, que son cuatro eventos y no uno.
 
-      iOS en Bajo Consumo bloquea toda reproduccion automatica hasta que hay un
-      gesto; despues del gesto, la misma llamada que fallaba funciona. El
-      listener queda puesto -no `once`- porque el primer toque puede ocurrir
-      antes de que el video tenga datos, y entonces habria que esperar al
-      siguiente. Cuando no hay nada que hacer, `reproducir()` sale en la primera
-      linea.
+      iOS en Bajo Consumo -y tambien en Modo de datos reducidos- bloquea toda
+      reproduccion automatica hasta que hay un gesto; despues del gesto, la
+      misma llamada que fallaba funciona.
+
+      **`pointerdown` solo no alcanza, y esto es lo que fallaba en el
+      telefono.** Safari no otorga la activacion de usuario al apoyar el dedo:
+      la da recien en `touchend` y en `click`. Escuchando nada mas que
+      `pointerdown`, el intento salia demasiado temprano, Safari lo rechazaba
+      igual, y despues no quedaba ningun evento por escuchar: el toque parecia
+      no servir de nada y habia que volver a tocar.
+
+      `keydown` esta por el escritorio, donde el gesto puede ser una tecla.
+
+      Los listeners quedan puestos -no `once`- porque el primer gesto puede
+      ocurrir antes de que el video tenga datos, y entonces habria que esperar
+      al siguiente. Cuando no hay nada que hacer, `reproducir()` sale en su
+      primera linea.
     */
-    document.addEventListener('pointerdown', reintentar, { passive: true })
+    const GESTOS = ['pointerdown', 'touchend', 'click', 'keydown'] as const
+    for (const gesto of GESTOS) {
+      document.addEventListener(gesto, reintentar, { passive: true })
+    }
 
     const io = new IntersectionObserver(
       ([entrada]) => {
@@ -206,11 +232,14 @@ export function HeroVideo() {
 
     return () => {
       io.disconnect()
+      video.removeEventListener('loadeddata', reproducir)
       video.removeEventListener('canplay', reproducir)
       video.removeEventListener('pause', alPausar)
       document.removeEventListener('visibilitychange', alCambiarVisibilidad)
       window.removeEventListener('pageshow', reintentar)
-      document.removeEventListener('pointerdown', reintentar)
+      for (const gesto of GESTOS) {
+        document.removeEventListener(gesto, reintentar)
+      }
       consulta.removeEventListener('change', alCambiarMovimiento)
     }
   }, [])

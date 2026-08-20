@@ -173,7 +173,16 @@ Son tres fallas distintas con una sola causa de fondo: la primera versión pedí
 3. **Todavía no había datos que reproducir**: en datos móviles el primer `play()` puede llegar antes que el primer byte útil.
    Al cambiar de página y volver, el archivo ya está en la caché y arranca de una, que es justo el síntoma reportado.
 
-La respuesta a las tres es la misma: `reproducir()` se llama en cada oportunidad nueva -`canplay`, `visibilitychange`, `pageshow` (bfcache), el primer `pointerdown`, y el evento `pause` que no pedimos nosotros- y sale en su primera línea cuando no hay nada que hacer.
+La respuesta a las tres es la misma: `reproducir()` se llama en cada oportunidad nueva -`loadeddata` y `canplay`, `visibilitychange`, `pageshow` (bfcache), el primer gesto de la persona, y el evento `pause` que no pedimos nosotros- y sale en su primera línea cuando no hay nada que hacer.
+
+**El gesto son cuatro eventos y no uno, y esto apareció recién probando en el teléfono.**
+Safari no otorga la activación de usuario al apoyar el dedo: la da recién en `touchend` y en `click`.
+Escuchando nada más que `pointerdown`, el intento salía demasiado temprano, Safari lo rechazaba igual y después no quedaba ningún evento por escuchar: el toque parecía no servir y había que volver a tocar.
+Ahora escucha `pointerdown`, `touchend`, `click` y `keydown`; verificado que cada uno produce exactamente un intento, nunca una ráfaga.
+
+**Lo que ningún sitio puede hacer es saltarse el bloqueo.**
+Con Bajo Consumo o Modo de datos reducidos activados, iOS no deja arrancar nada hasta que la persona toque la pantalla, y eso vale para este video igual que para cualquier otro.
+Por eso importa que el póster sea el primer cuadro exacto del clip: cuando el sistema dice que no, lo que queda en pantalla es una foto que se ve deliberada, no un hueco.
 Dos banderas sostienen eso: `pausaNuestra` distingue la pausa del `IntersectionObserver` de la que impone el sistema, y `bloqueado` evita reintentar en bucle contra un navegador que ya dijo que no.
 Verificado con `play()` parcheado para rechazar: **un** intento en dos segundos, no una ráfaga.
 

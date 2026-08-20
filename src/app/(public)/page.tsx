@@ -119,12 +119,17 @@ export default async function Portada() {
           quien la apoya, no antes.
         */}
         <section aria-labelledby="jugadores-titulo" className="mt-20">
+          {/*
+            Sin enlace a `/jugadores`, a diferencia del encabezado de noticias.
+
+            Alla el "Ver todas" lleva a algo que no esta en la portada. Aca el
+            formulario completo esta justo debajo, asi que el enlace mandaba a
+            otra pagina a hacer lo mismo que ya se podia hacer sin moverse.
+          */}
           <SectionHeading
             id="jugadores-titulo"
             title="¿Quieres jugar pero no tienes"
             accent="equipo?"
-            href="/jugadores"
-            hrefLabel="Ver la página"
           />
           <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,38rem)] lg:gap-16">
             <p className="text-ink/75 text-lg leading-relaxed text-pretty">

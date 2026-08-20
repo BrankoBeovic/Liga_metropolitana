@@ -2,7 +2,8 @@
  * TEXTO PROVISORIO DE /historia.
  *
  * ============================================================================
- * TODO LO QUE SIGUE ES RELLENO. No es informacion de la Liga Metropolitana.
+ * CASI TODO LO QUE SIGUE ES RELLENO. No es informacion de la Liga.
+ * Las dos excepciones son `ACTA` y `CIERRE`, y estan marcadas como tales.
  * ============================================================================
  *
  * Esta pagina se maqueto antes de tener el texto real, por pedido explicito del
@@ -114,8 +115,22 @@ export const HITOS: readonly Hito[] = [
   },
 ]
 
+/**
+ * El bloque que cierra la pagina, y **tampoco es relleno**.
+ *
+ * Lo que dice es lo que la Liga de verdad ofrece hoy, en la misma voz que la
+ * seccion de jugadores de la portada: quien no tiene club deja sus datos y la
+ * Liga lo contacta. Nada de esto depende de la historia que falta escribir, asi
+ * que no habia razon para dejarlo en lorem ipsum.
+ *
+ * El rotulo del boton vive aca y no en el JSX por la misma regla que el resto
+ * del archivo: el texto de esta pagina se cambia en un solo lugar.
+ */
 export const CIERRE = {
-  titulo: 'Lorem ipsum dolor sit',
+  titulo: 'Juega con nosotros',
   texto:
-    'Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl. Pellentesque dapibus suscipit ligula donec posuere augue in quam.',
+    'Esta historia la escribieron los que estuvieron en la cancha, y sigue abierta. Si quieres jugar y no tienes club, déjanos tus datos: la Liga te contacta cuando un equipo esté buscando gente en tu puesto.',
+  // No repite el "déjanos tus datos" del párrafo: un botón que dice lo mismo
+  // que la línea de arriba se lee como un eco y no como una acción.
+  boton: 'Quiero jugar',
 } as const

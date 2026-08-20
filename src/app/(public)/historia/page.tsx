@@ -53,8 +53,8 @@ export default function HistoriaPage() {
           <b className="font-display tracking-wide uppercase">
             Página en preparación.
           </b>{' '}
-          El texto que sigue es de relleno mientras la Liga prepara su historia.
-          La página no está indexada en buscadores.
+          Buena parte del texto que sigue es de relleno mientras la Liga prepara
+          su historia. La página no está indexada en buscadores.
         </p>
       ) : null}
 
@@ -179,7 +179,7 @@ export default function HistoriaPage() {
           href="/jugadores"
           className="font-display bg-accent text-canvas hover:bg-accent-light focus-visible:ring-accent focus-visible:ring-offset-editorial mt-6 inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm tracking-[0.12em] uppercase transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          ¿Quieres jugar?
+          {CIERRE.boton}
           <ArrowRight aria-hidden className="size-4" />
         </Link>
       </section>

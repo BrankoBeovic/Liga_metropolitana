@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 import { FeaturedLayout } from '@/components/articles/FeaturedLayout'
 import { JugadorForm } from '@/components/forms/JugadorForm'
 import { Hero } from '@/components/home/Hero'
@@ -132,11 +134,36 @@ export default async function Portada() {
             accent="equipo?"
           />
           <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,38rem)] lg:gap-16">
-            <p className="text-ink/75 text-lg leading-relaxed text-pretty">
-              Si quieres jugar y no tienes club, déjanos tus datos. La Liga te
-              contacta cuando un equipo esté buscando gente en tu puesto. El RUT
-              no se publica: lo ve solo el equipo de la Liga.
-            </p>
+            <div>
+              <p className="text-ink/75 text-lg leading-relaxed text-pretty">
+                Si quieres jugar y no tienes club, déjanos tus datos. La Liga te
+                contacta cuando un equipo esté buscando gente en tu puesto. El
+                RUT no se publica: lo ve solo el equipo de la Liga.
+              </p>
+
+              {/*
+                La foto llena la columna que quedaba vacia al lado del
+                formulario, y ademas hace un trabajo concreto: muestra a que se
+                esta apuntando uno cuando deja sus datos.
+
+                **Se recorta a 4:3 y el original es vertical.** El recorte se
+                corre al 30% de la altura y no al centro, porque la copa esta
+                arriba: centrado, la ventana visible la dejaba fuera y quedaba
+                un grupo de gente mirando hacia arriba a nada.
+
+                `loading` queda en el `lazy` por defecto: esta seccion cierra la
+                portada, muy por debajo del pliegue, y pedirla temprano solo le
+                robaria ancho de banda al video del Hero (CLAUDE.md seccion 4).
+              */}
+              <Image
+                src="/campeones.jpg"
+                alt="Jugadores de la Liga celebrando con la copa en alto en el centro de la cancha."
+                width={617}
+                height={771}
+                sizes="(min-width: 1024px) 40rem, 100vw"
+                className="mt-8 aspect-[4/3] w-full rounded-2xl object-cover object-[center_30%] ring-1 ring-white/10"
+              />
+            </div>
             <JugadorForm />
           </div>
         </section>

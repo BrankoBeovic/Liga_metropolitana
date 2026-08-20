@@ -145,9 +145,7 @@ export async function getReelsInstagram(
     que habla con Instagram.
   */
   if (!TOKEN) {
-    console.warn(
-      'Falta INSTAGRAM_ACCESS_TOKEN: se muestran Reels de muestra.'
-    )
+    console.warn('Falta INSTAGRAM_ACCESS_TOKEN: se muestran Reels de muestra.')
     const { reelsDeMuestra } = await import('./instagram.demo')
     return reelsDeMuestra(limite)
   }

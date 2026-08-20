@@ -144,10 +144,41 @@ El clip cierra donde abre, así que el `loop` no tiene costura.
 
 `public/hero-poster.jpg` es el primer cuadro **del archivo ya comprimido**, no del original: así el póster y el primer frame del video son el mismo píxel y no hay salto al arrancar.
 
+**En teléfono se sirve otro archivo.**
+`public/hero-mobile.mp4` es el mismo clip a 1280x720 con CRF 26: **1,45 MB** contra 3,0 MB, o sea la mitad de datos móviles antes de que el Hero se mueva.
+Va como primer `<source>` con `media="(max-width: 820px)"`, y el orden importa: el navegador se queda con la primera fuente cuyo `media` coincide.
+Verificado en el navegador que baja una sola de las dos: a 375px pide `hero-mobile.mp4` y a 1280px pide `hero.mp4`, nunca las dos.
+
+Bajar la resolución en vez del bitrate está medido.
+Mantener 1080p con CRF 30 pesaba 1,9 MB con un SSIM de 0,9857 contra el archivo grande; 720p con CRF 26 pesa 1,45 MB con 0,9848.
+Es 33% menos de peso por una diferencia de nueve diezmilésimos, y en un teléfono en vertical el video ya se amplía más del doble por el `object-cover`, así que los píxeles que se descartan no llegaban a verse.
+
+El corte va en 820px y no en 768 para incluir tablets en vertical, que también navegan con datos.
+La fuente se elige al cargar y no se revisa al redimensionar la ventana: nadie pasa de teléfono a escritorio a mitad de visita.
+
 **El `<video>` NO lleva el atributo `autoplay`.**
 Con `autoplay` en el HTML no hay forma de respetar `prefers-reduced-motion`: el navegador arranca antes de que corra una línea de JavaScript, y quien pidió menos movimiento vería el video empezar y recién después frenarse.
 `HeroVideo` lo arranca desde un efecto, salteándolo si la consulta está activa, y así quien pide menos movimiento simplemente se queda en el póster.
 El póster además es lo que mide el LCP, y viaja en el HTML que manda el servidor.
+
+### Nota: en un teléfono, pedir `play()` una sola vez no alcanza
+
+Reportado por el equipo mirando el sitio en el celular: el video "de repente se para y queda pegado", o directamente no parte hasta cambiar de página.
+Son tres fallas distintas con una sola causa de fondo: la primera versión pedía `play()` al montar y, si el navegador decía que no, se rendía ahí mismo.
+
+1. **El sistema operativo pausa el video por su cuenta**: una llamada, un cambio de app, la pantalla que se bloquea, el modo de ahorro de energía.
+   Al volver, el video sigue entero en pantalla, así que el `IntersectionObserver` no cambia de estado y nunca vuelve a dar la orden.
+   Medido en el navegador: pausado a mano con el elemento visible, a los 1,5 segundos seguía pausado y en el mismo cuadro.
+2. **La política de autoplay lo bloquea de entrada**: iOS en Bajo Consumo rechaza toda reproducción automática hasta que la persona toque la pantalla, y el `catch` vacío se tragaba ese rechazo.
+3. **Todavía no había datos que reproducir**: en datos móviles el primer `play()` puede llegar antes que el primer byte útil.
+   Al cambiar de página y volver, el archivo ya está en la caché y arranca de una, que es justo el síntoma reportado.
+
+La respuesta a las tres es la misma: `reproducir()` se llama en cada oportunidad nueva -`canplay`, `visibilitychange`, `pageshow` (bfcache), el primer `pointerdown`, y el evento `pause` que no pedimos nosotros- y sale en su primera línea cuando no hay nada que hacer.
+Dos banderas sostienen eso: `pausaNuestra` distingue la pausa del `IntersectionObserver` de la que impone el sistema, y `bloqueado` evita reintentar en bucle contra un navegador que ya dijo que no.
+Verificado con `play()` parcheado para rechazar: **un** intento en dos segundos, no una ráfaga.
+
+La propiedad `muted` se vuelve a afirmar antes de cada intento.
+El atributo viaja en el HTML, pero es la propiedad la que mira la política de autoplay.
 
 ### Accesibilidad
 
@@ -182,6 +213,7 @@ En este sitio no hay otro; si algún día hace falta sobre claro, hay que pedir 
 | `public/escudo.png` | Escudo completo, 900x554, con alfa. Header y footer. |
 | `public/og.jpg` | 1200x630 para compartir: el escudo centrado sobre el canvas. |
 | `public/hero.mp4`, `public/hero-poster.jpg` | El video del hero y su póster. |
+| `public/hero-mobile.mp4` | El mismo clip a 720p, para pantallas de hasta 820px. |
 | `src/app/icon.png` | Favicon, 256x256, con las esquinas transparentes. |
 | `src/app/apple-icon.png` | 180x180, cuadrado y opaco: iOS aplica su propia máscara. |
 | `components/ui/Marca.tsx` | El isotipo, en SVG inline. |
@@ -287,6 +319,7 @@ Medido: cero frames en dos segundos, y el observador no informa nunca mientras `
 
 Esto rompió el Hero. La primera versión de `HeroVideo` dejaba que el `IntersectionObserver` diera la orden de arrancar, así que abrir el sitio en una pestaña nueva -clic con el botón del medio, que es de lo más común- dejaba el Hero congelado en el póster hasta que la pestaña se mirara por primera vez.
 Ahora `reproducir()` se llama de una, y el observador se queda solo con lo que sí es seguro diferir: apagar.
+Por lo mismo, la visibilidad de la pestaña nunca es condición para arrancar: es solo una oportunidad más de reintentar, como se explica en la nota del `play()` de la sección 3.
 
 Es el mismo principio que ya estaba escrito para el carrusel en la sección 7: **nada que ponga las cosas en movimiento puede depender de que llegue un evento**.
 Vale la pena releerlo antes de escribir cualquier componente que arranque una animación.

@@ -3,6 +3,29 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: el video del hero en el celular
+
+### Hecho
+
+- **El Hero ya no se queda pegado.** Reportado desde un celular: el video se paraba solo, o no partía hasta cambiar de página.
+  `HeroVideo` ahora reintenta la reproducción en cada oportunidad nueva (`canplay`, vuelta al frente de la pestaña, `pageshow` del bfcache, primer toque, y toda pausa que no haya pedido el propio componente) en vez de rendirse en el primer `play()` rechazado.
+  El detalle de las tres fallas y de las dos banderas que sostienen esto está en `CLAUDE.md` sección 3.
+- **La mitad de datos móviles**: `public/hero-mobile.mp4`, el mismo clip a 720p CRF 26, 1,45 MB contra 3,0 MB.
+  Entra por `<source media="(max-width: 820px)">`.
+
+### Verificado en el navegador
+
+- Pausa impuesta desde afuera con el video en pantalla: antes seguía pausado a los 1,5 s; ahora reanuda solo (avanzó 0,98 s en 900 ms).
+- Con `play()` parcheado para rechazar siempre: **un** intento en 2 segundos, sin ráfaga de reintentos. Al soltar el parche, un toque en la pantalla lo hace arrancar.
+- A 375px baja `hero-mobile.mp4` (1280x720); a 1280px baja `hero.mp4` (1920x1080). Nunca las dos.
+- Las cuatro compuertas pasan (`type-check`, `lint`, `format:check`, `build`), y la consola queda sin errores.
+
+### Lo que no se pudo probar en esta máquina
+
+- **La pausa al salir de pantalla.** En el navegador de la vista previa ningún `IntersectionObserver` informa, porque la pestaña no está renderizando: se comprobó con un observador de control, que tampoco disparó nunca.
+  Esa parte de la lógica no cambió respecto de la versión anterior, salvo la bandera que la marca como pausa propia.
+- **Un iPhone de verdad**, que es donde apareció el problema. El equipo tiene que confirmarlo ahí, con Bajo Consumo activado y con datos móviles.
+
 ## Cambio: Inscríbete pasa a Jugadores
 
 ### Hecho

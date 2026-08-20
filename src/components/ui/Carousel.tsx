@@ -139,6 +139,41 @@ export function Carousel({ etiqueta, children, className }: CarouselProps) {
   }, [medir])
 
   /*
+    Las copias salen del tabulador sin dejar de ser clicables.
+
+    Este es el reemplazo de `inert`, que es lo que estaba puesto antes y tenia
+    un costo que no se habia notado: `inert` no solo saca del tabulador, tambien
+    **cancela los clics**. Como el riel se desplaza sin parar, la mayor parte
+    del tiempo lo que hay delante de la persona son tarjetas de la copia 2 o la
+    3 -doce de las dieciocho, medido en la portada- y hacer clic ahi no hacia
+    absolutamente nada. Esa es la razon por la que el carrusel "no llevaba a
+    Instagram": llevaba, pero solo en un tercio de las tarjetas.
+
+    La combinacion correcta ya estaba escrita en CLAUDE.md seccion 7 para las
+    copias que tienen que seguir siendo clicables: `aria-hidden` en el
+    contenedor mas `tabIndex={-1}` en cada elemento que reciba foco. Va desde un
+    efecto y no en el JSX porque las tarjetas son Server Components que el
+    carrusel recibe ya armadas: no puede tocar el marcado de adentro, pero si el
+    DOM ya montado.
+
+    Sin JavaScript las copias quedan tabulables. Es una degradacion chica y
+    aceptable: sin JavaScript el carrusel tampoco se mueve, asi que el loop -que
+    es la razon de que existan las copias- no llega a notarse.
+  */
+  useEffect(() => {
+    const t = track.current
+    if (!t) return
+
+    for (const li of t.children) {
+      if (li.getAttribute('aria-hidden') !== 'true') continue
+      const focusables = li.querySelectorAll(
+        'a[href], button, input, select, textarea, [tabindex]'
+      )
+      for (const el of focusables) el.setAttribute('tabindex', '-1')
+    }
+  }, [hijos.length])
+
+  /*
     Fuera de la pantalla, quieto.
 
     Sin esto el carrusel de Reels sigue escribiendo su `transform` sesenta
@@ -400,19 +435,17 @@ export function Carousel({ etiqueta, children, className }: CarouselProps) {
       <li
         key={`${c}-${i}`}
         /*
-          Solo la primera copia se anuncia y recibe foco. Las otras son relleno
-          visual para que el loop no muestre la costura.
+          Solo la primera copia se anuncia. Las otras son relleno visual para
+          que el loop no muestre la costura.
 
-          Las dos cosas juntas y no solo `aria-hidden`: sin `inert` las tarjetas
-          repetidas siguen siendo tabulables, asi que el teclado recorre tres
-          veces la misma lista y el foco entra en contenido que el lector de
-          pantalla no anuncia, que es de los peores estados posibles.
-
-          `inert` va como booleano porque React 19 lo soporta nativo. Pasarlo
-          como cadena vacia, que era el truco de React 18, aca no hace nada.
+          **Aca iba `inert` y se saco.** Sacaba del tabulador, que es lo que se
+          buscaba, pero de paso cancelaba los clics de dos tercios de las
+          tarjetas: con el riel siempre en movimiento, lo que uno tiene delante
+          casi siempre es una copia. El tabulador ahora se resuelve poniendo
+          `tabindex="-1"` desde el efecto de mas arriba, que hace lo mismo sin
+          apagar el clic.
         */
         aria-hidden={c > 0 ? true : undefined}
-        inert={c > 0}
         className="shrink-0"
       >
         {hijo}

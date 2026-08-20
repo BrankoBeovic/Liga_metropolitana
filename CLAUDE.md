@@ -606,7 +606,8 @@ Decisiones no obvias y los cinco bugs que las produjeron:
 
 - **Se mueve con `transform`, no con `scrollLeft`**: la posición tiene que poder ser fraccionaria y `transform` se compone en la GPU.
 - **La lista se repite tres veces** (con dos copias, un viewport ancho deja ver un hueco al cerrar el loop).
-  Las copias 2 y 3 llevan `aria-hidden` **y** `inert`; `inert` va como booleano (React 19), la cadena vacía de React 18 no hace nada.
+  Las copias 2 y 3 llevan `aria-hidden`, y **ya no llevan `inert`**: lo llevaron, y por eso dos tercios de las tarjetas no se podían clickear (ver abajo).
+  Salen del tabulador con `tabindex="-1"`, puesto desde un efecto del propio carrusel, que es lo único que puede tocarlas: las tarjetas llegan como Server Components ya armados.
 - **El loop se normaliza con un módulo del ancho de una copia, corrigiendo el signo**: el resto de un negativo en JS es negativo y sin la corrección arrastrar hacia atrás manda el riel fuera de vista.
 - **Un arrastre de más de 8px cancela el clic que lo cierra**, con un handler en fase de captura y desbloqueo en `setTimeout` de cero.
   **Nunca con `pointer-events-none` en el riel**: el riel es el mismo elemento que tiene la captura del puntero y sin eventos dejaba de recibir el `pointerup`, el gesto no terminaba nunca y el carrusel quedaba trabado.
@@ -626,8 +627,21 @@ Rendimiento, encontrado midiendo:
 - `draggable={false}` en cada `next/image` **y** `onDragStart` cancelado en el riel: sin las dos cosas el arrastre nativo de imágenes se come el gesto.
 - Los títulos llevan alto fijo de dos líneas (`line-clamp-2` más `min-h`); con `border-box` el `min-height` incluye el padding, así que si el elemento tiene relleno propio va `min-h-[calc(2lh+...)]`.
 
-**En las copias `aria-hidden` que deben seguir siendo clicables (avisos, no decorado) NO va `inert`**: `inert` cancela los clics.
-La combinación correcta ahí es `aria-hidden` en el contenedor más `tabIndex={-1}` en el enlace.
+**En las copias `aria-hidden` que deben seguir siendo clicables NO va `inert`**: `inert` cancela los clics.
+La combinación correcta es `aria-hidden` en el contenedor más `tabindex="-1"` en cada elemento que reciba foco.
+
+Esto estaba escrito acá como advertencia y aun así el carrusel de Reels lo tenía puesto, con la consecuencia exacta que la advertencia describe: como el riel se desplaza sin parar, lo que hay delante de la persona casi siempre es una copia, así que hacer clic en un Reel no hacía nada.
+Medido en la portada: 12 de las 18 tarjetas eran `inert`.
+Que la regla esté escrita no alcanza si el código no la cumple; al tocar un carrusel, revisar cuál de las dos cosas está pasando.
+
+**Y en las tarjetas de Reels lo clickeable es el botón de play, no la tarjeta entera.**
+En un carrusel que se arrastra con el dedo, hacer clickeable toda la superficie convierte el gesto de mover el riel en el gesto de salir del sitio: cualquier arrastre que se quede corto abre Instagram.
+El play mide 44px por eso: dejó de ser un adorno dentro de un enlace grande y pasó a ser el único objetivo, así que ahora le toca cumplir el mínimo táctil.
+Su nombre accesible lleva el título del Reel; sin eso, seis enlaces seguidos se anuncian todos igual.
+
+**El marco de la miniatura recorta por su cuenta** (`overflow-hidden` en el `aspect-[9/16]`, además del de la tarjeta).
+El recorte de la tarjeta cae por debajo de la franja del título, así que la miniatura ampliada por el hover se derramaba 8px sobre esa franja y se veía su degradado negro cruzándola.
+Regla general: si algo se amplía adentro de una caja, el recorte va en esa caja y no en la que la contiene.
 
 ## 8. Convenciones de código
 

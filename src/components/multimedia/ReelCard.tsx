@@ -40,16 +40,31 @@ type ReelCardProps = {
  * cache, que dura 31 dias por `minimumCacheTTL` en `next.config.mjs`.
  *
  * El clic abre el `permalink`, que a diferencia de la miniatura es estable.
+ *
+ * **Lo clicable es el boton de play, no la tarjeta entera.** Antes el enlace
+ * envolvia todo: la miniatura, el titulo y el marco. En un carrusel que ademas
+ * se arrastra con el dedo, eso convierte a la superficie que uno agarra para
+ * mover el riel en la misma que abre Instagram, y cualquier arrastre que se
+ * quede corto termina sacando a la persona del sitio. Con un objetivo chico y
+ * explicito, mover el carrusel y abrir un Reel dejan de ser el mismo gesto.
+ *
+ * El play mide 44px, que es el minimo tactil que pide CLAUDE.md: antes eran 36
+ * y podia ser asi porque el objetivo real era la tarjeta completa. Ahora que es
+ * el unico camino, tiene que cumplirlo el.
  */
 export function ReelCard({ item, sizes = SIZES_FLUIDO }: ReelCardProps) {
   return (
-    <a
-      href={item.permalink}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group focus-visible:ring-accent block overflow-hidden rounded-[22px] bg-black ring-1 ring-white/10 focus-visible:ring-2 focus-visible:outline-none"
-    >
-      <div className="relative aspect-[9/16] w-full">
+    <div className="group overflow-hidden rounded-[22px] bg-black ring-1 ring-white/10">
+      {/*
+        El recorte va tambien aca, y no solo en la tarjeta.
+
+        La tarjeta entera ya es `overflow-hidden`, pero ese recorte cae en el
+        borde de la tarjeta, o sea DEBAJO de la franja del titulo. Al ampliarse
+        la miniatura, el sobrante -con su degradado negro incluido- se derramaba
+        sobre esa franja y se veia una sombra cruzandole por encima. Recortando
+        en el marco, la ampliacion se queda dentro de la foto.
+      */}
+      <div className="relative aspect-[9/16] w-full overflow-hidden">
         <Image
           src={item.thumbnailUrl}
           alt={item.title}
@@ -59,7 +74,15 @@ export function ReelCard({ item, sizes = SIZES_FLUIDO }: ReelCardProps) {
           // miniatura con el arrastre nativo del navegador en vez de correr el
           // riel.
           draggable={false}
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          /*
+            El zoom responde al hover del PLAY, no al de la tarjeta.
+
+            Una tarjeta que se agranda al pasarle el mouse promete que es
+            clicable, y desde que el enlace es solo el boton, no lo es. Con
+            `group-has-*` la reaccion queda donde de verdad se puede hacer clic,
+            y el foco de teclado la dispara igual.
+          */
+          className="object-cover transition-transform duration-500 group-has-[a:focus-visible]:scale-[1.04] group-has-[a:hover]:scale-[1.04]"
         />
 
         <div
@@ -72,9 +95,13 @@ export function ReelCard({ item, sizes = SIZES_FLUIDO }: ReelCardProps) {
             Reel
           </span>
           {/*
-            El play es lo unico que detiene el carrusel al pasarle el mouse.
-            Sigue dentro del enlace, asi que tambien abre el Reel: es el boton
-            visible de la tarjeta, no un adorno.
+            El play: el unico enlace de la tarjeta, y lo unico que detiene el
+            carrusel al pasarle el mouse.
+
+            Su nombre accesible lleva el titulo del Reel, porque un enlace que
+            solo dice "play" no le sirve de nada a quien recorre la pagina con
+            un lector de pantalla: en una lista de seis, los seis se llamarian
+            igual.
 
             Sin `backdrop-blur`, a diferencia del resto de las superficies de
             vidrio del sitio. Desenfocar el fondo obliga al navegador a leer lo
@@ -83,13 +110,16 @@ export function ReelCard({ item, sizes = SIZES_FLUIDO }: ReelCardProps) {
             una foto, un negro semitransparente da el mismo contraste al icono
             por una fraccion del costo.
           */}
-          <span
-            aria-hidden
+          <a
+            href={item.permalink}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ver «${item.title}» en Instagram (se abre en una pestaña nueva)`}
             {...PROPS_PAUSA}
-            className="flex size-9 items-center justify-center rounded-full bg-black/50 ring-1 ring-white/30 transition-colors group-hover:bg-black/70"
+            className="focus-visible:ring-accent flex size-11 shrink-0 items-center justify-center rounded-full bg-black/50 ring-1 ring-white/30 transition-colors hover:bg-black/75 focus-visible:ring-2 focus-visible:outline-none"
           >
-            <Play className="size-4 fill-white text-white" />
-          </span>
+            <Play aria-hidden className="size-4 fill-white text-white" />
+          </a>
         </div>
       </div>
 
@@ -113,10 +143,6 @@ export function ReelCard({ item, sizes = SIZES_FLUIDO }: ReelCardProps) {
       <p className="bg-editorial text-ink line-clamp-2 h-[calc(2lh+1.5rem)] border-t border-white/10 px-3.5 py-3 text-[13px] leading-snug font-semibold">
         {item.title}
       </p>
-
-      <span className="sr-only">
-        (se abre en Instagram, en una pestaña nueva)
-      </span>
-    </a>
+    </div>
   )
 }

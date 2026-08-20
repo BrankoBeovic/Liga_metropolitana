@@ -131,9 +131,9 @@ El caso especial es el texto del Hero, que va sobre el video: ahí se midió el 
 - **Fade Up on Scroll**: `y: 24 -> 0`, `opacity: 0 -> 1`, stagger +50ms por tarjeta.
 - **Hover Life Cards**: desktop (`@media (hover: hover)`) spotlight radial más micro-tilt 3D de 4 a 6 grados; touch `active:scale-[0.98]`.
 - **Content Unmasking Reveal**: contenedor `overflow-hidden`, texto de `translate-y-full` a `translate-y-0`.
-- **El eslogan del Hero** entra con 0,3s de retraso y 1s de animación: termina a 1,3s.
-  Eran 1,5s más 3s -o sea 4,5s- y el equipo pidió acortarlo: quien llegaba y bajaba enseguida no alcanzaba a leerlo.
-  El retraso corto se conserva porque es lo que hace que el texto entre después del video en vez de estar ahí desde el principio.
+- **El eslogan del Hero** entra con 0,9s de retraso y 1,1s de animación: termina a 2s.
+  Eran 1,5s más 3s -o sea 4,5s- y el equipo pidió acortarlo; la primera corrección lo dejó en 1,3s, que resultó demasiado seco, y este es el punto medio que quedó.
+  El retraso es la palanca que importa: es lo que hace que el texto entre después del video en vez de estar ahí desde el principio.
 - **El menú flotante espera un segundo antes de plegarse** cuando el mouse se va (`MS_ANTES_DE_CERRAR` en `MenuFlotante`).
   Se despliega hacia la izquierda, así que el puntero tiene que recorrer toda la píldora para llegar a los enlaces: cerrando al instante, un desvío mínimo lo plegaba en la cara.
   Entrar abre de inmediato y volver a entrar cancela el cierre pendiente, así que ir y venir no hace parpadear nada.

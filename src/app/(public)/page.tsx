@@ -153,11 +153,16 @@ export default async function Portada() {
                 1600 cubre el peor caso con margen y pesa 294 KB.
 
                 **Se recorta a 4:3 y el original es vertical (1600x1999).** El
-                recorte va centrado, y eso no es la opcion por descarte: con
-                estas medidas el centro deja justo la copa completa arriba y a
-                todo el equipo, cortando a la altura de las rodillas.
-                Verificado generando el recorte exacto y mirandolo, no a ojo
-                sobre la pagina.
+                recorte se corre al 35% de la altura: centrado, la punta de la
+                copa quedaba pegada al borde de arriba y se leia como cortada.
+                Subirlo deja la copa entera con aire y se lleva un poco mas de
+                pierna abajo, que es exactamente el cambio que pidio el equipo.
+
+                El 35% no es tanteo: el rango de desplazamiento son 799px -la
+                altura del archivo menos la ventana visible de 1200- y el 35%
+                cae en 280, que es el recorte que se genero con ffmpeg y se
+                miro antes de escribirlo. Si se cambia la foto, hay que rehacer
+                esa cuenta con las medidas nuevas.
 
                 `loading` queda en el `lazy` por defecto: esta seccion cierra la
                 portada, muy por debajo del pliegue, y pedirla temprano solo le
@@ -169,7 +174,7 @@ export default async function Portada() {
                 width={1600}
                 height={1999}
                 sizes="(min-width: 1024px) 40rem, 100vw"
-                className="mt-8 aspect-[4/3] w-full rounded-2xl object-cover object-center ring-1 ring-white/10"
+                className="mt-8 aspect-[4/3] w-full rounded-2xl object-cover object-[center_35%] ring-1 ring-white/10"
               />
             </div>
             <JugadorForm />

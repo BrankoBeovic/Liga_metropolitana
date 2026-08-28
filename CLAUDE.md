@@ -440,16 +440,14 @@ El atributo `download` de un enlace **se ignora cuando el archivo es de otro ori
 Sin `urlDeDescarga`, tocar "Descargar" abre el visor del navegador, que no es lo que dice el botón.
 Supabase resuelve el caso con `?download`, que le hace mandar `Content-Disposition: attachment`.
 
-### `/historia` está maquetada con texto de relleno
+### `/historia` ya tiene el texto real
 
-Decisión del equipo: la página se armó antes de tener el texto.
-Todo el contenido vive en `(public)/historia/contenido.ts` y **nada** está escrito en el JSX, así que cargar la historia de verdad es editar un archivo.
+Estuvo maquetada con relleno hasta que el equipo entregó el documento de historia (docx, agosto de 2026).
+Todo el contenido sigue viviendo en `(public)/historia/contenido.ts` y **nada** está escrito en el JSX: la próxima actualización de la historia se edita ahí y nada más.
 
-Mientras `ES_RELLENO` sea `true`, la página lleva `noindex` y no aparece en el sitemap: un sitio con una página de relleno indexada le dice a Google que su contenido es de baja calidad, y esa señal cuesta más de remontar de lo que cuesta esperar el texto.
-**Al cargar el texto hay que hacer tres cosas**: reemplazar el contenido, poner `ES_RELLENO` en `false` y agregar `/historia` a `src/app/sitemap.ts`.
-
-Los dos avisos en pantalla que anunciaban el relleno -uno en el bloque Legado de la portada y otro arriba de `/historia`- se sacaron a pedido del equipo, para poder mostrar el sitio sin carteles.
-La consecuencia hay que tenerla presente: el lorem ipsum sigue ahí y ya no se anuncia solo, así que lo único que queda avisando es esta nota y el `noindex`.
+`ES_RELLENO` quedó en `false`, la página perdió el `noindex` y `/historia` ya está en `src/app/sitemap.ts`.
+`RESUMEN` (bloque Legado de la portada) e `INTRO` son versiones resumidas del documento fuente; `HITOS` son los cinco momentos que el documento marca como hitos (fundación 1989, los 30 años de Noé Méndez, la nueva directiva de 2019, el premio Sports League of the Year 2023 y el presente).
+Si llega una versión más larga o corregida del documento, este es el archivo a editar.
 
 ### Las posiciones del formulario de jugadores
 

@@ -1,28 +1,14 @@
 /**
- * TEXTO PROVISORIO DE /historia.
+ * Texto de /historia.
  *
- * ============================================================================
- * CASI TODO LO QUE SIGUE ES RELLENO. No es informacion de la Liga.
- * Las dos excepciones son `ACTA` y `CIERRE`, y estan marcadas como tales.
- * ============================================================================
- *
- * Esta pagina se maqueto antes de tener el texto real, por pedido explicito del
- * equipo. Todo el contenido vive en este archivo y NADA de el esta escrito en
- * el JSX: reemplazar el relleno por la historia de verdad es editar acá y nada
- * mas, sin tocar el layout.
- *
- * Mientras esto sea lorem ipsum, la pagina esta marcada como `noindex` y NO
- * aparece en el sitemap. Un sitio con una pagina de relleno indexada le dice a
- * Google que el contenido es de baja calidad, y esa señal cuesta mas de
- * remontar de lo que cuesta esperar el texto.
- *
- * **Al cargar el texto real hay que hacer las tres cosas**: reemplazar esto,
- * sacar el `robots: { index: false }` de `page.tsx`, y agregar `/historia` a
- * `src/app/sitemap.ts`. Estan anotadas en los tres lugares.
+ * La fuente es el documento que entregó el equipo ("Historia Liga
+ * Metropolitana de Maxibásquetbol"), redactado con motivo de los 37 años de
+ * la Liga (2026). Todo el contenido vive en este archivo y nada de el esta
+ * escrito en el JSX: la proxima actualizacion de la historia se edita aca y
+ * nada mas, sin tocar el layout.
  */
 
-/** Cambiar a `false` cuando el texto sea el de verdad. */
-export const ES_RELLENO = true
+export const ES_RELLENO = false
 
 /**
  * El acta de la primera reunión, y **lo único de esta página que NO es
@@ -57,7 +43,7 @@ export const ACTA = {
 } as const
 
 export const BAJADA =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio praesent libero sed cursus ante dapibus diam, desde 1989.'
+  'Desde el 16 de mayo de 1989, treinta y siete años de básquetbol, comunidad y evolución.'
 
 /**
  * El resumen que se muestra en el bloque "Legado" de la portada.
@@ -67,13 +53,13 @@ export const BAJADA =
  * llegue el de verdad.
  */
 export const RESUMEN = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.',
-  'Maecenas ligula massa, varius a, semper congue, euismod non mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.',
+  'El 16 de mayo de 1989, en la sede de Unión Española, ocho instituciones -Estadio Español de Las Condes, Estadio Italiano, Estadio Israelita-Macabbi, Unión Española, Club Internacional, Banco Central, Universidad de Chile y YMCA- fundaron la Liga Metropolitana de Maxibásquetbol. Desde entonces, generaciones de jugadores, dirigentes, entrenadores y árbitros han mantenido vivo un mismo principio: el básquetbol puede acompañar a las personas durante toda la vida.',
+  'Hoy la Liga reúne a más de cincuenta equipos y varios cientos de jugadores, y en 2023 fue distinguida como Sports League of the Year en los South America Prestige Awards. Pero su patrimonio más grande sigue siendo el mismo de siempre: la comunidad que se forma cada vez que alguien vuelve a entrar a una cancha.',
 ] as const
 
 export const INTRO = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
-  'Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor.',
+  'El 16 de mayo de 1989, en la sede del Club Unión Española, nació la Liga Metropolitana de Maxibásquetbol. La fundaron ocho instituciones -Estadio Español de Las Condes, Estadio Italiano, Estadio Israelita-Macabbi, Unión Española, Club Internacional, Banco Central, Universidad de Chile y YMCA- que buscaban un espacio para que los basquetbolistas siguieran jugando de manera organizada y competitiva. Desde aquella primera temporada han pasado generaciones completas de jugadores, dirigentes, entrenadores, árbitros y clubes, y sigue intacta la misma pasión por volver a entrar a una cancha.',
+  'Los primeros treinta años, bajo la presidencia de Noé Méndez, se construyeron las bases: continuidad, pertenencia y una relación profunda entre jugadores e instituciones. Desde 2019, con la llegada de una nueva directiva, la Liga entró en un proceso de modernización, tecnología y profesionalización que en 2023 la llevó a ser distinguida internacionalmente como la mejor liga del año. Esta es la línea de tiempo de esas casi cuatro décadas.',
 ] as const
 
 export type Hito = {
@@ -85,33 +71,33 @@ export type Hito = {
 export const HITOS: readonly Hito[] = [
   {
     anio: '1989',
-    titulo: 'Lorem ipsum dolor',
+    titulo: 'Nace la Liga Metropolitana',
     texto:
-      'Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales.',
+      'Ocho instituciones fundan la Liga en la sede de Unión Española: Estadio Español de Las Condes, Estadio Italiano, Estadio Israelita-Macabbi, Unión Española, Club Internacional, Banco Central, Universidad de Chile y YMCA. La competencia arranca con unos 10 a 12 equipos, concentrada en clubes y estadios de colonia de la zona oriente de Santiago.',
   },
   {
-    anio: '1997',
-    titulo: 'Consectetur adipiscing',
+    anio: '1989 - 2019',
+    titulo: 'Treinta años de Noé Méndez',
     texto:
-      'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum.',
+      'El primer presidente de la Liga conduce la institución durante tres décadas, en las que se construyen sus bases: continuidad, pertenencia y una relación profunda entre jugadores e instituciones. En ese mismo período participa también en la creación de FECHIMAX, la federación nacional del maxibásquetbol.',
   },
   {
-    anio: '2006',
-    titulo: 'Integer nec odio',
+    anio: '2019',
+    titulo: 'Una nueva etapa',
     texto:
-      'Maecenas adipiscing ante non diam sodales hendrerit. Ut velit mauris, egestas sed, gravida nec, ornare ut, mi. Aenean ut orci vel massa suscipit pulvinar.',
+      'Con la llegada de una nueva directiva encabezada por Rodrigo Gajardo Zavala, comienza un proceso de crecimiento, modernización y profesionalización. La Liga incorpora las planillas digitales de NBN23 -pionera en Latinoamérica, según los South America Prestige Awards- y amplía sus categorías hasta reunir más de 50 equipos y varios cientos de jugadores.',
   },
   {
-    anio: '2014',
-    titulo: 'Praesent libero',
+    anio: '2023',
+    titulo: 'Sports League of the Year',
     texto:
-      'Nulla sollicitudin. Fusce varius, ligula non tempus aliquam, nunc turpis ullamcorper nibh, in tempus sapien eros vitae ligula. Pellentesque rhoncus nunc.',
+      'Los South America Prestige Awards distinguen a la Liga Metropolitana como la mejor liga del año, destacando la modernización de su gestión, la incorporación de tecnología y el crecimiento de sus comunicaciones y transmisiones. La publicación la describe además como la liga de maxibásquetbol más antigua de Chile.',
   },
   {
     anio: '2026',
-    titulo: 'Sed cursus ante',
+    titulo: 'Treinta y siete años y sigue',
     texto:
-      'Vivamus a tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede.',
+      'La Metro sigue creciendo: nuevas competencias, más jugadores y jugadoras, y una organización que se fortalece sin perder lo que la trajo hasta acá. Cada nueva temporada, cada nuevo equipo y cada jugador que vuelve a entrar a una cancha empieza a escribir un nuevo capítulo de esta historia.',
   },
 ]
 

@@ -25,12 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     aparece como "URL enviada no encontrada" en Search Console, asi que cada
     ruta entra aca recien cuando la pagina esta hecha.
 
-    **Falta `/historia` a proposito.** La pagina existe pero su texto todavia
-    es relleno, y va con `noindex` hasta que llegue el de verdad (ver
-    `(public)/historia/contenido.ts`). Declarar en el sitemap una URL que ademas
-    pedimos no indexar es una señal contradictoria; entra cuando se saque el
-    `noindex`.
-
     Las categorias no van a entrar nunca: este sitio no tiene paginas de
     categoria, las categorias solo clasifican noticias (CLAUDE.md seccion 4).
   */
@@ -45,6 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: urlAbsoluta('/noticias'),
       changeFrequency: 'daily',
       priority: 0.9,
+    },
+    {
+      // El texto real reemplazo al relleno; ya no lleva noindex.
+      url: urlAbsoluta('/historia'),
+      changeFrequency: 'yearly',
+      priority: 0.6,
     },
     {
       // Cambia cuando la Liga sube o saca un PDF, no todos los dias.

@@ -146,20 +146,22 @@ El caso especial es el texto del Hero, que va sobre el video: ahí se midió el 
 ### Nota: el hero de la landing lleva video
 
 La pieza original (`ligamefinaled.mp4`, 1920x1080, 10,3 s) pesaba 25,7 MB y traía pista de audio.
-En `public/hero.mp4` va la versión que se sirve: H.264 CRF 25, sin audio, `+faststart`, **3,0 MB**.
-CRF 23 pesaba 4,0 MB y el SSIM contra el original subía de 0,9879 a 0,9896: un tercio más de peso por una diferencia que no se ve.
+En `public/hero.mp4` va la versión que se sirve: H.264 CRF 28, sin audio, `+faststart`, **2,3 MB**.
 El clip cierra donde abre, así que el `loop` no tiene costura.
+
+Se revisó de nuevo en la Etapa 7 para que cargara más liviano en todos los dispositivos, midiendo SSIM contra el original en cada paso: CRF 25 (la versión anterior, 3,0 MB) daba 0,9879; CRF 27 (2,5 MB) 0,9859; CRF 28 (2,3 MB) 0,9847; CRF 29 (2,0 MB) 0,9834.
+Se eligió CRF 28 por quedar en la misma banda de SSIM que ya tenía aceptada `hero-mobile.mp4` (ver abajo), un cuarto menos de peso que la versión anterior por una diferencia que sigue sin notarse.
 
 `public/hero-poster.jpg` es el primer cuadro **del archivo ya comprimido**, no del original: así el póster y el primer frame del video son el mismo píxel y no hay salto al arrancar.
 
 **En teléfono se sirve otro archivo.**
-`public/hero-mobile.mp4` es el mismo clip a 1280x720 con CRF 26: **1,45 MB** contra 3,0 MB, o sea la mitad de datos móviles antes de que el Hero se mueva.
+`public/hero-mobile.mp4` es el mismo clip a 1280x720 con CRF 29: **1,0 MB** contra 2,3 MB, menos de la mitad de datos móviles antes de que el Hero se mueva.
 Va como primer `<source>` con `media="(max-width: 820px)"`, y el orden importa: el navegador se queda con la primera fuente cuyo `media` coincide.
 Verificado en el navegador que baja una sola de las dos: a 375px pide `hero-mobile.mp4` y a 1280px pide `hero.mp4`, nunca las dos.
 
 Bajar la resolución en vez del bitrate está medido.
-Mantener 1080p con CRF 30 pesaba 1,9 MB con un SSIM de 0,9857 contra el archivo grande; 720p con CRF 26 pesa 1,45 MB con 0,9848.
-Es 33% menos de peso por una diferencia de nueve diezmilésimos, y en un teléfono en vertical el video ya se amplía más del doble por el `object-cover`, así que los píxeles que se descartan no llegaban a verse.
+Revisado de nuevo en la Etapa 7 junto con `hero.mp4`, esta vez midiendo SSIM contra el original y no contra el archivo de escritorio: 720p con CRF 29 pesa 1,0 MB con un SSIM de 0,9817, la misma diferencia (0,0017) que ya se había aceptado como imperceptible al elegir CRF 25 sobre CRF 23 para el desktop en la Etapa 5.
+En un teléfono en vertical el video ya se amplía más del doble por el `object-cover`, así que los píxeles que se descartan no llegaban a verse.
 
 El corte va en 820px y no en 768 para incluir tablets en vertical, que también navegan con datos.
 La fuente se elige al cargar y no se revisa al redimensionar la ventana: nadie pasa de teléfono a escritorio a mitad de visita.
@@ -658,7 +660,7 @@ Regla general: si algo se amplía adentro de una caja, el recorte va en esa caja
 
 - **`pnpm` no está en el PATH**: usar `corepack pnpm ...` o correr `corepack enable` primero.
 - **`ffmpeg` tampoco está en el PATH**, pero está instalado (winget, Gyan build):
-  `C:\Users\dell\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0-full_build\bin`.
+  `C:\Users\dell\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.1-full_build\bin` (winget lo actualiza solo; si la ruta no existe, buscar la carpeta `ffmpeg-*-full_build` vigente).
   Con eso se comprimió el video del hero y se sacaron el escudo y el póster.
   No hay Pillow instalado; sí hay numpy, y ffmpeg lee y escribe `rawvideo` por stdin/stdout, que alcanza para todo lo que hizo falta.
 - **Nunca editar archivos con reemplazos de PowerShell**: lee como ANSI y corrompe los acentos.

@@ -3,6 +3,24 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: correo de contacto real y video del hero más liviano
+
+### Hecho
+
+- `CORREO_DESTINO` pasa a admitir varias direcciones separadas por coma.
+  Ya no llega a la casilla provisoria de Branko: llega a `hugo.munoz@maxibasquetbol.cl` y `contacto@maxibasquetbol.cl`, con `CORREO_REMITENTE` verificado en el dominio (`notificaciones.web@maxibasquetbol.cl`).
+  Probado con un envío real por Resend antes de comitear: llegó bien a las dos casillas.
+- El video del hero se volvió a comprimir desde el master (`ligamefinaled.mp4`, en Descargas) para que cargue más liviano en todos los dispositivos.
+  `public/hero.mp4` bajó de 3,0 MB a 2,3 MB (CRF 28) y `public/hero-mobile.mp4` de 1,45 MB a 1,0 MB (CRF 29), midiendo SSIM contra el original en cada paso para no perder calidad de forma perceptible.
+  El póster se regeneró desde el archivo nuevo, porque tiene que ser el mismo píxel que el primer cuadro.
+  Detalle completo y las cifras de SSIM en `CLAUDE.md` sección 3.
+
+### Pendiente conocido, no es un bug
+
+- Antes de conectar el dominio: `NEXT_PUBLIC_SITE_URL` y `REVALIDATION_SECRET` siguen vacías, y no hay evidencia de que el sitio ya esté desplegado en un hosting.
+- Falta confirmar en el dashboard de Supabase que el registro público esté deshabilitado y que exista un usuario promovido a `admin`.
+- La subida de PDF de punta a punta y el Hero en un iPhone real siguen sin probarse en esta máquina (arrastrado de etapas anteriores).
+
 ## Cambio: el video del hero en el celular
 
 ### Hecho

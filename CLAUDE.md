@@ -15,7 +15,8 @@ Bajada: "El maxibásquetbol chileno desde 1989".
 
 - Instagram: [@ligametromaxibasquet](https://www.instagram.com/ligametromaxibasquet/)
 - Dominio: pendiente, se conecta después.
-- Correo para formularios: llega a `brankobeovic24@gmail.com`, que es **provisorio** hasta que exista la casilla del equipo. Se cambia en `CORREO_DESTINO`, sin tocar código.
+- Correo para formularios: llega a `hugo.munoz@maxibasquetbol.cl` y `contacto@maxibasquetbol.cl`.
+  `CORREO_DESTINO` admite varias direcciones separadas por coma, sin tocar código.
 - Token de la API de Instagram: pendiente. Mientras falte, la portada muestra Reels de muestra (recortes del video de marca). Con token, esa rama no corre.
 
 Las categorías de las noticias son dos: **Novedades** e **Institucional**.

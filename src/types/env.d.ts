@@ -39,7 +39,11 @@ declare namespace NodeJS {
     /** Server-only. API key de Resend, para los formularios del sitio. */
     readonly RESEND_API_KEY?: string
 
-    /** Server-only. A donde llegan los mensajes de los formularios. */
+    /**
+     * Server-only. A donde llegan los mensajes de los formularios.
+     *
+     * Admite varias direcciones separadas por coma.
+     */
     readonly CORREO_DESTINO?: string
 
     /**

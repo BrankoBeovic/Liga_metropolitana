@@ -40,10 +40,15 @@ export type ResultadoEnvio = { ok: true } | { ok: false; error: string }
  * dejo de funcionar.
  */
 function leerConfiguracion():
-  | { api: string; destino: string; remitente: string; error: null }
+  | { api: string; destino: string[]; remitente: string; error: null }
   | { api: null; destino: null; remitente: null; error: string } {
   const api = process.env.RESEND_API_KEY
-  const destino = process.env.CORREO_DESTINO
+  // CORREO_DESTINO admite varias direcciones separadas por coma, para que
+  // un mismo aviso le llegue a mas de una persona del equipo.
+  const destino = (process.env.CORREO_DESTINO ?? '')
+    .split(',')
+    .map((correo) => correo.trim())
+    .filter((correo) => correo.length > 0)
 
   if (!api) {
     return {
@@ -53,7 +58,7 @@ function leerConfiguracion():
       error: 'Falta RESEND_API_KEY.',
     }
   }
-  if (!destino) {
+  if (destino.length === 0) {
     return {
       api: null,
       destino: null,
@@ -101,7 +106,7 @@ export async function enviarCorreo(mensaje: Mensaje): Promise<ResultadoEnvio> {
     const resend = new Resend(config.api)
     const { error } = await resend.emails.send({
       from: config.remitente,
-      to: [config.destino],
+      to: config.destino,
       subject: mensaje.asunto,
       text: mensaje.texto,
       ...(mensaje.responderA ? { replyTo: mensaje.responderA } : {}),

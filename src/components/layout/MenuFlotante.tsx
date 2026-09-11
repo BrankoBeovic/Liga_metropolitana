@@ -21,7 +21,8 @@ import { NAV_LINKS } from '@/lib/navigation'
  * tablet en vertical: medido a 360px con los enlaces de entonces (uno menos
  * que ahora), se dibujaban fuera de la pantalla. Debajo de `lg` el menú es
  * `MenuLateral`, un panel que entra desde el costado.
- * Pendiente: remedir el ancho desplegado con los siete enlaces actuales.
+ * Confirmado en el navegador con los siete enlaces actuales y el tope en
+ * `max-w-4xl`: "Contacto" ya no se recorta.
  *
  * **El ancho se anima con `max-width`, y no con el truco de
  * `grid-template-columns: 0fr -> 1fr`.** Aquel es el camino habitual para

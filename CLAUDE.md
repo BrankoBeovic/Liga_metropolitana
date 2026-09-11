@@ -17,7 +17,7 @@ Bajada: "El maxibásquetbol chileno desde 1989".
 - Dominio: pendiente, se conecta después.
 - Correo para formularios: llega a `hugo.munoz@maxibasquetbol.cl` y `contacto@maxibasquetbol.cl`.
   `CORREO_DESTINO` admite varias direcciones separadas por coma, sin tocar código.
-- Token de la API de Instagram: pendiente. Mientras falte, la portada muestra Reels de muestra (recortes del video de marca). Con token, esa rama no corre.
+- Token de la API de Instagram: cargado y definitivo en `INSTAGRAM_ACCESS_TOKEN`. Dura 60 días y hay que refrescarlo antes de que venza, porque vencido no se puede refrescar y hay que rehacer la autorización desde cero. Sin él, la portada cae a Reels de muestra (recortes del video de marca); con él puesto, esa rama no corre.
 
 Las categorías de las noticias son tres: **Novedades**, **Institucional** y **Otras Actividades** (esta última para torneos nacionales, internacionales, supercopas y campeones de liga en los que participa La Metro).
 En el CMS se llaman "categorías".

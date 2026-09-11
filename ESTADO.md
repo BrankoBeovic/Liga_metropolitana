@@ -3,6 +3,18 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: YouTube en el footer, intro de Historia en dos columnas y menú flotante que recortaba "Contacto"
+
+### Hecho
+
+- Enlace a YouTube en el footer, debajo del de Instagram (`YOUTUBE_URL` en `lib/navigation.ts`, ícono nuevo `YoutubeIcon` en `BrandIcons.tsx`).
+- La intro de `/historia` (dos párrafos) pasa de apilada a dos columnas desde `lg`, para no dejar el hueco vacío al lado del primer párrafo que se veía junto al escudo del header.
+- El menú flotante recortaba "Contacto": el tope de `max-width` que abre la píldora (`MenuFlotante.tsx`) había quedado fijo de cuando la barra tenía seis enlaces, y al sumar Convenios pasaron a ser siete. Subido de `max-w-3xl` a `max-w-4xl`.
+
+### Verificado en el navegador
+
+- Los tres cambios, confirmados por el equipo: el menú ya no corta "Contacto", las dos columnas de `/historia` se ven bien, y el enlace de YouTube quedó donde corresponde.
+
 ## Cambio: categorías (noticias y documentos), inscripción de equipos, convenios y beneficios, CMS sin pantalla de categorías
 
 ### Hecho
@@ -22,9 +34,9 @@ El detalle de cada decisión vive en `CLAUDE.md`.
   El logo va a una subcarpeta del bucket `sponsor-logos` existente, para no tener que reescribir las cuatro políticas de Storage.
   `/admin/convenios` sigue el mismo patrón que `/admin/sponsors`.
 
-### Pendiente conocido, no es un bug
+### Verificado en el navegador
 
-- No se pudo probar en un navegador real el formulario de equipos en `/inscripciones`, el filtro de categoría en `/documentos`, ni el alta de un convenio en `/admin/convenios`: la extensión de Chrome no estaba conectada en esta sesión.
+- El formulario de equipos en `/inscripciones`, el filtro de categoría en `/documentos` y el alta de un convenio en `/admin/convenios`: los tres probados por el equipo, sin problemas.
 
 ## Cambio: correo de contacto real y video del hero más liviano
 
@@ -38,11 +50,17 @@ El detalle de cada decisión vive en `CLAUDE.md`.
   El póster se regeneró desde el archivo nuevo, porque tiene que ser el mismo píxel que el primer cuadro.
   Detalle completo y las cifras de SSIM en `CLAUDE.md` sección 3.
 
+### Verificado
+
+- Registro público deshabilitado en el dashboard de Supabase, y ya existe un usuario promovido a `admin`.
+- Subida de PDF de punta a punta, con un archivo real.
+- El Hero en un iPhone real: no se pega ni se queda pausado.
+- `REVALIDATION_SECRET` generado y cargado en `.env.local` (con `openssl rand -base64 32`).
+
 ### Pendiente conocido, no es un bug
 
-- Antes de conectar el dominio: `NEXT_PUBLIC_SITE_URL` y `REVALIDATION_SECRET` siguen vacías, y no hay evidencia de que el sitio ya esté desplegado en un hosting.
-- Falta confirmar en el dashboard de Supabase que el registro público esté deshabilitado y que exista un usuario promovido a `admin`.
-- La subida de PDF de punta a punta y el Hero en un iPhone real siguen sin probarse en esta máquina (arrastrado de etapas anteriores).
+- Antes de conectar el dominio: `NEXT_PUBLIC_SITE_URL` sigue vacía, y no hay evidencia de que el sitio ya esté desplegado en un hosting.
+  Cuando exista un hosting, `REVALIDATION_SECRET` (ya generado) también hay que cargarlo en el panel de variables de entorno de ese servicio, no solo acá.
 
 ## Cambio: el video del hero en el celular
 
@@ -66,6 +84,7 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 - **La pausa al salir de pantalla.** En el navegador de la vista previa ningún `IntersectionObserver` informa, porque la pestaña no está renderizando: se comprobó con un observador de control, que tampoco disparó nunca.
   Esa parte de la lógica no cambió respecto de la versión anterior, salvo la bandera que la marca como pausa propia.
 - **Un iPhone de verdad**, que es donde apareció el problema. El equipo tiene que confirmarlo ahí, con Bajo Consumo activado y con datos móviles.
+  Confirmado después: probado en un iPhone real, el Hero anda bien.
 
 ## Cambio: Inscríbete pasa a Jugadores
 

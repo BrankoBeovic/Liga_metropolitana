@@ -40,11 +40,19 @@ export default function HistoriaPage() {
       */}
       <PageHeader titulo="Historia" bajada={BAJADA} />
 
-      <div className="mt-12 max-w-[38rem]">
+      {/*
+        Dos parrafos, uno al lado del otro desde `lg`.
+        Apilados el primero dejaba metros de espacio vacio a la derecha, con
+        el escudo del header flotando solo encima de un hueco.
+        Cada uno mantiene su propio `max-w-[38rem]` (la medida de lectura del
+        sitio, CLAUDE.md seccion 4): la columna no se ensancha solo porque el
+        contenedor tenga sitio de sobra.
+      */}
+      <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:gap-16">
         {INTRO.map((parrafo) => (
           <p
             key={parrafo.slice(0, 24)}
-            className="text-ink/85 mt-5 text-lg leading-[1.75] first:mt-0"
+            className="text-ink/85 max-w-[38rem] text-lg leading-[1.75]"
           >
             {parrafo}
           </p>

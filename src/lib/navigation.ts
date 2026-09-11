@@ -42,6 +42,16 @@ export const INSTAGRAM_URL = 'https://www.instagram.com/ligametromaxibasquet/'
 export const INSTAGRAM_HANDLE = '@ligametromaxibasquet'
 
 /**
+ * Canal oficial de YouTube.
+ *
+ * Solo enlace en el footer, no alimenta ningun carrusel (esa maquinaria se
+ * descarto entera al copiar la fuente, ver CLAUDE.md seccion "Que se dejo
+ * afuera del traspaso").
+ */
+export const YOUTUBE_URL =
+  'https://www.youtube.com/channel/UCa1vVmhF0qyuZqerQjhnicw/videos?view=0&sort=dd&shelf_id=0'
+
+/**
  * Firma para las notas marcadas como anonimas.
  *
  * El autor real se sigue guardando en `posts.author_id`: de el dependen las

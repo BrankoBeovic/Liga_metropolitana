@@ -17,10 +17,11 @@ import { NAV_LINKS } from '@/lib/navigation'
  * cambia de ancho, no un panel que aparece encima: el botón es el extremo
  * derecho de la misma superficie.
  *
- * **Solo desde `lg`.** Desplegada mide 736px, y a 768px de pantalla el header
- * deja 704px útiles: medido a 360px, los seis enlaces se dibujaban entre x=290
- * y x=970, o sea los seis fuera de la pantalla. Debajo de `lg` el menú es
+ * **Solo desde `lg`.** Desplegada no entra en una pantalla de teléfono ni de
+ * tablet en vertical: medido a 360px con los enlaces de entonces (uno menos
+ * que ahora), se dibujaban fuera de la pantalla. Debajo de `lg` el menú es
  * `MenuLateral`, un panel que entra desde el costado.
+ * Pendiente: remedir el ancho desplegado con los siete enlaces actuales.
  *
  * **El ancho se anima con `max-width`, y no con el truco de
  * `grid-template-columns: 0fr -> 1fr`.** Aquel es el camino habitual para
@@ -31,9 +32,11 @@ import { NAV_LINKS } from '@/lib/navigation'
  * porque ahí la altura del contenedor sí es automática.
  *
  * `max-width` no tiene ese problema: va de `0` a un tope, y el ancho visible es
- * el del contenido -680px medidos con los seis rótulos actuales- porque queda
- * por debajo del tope. **El tope de 48rem tiene que quedar por encima del ancho
- * real**: si algún día los rótulos suman más que eso, los últimos se recortan.
+ * el del contenido porque queda por debajo del tope. **El tope tiene que quedar
+ * por encima del ancho real**: si algún día los rótulos suman más que eso, los
+ * últimos se recortan. Pasó al sumar "Convenios" a la barra: con siete enlaces
+ * el contenido ya no entraba en el tope de 48rem que alcanzaba para seis, y
+ * "Contacto", el último, salía cortado.
  *
  * **Abre con hover, pero no solo con hover**, porque hover no existe en una
  * pantalla táctil ni en un teclado:
@@ -140,7 +143,7 @@ export function MenuFlotante() {
         inert={!abierto}
         className={cn(
           'overflow-hidden transition-[max-width] duration-300 ease-out',
-          abierto ? 'max-w-3xl' : 'max-w-0'
+          abierto ? 'max-w-4xl' : 'max-w-0'
         )}
       >
         <div>

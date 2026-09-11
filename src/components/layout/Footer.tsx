@@ -2,13 +2,14 @@ import { LogIn } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { InstagramIcon } from '@/components/ui/BrandIcons'
+import { InstagramIcon, YoutubeIcon } from '@/components/ui/BrandIcons'
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   NAV_LINKS,
   SITE_NAME,
   SITE_TAGLINE,
+  YOUTUBE_URL,
 } from '@/lib/navigation'
 
 /**
@@ -92,6 +93,20 @@ export function Footer() {
               <span className="sr-only">
                 {' '}
                 (se abre en Instagram, en una pestaña nueva)
+              </span>
+            </a>
+
+            <a
+              href={YOUTUBE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ink/70 hover:text-ink focus-visible:ring-accent mt-3 inline-flex min-h-11 items-center gap-2.5 rounded-full px-3 text-sm ring-1 ring-white/15 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:outline-none"
+            >
+              <YoutubeIcon className="size-5" />
+              YouTube
+              <span className="sr-only">
+                {' '}
+                (se abre en YouTube, en una pestaña nueva)
               </span>
             </a>
           </div>

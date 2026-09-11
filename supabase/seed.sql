@@ -8,8 +8,9 @@
 
 insert into public.categories (name, slug, display_order)
 values
-  ('Novedades',     'novedades',     10),
-  ('Institucional', 'institucional', 20)
+  ('Novedades',         'novedades',          10),
+  ('Institucional',     'institucional',      20),
+  ('Otras Actividades', 'otras-actividades',  30)
 on conflict (slug) do update
   set name          = excluded.name,
       display_order = excluded.display_order;

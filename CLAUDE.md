@@ -19,8 +19,9 @@ Bajada: "El maxibásquetbol chileno desde 1989".
   `CORREO_DESTINO` admite varias direcciones separadas por coma, sin tocar código.
 - Token de la API de Instagram: pendiente. Mientras falte, la portada muestra Reels de muestra (recortes del video de marca). Con token, esa rama no corre.
 
-Las categorías de las noticias son dos: **Novedades** e **Institucional**.
+Las categorías de las noticias son tres: **Novedades**, **Institucional** y **Otras Actividades** (esta última para torneos nacionales, internacionales, supercopas y campeones de liga en los que participa La Metro).
 En el CMS se llaman "categorías".
+Se tratan todas igual: mismo estilo visual, mismo feed de la portada y de `/noticias`, sin página propia por categoría.
 
 La base del código se copió de "Hablemos de Básquet" (`C:\Users\dell\Desktop\Trabajo\HABLEMOS DE BASQUET\HABLEMOS_DE_BASQUET`), que es SOLO LECTURA.
 Se copió tal cual y se adaptó después; las decisiones técnicas de la fuente que siguen vigentes están documentadas acá.

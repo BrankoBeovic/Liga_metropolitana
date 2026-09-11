@@ -355,6 +355,21 @@ Esa sección se queda, con un estado vacío explícito, porque una portada de un
 El `h1` de la portada es `sr-only`.
 La portada de un medio no tiene titular propio, y el nombre de la Liga ya está dicho en letras de tres metros en el video: escribirlo encima sería decirlo dos veces y pelearle el centro a la imagen.
 
+### Nota: las miniaturas de Reels pasan por una ruta propia, no por la URL de Instagram
+
+`me/media` devuelve `thumbnail_url` firmada y con vencimiento, y la firma cambia en cada consulta aunque la foto de atrás sea siempre la misma.
+Como `getReelsInstagram` vuelve a consultar cada `REVALIDAR_SEGUNDOS` (15 minutos), pasarle esa URL directo a `next/image` significa que Vercel factura una transformación nueva por cada firma distinta que ve pasar, para las mismas ocho fotos, cada 15 minutos.
+`minimumCacheTTL` no protege de esto: cachea por URL, y si la URL nunca se repite, nunca hay acierto de cache.
+
+Por eso `thumbnailUrl` no es la URL de Instagram: es `rutaReelThumb(id)`, una ruta propia y estable (`lib/instagram.ts`).
+`/api/reel-thumb/[id]` resuelve la firma vigente en el momento en que alguien pide la miniatura y devuelve los bytes con `Cache-Control: immutable` de 31 días.
+Como la ruta no cambia nunca para un mismo Reel, ahí sí `next/image` cachea de verdad, y la resolución a Instagram ocurre una vez por Reel y no una vez por revalidación de página.
+
+De paso, `next.config.mjs` dejó de admitir `**.cdninstagram.com` y `**.fbcdn.net` en `remotePatterns`: `next/image` ya no ve nunca una URL de Meta.
+
+Junto con este fix se sacó `image/avif` de `images.formats` (cada formato extra duplica las transformaciones por imagen, y para fotos comunes AVIF gana poco sobre WebP) y se reemplazaron `deviceSizes`/`imageSizes` por los anchos reales que usa el sitio en vez de los defaults de Next, que traían anchos que acá nadie pide.
+Si se agrega un `sizes` con un ancho nuevo, conviene colapsarlo al bucket existente más cercano en vez de sumar uno: cada bucket de más es una combinación (URL, ancho, formato) más que Vercel puede llegar a facturar.
+
 ### Los formularios: contacto manda correo, inscripciones además se guardan
 
 `/contacto` sigue el circuito original: manda un correo con Resend y no escribe en ninguna tabla.

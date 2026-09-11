@@ -28,34 +28,21 @@ function supabaseImagePatterns() {
 }
 
 /**
- * Miniaturas de Reels de Instagram.
- *
- * Dos hostnames con comodin porque la CDN de Meta rota entre muchisimos
- * subdominios (`scontent-eze1-1.cdninstagram.com`, `instagram.fscl2-1.fna...`)
- * y no hay forma de enumerarlos. Es mas amplio de lo que uno quisiera, pero la
- * alternativa es que la miniatura falle sin motivo aparente segun de que
- * servidor le haya tocado salir.
- *
- * Hotlinkear no deja al lector expuesto al vencimiento de las firmas: con
- * `next/image` en el medio el lector nunca le pega a Meta, el servidor baja la
- * imagen y la sirve cacheada desde /_next/image.
- */
-const INSTAGRAM_IMAGE_PATTERNS = /** @type {const} */ ([
-  { protocol: 'https', hostname: '**.cdninstagram.com', pathname: '/**' },
-  { protocol: 'https', hostname: '**.fbcdn.net', pathname: '/**' },
-])
-
-/**
  * Cuanto conserva Next las copias optimizadas: 31 dias.
  *
- * Es la defensa concreta contra el vencimiento de las firmas de Instagram. Una
- * vez que una miniatura se bajo bien, se sigue sirviendo desde nuestra cache
- * aunque la URL original ya no exista, y el lector nunca ve el hueco.
+ * Una vez que una miniatura de Reel se bajo bien, se sigue sirviendo desde
+ * nuestra cache sin volver a pedirla. Esto solo funciona porque las
+ * miniaturas de Reels ya no llegan a `next/image` con la URL firmada de
+ * Instagram (que caduca y cambia en cada consulta a la API) sino con la ruta
+ * propia y estable de `/api/reel-thumb/[id]` (ver `rutaReelThumb` en
+ * `lib/instagram.ts`): `minimumCacheTTL` cachea por URL, y sin esa ruta de por
+ * medio la URL jamas se repetia, asi que nunca habia acierto de cache y cada
+ * revalidacion facturaba transformaciones nuevas para las mismas fotos.
  *
  * La contra que advierte la documentacion es que no hay forma de invalidar esa
  * cache. Acá no molesta: la miniatura de un Reel no cambia despues de
- * publicado, y si cambiara, la URL firmada cambia con ella y pasa a ser otra
- * entrada de cache.
+ * publicado, y si cambiara, sale un Reel nuevo con otro id y otra entrada de
+ * cache.
  */
 const CACHE_IMAGENES_SEGUNDOS = 2678400
 
@@ -74,6 +61,37 @@ const CACHE_IMAGENES_SEGUNDOS = 2678400
  */
 const MAX_CUERPO_ACCION = '16mb'
 
+/**
+ * Anchos fijos que de verdad se piden en el sitio (para imagenes con `sizes`
+ * en pixeles, sin fraccion de viewport): avatar de autor (64), tarjeta chica
+ * de nota (128), logos de sponsor/convenio y subida del CMS (160), miniatura
+ * de Reel en tablet (192, colapsado a 224), PageHeader y footer (300, 220
+ * colapsado a 224).
+ *
+ * Colapsar anchos parecidos en un mismo bucket (192 y 220 dentro de 224) es a
+ * proposito: el "desperdicio" de servir una imagen un poco mas grande de la
+ * necesaria es marginal, y cada bucket que se saca es una combinacion
+ * (URL, ancho, formato) menos que Vercel puede llegar a facturar como
+ * transformacion nueva.
+ *
+ * Reemplaza el default de Next (16, 32, 48, 64, 96, 128, 256, 384), que trae
+ * anchos que este sitio nunca pide.
+ */
+const IMAGE_SIZES = [64, 128, 160, 224, 300]
+
+/**
+ * Anchos de viewport, para imagenes con `sizes` en `vw` o fijas y grandes:
+ * columna de lectura (608, `ANCHO_LECTURA` en `ArticleContent`), quiebres de
+ * `40rem`/`28rem` de Historia y la portada (640, 448), portada de nota (896),
+ * y dos anchos de escritorio para las fracciones de viewport de las grillas
+ * de notas (1280, 1920).
+ *
+ * Reemplaza el default de Next (640, 750, 828, 1080, 1200, 1920, 2048, 3840),
+ * que trae anchos de escritorio grande (2048, 3840) que ninguna imagen de
+ * este sitio necesita.
+ */
+const DEVICE_SIZES = [448, 608, 640, 896, 1280, 1920]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -82,10 +100,19 @@ const nextConfig = {
     serverActions: { bodySizeLimit: MAX_CUERPO_ACCION },
   },
   images: {
-    // Portadas y miniaturas 9:16 servidas en WebP/AVIF.
-    formats: ['image/avif', 'image/webp'],
+    /**
+     * Solo WebP, sin AVIF.
+     *
+     * Cada formato extra duplica las transformaciones facturables por
+     * imagen (misma URL y ancho, un archivo distinto por formato). Para
+     * fotos comunes AVIF gana poco sobre WebP, y no vale duplicar el cupo de
+     * Vercel para esa ganancia marginal.
+     */
+    formats: ['image/webp'],
     minimumCacheTTL: CACHE_IMAGENES_SEGUNDOS,
-    remotePatterns: [...supabaseImagePatterns(), ...INSTAGRAM_IMAGE_PATTERNS],
+    deviceSizes: DEVICE_SIZES,
+    imageSizes: IMAGE_SIZES,
+    remotePatterns: supabaseImagePatterns(),
   },
   async redirects() {
     return [

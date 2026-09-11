@@ -15,8 +15,35 @@ export type ReelInstagram = {
   title: string
   /** Enlace estable al Reel. Es a donde lleva el clic. */
   permalink: string
+  /**
+   * Ruta propia y estable, no la URL firmada que devuelve Instagram.
+   *
+   * Ver `rutaReelThumb` para el porque.
+   */
   thumbnailUrl: string
   publishedAt: string
+}
+
+/**
+ * Arma la ruta estable de una miniatura de Reel, en el unico lugar que lo
+ * hace.
+ *
+ * La URL que devuelve `me/media` (`thumbnail_url`) viene firmada por Instagram
+ * y caduca, y ademas cambia en cada consulta aunque la foto sea la misma. Si
+ * esa URL entrara directo a `next/image`, Vercel factura una transformacion
+ * nueva por cada firma distinta que ve pasar: como este modulo vuelve a
+ * preguntarle a Instagram cada `REVALIDAR_SEGUNDOS`, serian transformaciones
+ * nuevas cada 15 minutos para las mismas fotos de siempre.
+ * `minimumCacheTTL` (en `next.config.mjs`) no protege de esto: cachea por URL,
+ * y si la URL nunca se repite, nunca hay acierto de cache.
+ *
+ * La ruta de `/api/reel-thumb/[id]` (implementada ahi) resuelve la firma
+ * vigente en el momento en que alguien la pide, no en el momento en que se
+ * genero la pagina. Como la ruta no cambia nunca para un mismo Reel,
+ * `next/image` si puede cachearla de verdad.
+ */
+export function rutaReelThumb(id: string): string {
+  return `/api/reel-thumb/${id}`
 }
 
 /**
@@ -48,8 +75,11 @@ const A_PEDIR = 25
  * URLs: las miniaturas de Instagram vienen firmadas y caducan. Cada consulta
  * trae firmas nuevas, asi que preguntar mas seguido achica la ventana en la
  * que una pagina cacheada apunta a una firma vencida.
+ *
+ * Exportada porque `/api/reel-thumb/[id]` la reusa para cachear su propia
+ * resolucion de la firma vigente con la misma cadencia.
  */
-const REVALIDAR_SEGUNDOS = 900
+export const REVALIDAR_SEGUNDOS = 900
 
 const CAMPOS = [
   'id',
@@ -188,7 +218,7 @@ export async function getReelsInstagram(
           id: m.id,
           title: tituloDesde(m.caption),
           permalink: m.permalink,
-          thumbnailUrl: m.thumbnail_url,
+          thumbnailUrl: rutaReelThumb(m.id),
           publishedAt: m.timestamp ?? '',
         },
       ]

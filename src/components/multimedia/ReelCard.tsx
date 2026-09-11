@@ -35,9 +35,12 @@ type ReelCardProps = {
  * texto que escribio alguien y no un titular compuesto, y el sitio pone en
  * mayusculas todo lo que va en display: un pie de Reel gritado se lee mal.
  *
- * La miniatura viene firmada por Instagram y caduca, pero el lector nunca le
- * pega a Meta: `next/image` la descarga en el servidor y la sirve desde nuestra
- * cache, que dura 31 dias por `minimumCacheTTL` en `next.config.mjs`.
+ * `item.thumbnailUrl` no es la URL firmada de Instagram: es la ruta propia y
+ * estable de `/api/reel-thumb/[id]` (ver `rutaReelThumb` en `lib/instagram.ts`).
+ * El lector nunca le pega a Meta ni ve una firma vencida: `next/image` pide
+ * esa ruta, que resuelve la firma vigente al momento y devuelve los bytes, y
+ * la sirve desde nuestra cache, que dura 31 dias por `minimumCacheTTL` en
+ * `next.config.mjs`.
  *
  * El clic abre el `permalink`, que a diferencia de la miniatura es estable.
  *

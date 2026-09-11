@@ -8,6 +8,7 @@ import {
   confirmarSubidaPdf,
   crearSubidaFirmada,
 } from '@/lib/admin/storage'
+import { categoriaDocumentoValida } from '@/lib/documentos-categorias'
 import { createClient } from '@/lib/supabase/server'
 
 export type EstadoDocumento = { error: string | null; ok: string | null }
@@ -44,6 +45,7 @@ type DatosDocumento = {
   id?: number
   title: string
   description: string
+  category: string
   /** Ruta del PDF recien subido. Vacia si se esta editando sin cambiar el archivo. */
   ruta?: string
   /** URL del PDF que ya tenia la fila, para poder reemplazarlo. */
@@ -82,6 +84,9 @@ export async function guardarDocumento(
       error: `La descripción no puede pasar de ${MAX_DESCRIPCION} caracteres.`,
       ok: null,
     }
+  }
+  if (!categoriaDocumentoValida(datos.category)) {
+    return { error: 'Elige una categoría de la lista.', ok: null }
   }
 
   let fileUrl = datos.urlActual ?? ''
@@ -123,6 +128,7 @@ export async function guardarDocumento(
   const fila = {
     title: titulo,
     description: descripcion || null,
+    category: datos.category,
     file_url: fileUrl,
     ...(bytes !== null ? { file_size_bytes: bytes } : {}),
   }

@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react'
 
-import { enviarJugador } from '@/app/(public)/jugadores/actions'
+import { enviarJugador } from '@/app/(public)/inscripciones/actions'
 import { ESTADO_INICIAL } from '@/lib/formularios'
 import {
   BIO_MAX,

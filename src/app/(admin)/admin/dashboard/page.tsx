@@ -22,29 +22,39 @@ export default async function DashboardPage() {
 
   // Las consultas pasan por RLS con la identidad del usuario: un editor cuenta
   // solo lo suyo y un admin cuenta todo, sin que haya que filtrar aca.
-  const [publicados, borradores, reels, sponsors, documentos, jugadores] =
-    await Promise.all([
-      supabase
-        .from('posts')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'published'),
-      supabase
-        .from('posts')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'draft'),
-      /*
+  const [
+    publicados,
+    borradores,
+    reels,
+    sponsors,
+    documentos,
+    jugadores,
+    equipos,
+    convenios,
+  ] = await Promise.all([
+    supabase
+      .from('posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'published'),
+    supabase
+      .from('posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'draft'),
+    /*
         Los Reels no se cuentan en la base: se preguntan a la misma funcion que
         usa la portada. Sin token configurado la lista llega vacia y la tarjeta
         muestra 0, que es exactamente lo que el sitio esta mostrando.
       */
-      getReelsInstagram(REELS_EN_PORTADA),
-      supabase.from('sponsors').select('id', { count: 'exact', head: true }),
-      supabase
-        .from('documents')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true),
-      supabase.from('players').select('id', { count: 'exact', head: true }),
-    ])
+    getReelsInstagram(REELS_EN_PORTADA),
+    supabase.from('sponsors').select('id', { count: 'exact', head: true }),
+    supabase
+      .from('documents')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true),
+    supabase.from('players').select('id', { count: 'exact', head: true }),
+    supabase.from('teams').select('id', { count: 'exact', head: true }),
+    supabase.from('benefits').select('id', { count: 'exact', head: true }),
+  ])
 
   return (
     <AdminShell
@@ -94,6 +104,12 @@ export default async function DashboardPage() {
           titulo="Jugadores"
           valor={jugadores.count}
           href="/admin/jugadores"
+        />
+        <Tarjeta titulo="Equipos" valor={equipos.count} href="/admin/equipos" />
+        <Tarjeta
+          titulo="Convenios"
+          valor={convenios.count}
+          href="/admin/convenios"
         />
       </ul>
     </AdminShell>

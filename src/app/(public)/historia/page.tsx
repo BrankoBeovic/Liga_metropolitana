@@ -158,7 +158,7 @@ export default function HistoriaPage() {
         <p className="text-ink/75 mt-3 leading-relaxed">{CIERRE.texto}</p>
 
         <Link
-          href="/jugadores"
+          href="/inscripciones"
           className="font-display bg-accent text-canvas hover:bg-accent-light focus-visible:ring-accent focus-visible:ring-offset-editorial mt-6 inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm tracking-[0.12em] uppercase transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           {CIERRE.boton}

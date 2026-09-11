@@ -91,7 +91,12 @@ const nextConfig = {
     return [
       {
         source: '/inscribete',
-        destination: '/jugadores',
+        destination: '/inscripciones',
+        permanent: true,
+      },
+      {
+        source: '/jugadores',
+        destination: '/inscripciones',
         permanent: true,
       },
     ]

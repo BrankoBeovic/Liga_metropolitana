@@ -53,10 +53,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      // Quienes buscan equipo. Cambia cuando alguien se inscribe, no todos los dias.
-      url: urlAbsoluta('/jugadores'),
+      // Jugadores sueltos y equipos que quieren sumarse. Cambia cuando alguien
+      // se inscribe, no todos los dias.
+      url: urlAbsoluta('/inscripciones'),
       changeFrequency: 'monthly',
       priority: 0.8,
+    },
+    {
+      // El seguro medico y los convenios. Cambia cuando la Liga carga uno
+      // nuevo, no todos los dias.
+      url: urlAbsoluta('/convenios'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
     },
     {
       // Cambia poco y no es una pagina de trafico, pero si de confianza: es la

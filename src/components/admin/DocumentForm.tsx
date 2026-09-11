@@ -8,6 +8,7 @@ import {
   type EstadoDocumento,
 } from '@/app/(admin)/admin/documentos/actions'
 import { ACCEPT_PDF, MAX_PDF_MB, revisarPdf } from '@/lib/archivos'
+import { CATEGORIAS_DOCUMENTO } from '@/lib/documentos-categorias'
 import { formatearPeso } from '@/lib/format'
 import { createClient } from '@/lib/supabase/client'
 
@@ -17,6 +18,12 @@ type DocumentoEditable = {
   description: string | null
   file_url: string
   file_size_bytes: number | null
+  /**
+   * `string` y no `CategoriaDocumento`: llega tal cual de la fila de Supabase,
+   * tipada como columna de texto. El CHECK de la base es lo que garantiza que
+   * el valor real sea una de las cuatro categorias.
+   */
+  category: string
 }
 
 type DocumentFormProps = {
@@ -73,6 +80,7 @@ export function DocumentForm({ documento }: DocumentFormProps) {
     const datos = new FormData(form)
     const title = String(datos.get('title') ?? '')
     const description = String(datos.get('description') ?? '')
+    const category = String(datos.get('category') ?? '')
 
     // Crear sin archivo no tiene sentido; editar sin archivo conserva el
     // que ya estaba.
@@ -125,6 +133,7 @@ export function DocumentForm({ documento }: DocumentFormProps) {
       ...(documento ? { id: documento.id, urlActual: documento.file_url } : {}),
       title,
       description,
+      category,
       ...(ruta ? { ruta } : {}),
     })
 
@@ -176,6 +185,31 @@ export function DocumentForm({ documento }: DocumentFormProps) {
           placeholder="Una línea que explique para qué sirve el documento."
           className="focus:border-accent focus:ring-accent/20 mt-1.5 block w-full rounded-lg border border-black/10 px-3 py-2.5 text-[15px] outline-none focus:ring-4"
         />
+      </div>
+
+      <div>
+        <label
+          htmlFor={`category-${idBase}`}
+          className="text-ink/70 block text-sm font-medium"
+        >
+          Categoría
+        </label>
+        <select
+          id={`category-${idBase}`}
+          name="category"
+          required
+          defaultValue={documento?.category ?? ''}
+          className="focus:border-accent focus:ring-accent/20 mt-1.5 block h-11 w-full rounded-lg border border-black/10 px-3 text-[15px] outline-none focus:ring-4"
+        >
+          <option value="" disabled>
+            Elige una categoría
+          </option>
+          {CATEGORIAS_DOCUMENTO.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

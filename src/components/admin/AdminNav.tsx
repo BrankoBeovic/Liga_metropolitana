@@ -19,12 +19,13 @@ type AdminNavProps = {
 const ENLACES = [
   { href: '/admin/dashboard', label: 'Inicio', soloAdmin: false },
   { href: '/admin/noticias', label: 'Noticias', soloAdmin: false },
-  { href: '/admin/categorias', label: 'Categorías', soloAdmin: true },
   // Sponsors no es exclusivo del admin: lo administra todo el equipo.
   { href: '/admin/sponsors', label: 'Sponsors', soloAdmin: false },
+  { href: '/admin/convenios', label: 'Convenios', soloAdmin: false },
   // Los PDFs de /documentos. Tambien los administra todo el equipo.
   { href: '/admin/documentos', label: 'Documentos', soloAdmin: false },
   { href: '/admin/jugadores', label: 'Jugadores', soloAdmin: false },
+  { href: '/admin/equipos', label: 'Equipos', soloAdmin: false },
   /*
     "Mi perfil" va en la barra y no colgado del nombre del usuario, que seria
     el lugar habitual: ese nombre esta oculto abajo de `sm`, y un unico camino

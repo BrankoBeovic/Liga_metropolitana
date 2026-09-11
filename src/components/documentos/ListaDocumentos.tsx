@@ -3,9 +3,15 @@
 import { Download, FileText, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { Badge } from '@/components/ui/Badge'
 import { urlDeDescarga } from '@/lib/archivos'
+import { cn } from '@/lib/cn'
 import type { Documento } from '@/lib/documentos'
+import { CATEGORIAS_DOCUMENTO } from '@/lib/documentos-categorias'
 import { formatearFecha, formatearPeso } from '@/lib/format'
+
+/** Valor del filtro cuando no hay ninguna categoría elegida. */
+const TODAS = ''
 
 type ListaDocumentosProps = {
   documentos: readonly Documento[]
@@ -38,17 +44,25 @@ function normalizar(texto: string): string {
  * Es el unico pedazo de cliente de la pagina: la lista se arma en el servidor y
  * baja como HTML, asi que sin JavaScript se ve completa igual. Lo unico que se
  * pierde es el filtro.
+ *
+ * El filtro de categoria son chips, igual que en `ListaNoticias`, y no
+ * enlaces: tampoco hay paginas de categoria para los documentos. Los dos
+ * filtros (texto y categoria) se aplican juntos, en AND.
  */
 export function ListaDocumentos({ documentos }: ListaDocumentosProps) {
   const [consulta, setConsulta] = useState('')
+  const [categoria, setCategoria] = useState(TODAS)
 
   const filtrados = useMemo(() => {
     const q = normalizar(consulta.trim())
-    if (!q) return documentos
-    return documentos.filter((d) =>
-      normalizar(`${d.title} ${d.description ?? ''}`).includes(q)
-    )
-  }, [consulta, documentos])
+    return documentos.filter((d) => {
+      if (categoria !== TODAS && d.category !== categoria) return false
+      if (!q) return true
+      return normalizar(`${d.title} ${d.description ?? ''}`).includes(q)
+    })
+  }, [consulta, categoria, documentos])
+
+  const opcionesCategoria = [TODAS, ...CATEGORIAS_DOCUMENTO]
 
   return (
     <div>
@@ -67,13 +81,39 @@ export function ListaDocumentos({ documentos }: ListaDocumentosProps) {
         />
       </div>
 
+      <div
+        role="group"
+        aria-label="Filtrar documentos por categoría"
+        className="mt-4 flex flex-wrap gap-2"
+      >
+        {opcionesCategoria.map((op) => {
+          const activo = categoria === op
+          return (
+            <button
+              key={op || 'todas'}
+              type="button"
+              onClick={() => setCategoria(op)}
+              aria-pressed={activo}
+              className={cn(
+                'font-display focus-visible:ring-accent focus-visible:ring-offset-canvas flex min-h-11 items-center rounded-full px-4 text-xs tracking-[0.1em] uppercase transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+                activo
+                  ? 'bg-accent text-canvas'
+                  : 'bg-editorial text-ink/75 hover:text-ink ring-1 ring-white/10 hover:bg-white/10'
+              )}
+            >
+              {op || 'Todas'}
+            </button>
+          )
+        })}
+      </div>
+
       {/*
         El recuento va en una region viva: sin esto, quien navega con lector de
-        pantalla escribe en el buscador y no recibe ninguna señal de que la
-        lista cambio debajo.
+        pantalla escribe en el buscador o toca un filtro y no recibe ninguna
+        señal de que la lista cambio debajo.
       */}
       <p role="status" aria-live="polite" className="text-ink/60 mt-3 text-sm">
-        {consulta.trim()
+        {consulta.trim() || categoria !== TODAS
           ? `${filtrados.length} de ${documentos.length} ${documentos.length === 1 ? 'documento' : 'documentos'}`
           : `${documentos.length} ${documentos.length === 1 ? 'documento' : 'documentos'}`}
       </p>
@@ -85,7 +125,11 @@ export function ListaDocumentos({ documentos }: ListaDocumentosProps) {
             return (
               <li key={doc.id}>
                 <article className="bg-editorial flex h-full flex-col rounded-2xl p-5 ring-1 ring-white/10">
-                  <div className="flex items-start gap-3">
+                  <Badge variant="outline" className="self-start">
+                    {doc.category}
+                  </Badge>
+
+                  <div className="mt-3 flex items-start gap-3">
                     <FileText
                       aria-hidden
                       className="text-accent mt-0.5 size-5 shrink-0"
@@ -144,7 +188,9 @@ export function ListaDocumentos({ documentos }: ListaDocumentosProps) {
         </ul>
       ) : (
         <p className="border-ink/15 text-ink/60 mt-6 rounded-2xl border border-dashed px-6 py-12 text-center text-sm">
-          No hay ningún documento que coincida con “{consulta.trim()}”.
+          {consulta.trim()
+            ? `No hay ningún documento que coincida con “${consulta.trim()}”.`
+            : `No hay documentos en ${categoria}.`}
         </p>
       )}
     </div>

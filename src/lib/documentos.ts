@@ -6,10 +6,17 @@ import { supabasePublic } from './supabase/public'
 
 export type Documento = Pick<
   Database['public']['Tables']['documents']['Row'],
-  'id' | 'title' | 'description' | 'file_url' | 'file_size_bytes' | 'created_at'
+  | 'id'
+  | 'title'
+  | 'description'
+  | 'file_url'
+  | 'file_size_bytes'
+  | 'category'
+  | 'created_at'
 >
 
-const COLUMNAS = 'id, title, description, file_url, file_size_bytes, created_at'
+const COLUMNAS =
+  'id, title, description, file_url, file_size_bytes, category, created_at'
 
 /**
  * Los documentos publicados, del mas reciente al mas viejo.

@@ -3,8 +3,8 @@
  *
  * A diferencia de la fuente, la barra ES una lista fija en el codigo y no se
  * lee de `categories` (decision registrada en CLAUDE.md): los enlaces de la
- * barra son paginas (Historia, Documentos, Jugadores, Contacto), no
- * categorias, y son unos pocos. La maquinaria de nav_label / show_in_navbar de
+ * barra son paginas (Historia, Documentos, Inscripciones, Convenios,
+ * Contacto), no categorias. La maquinaria de nav_label / show_in_navbar de
  * la fuente existia para nueve secciones que no cabian; aca sobra.
  */
 
@@ -26,7 +26,8 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: '/noticias', label: 'Noticias' },
   { href: '/historia', label: 'Historia' },
   { href: '/documentos', label: 'Documentos' },
-  { href: '/jugadores', label: 'Jugadores' },
+  { href: '/inscripciones', label: 'Inscripciones' },
+  { href: '/convenios', label: 'Convenios' },
   { href: '/contacto', label: 'Contacto' },
 ]
 

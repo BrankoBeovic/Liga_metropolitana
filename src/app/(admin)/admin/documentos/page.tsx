@@ -27,7 +27,7 @@ export default async function DocumentosPage() {
   const { data: documentos } = await supabase
     .from('documents')
     .select(
-      'id, title, description, file_url, file_size_bytes, is_active, created_at'
+      'id, title, description, category, file_url, file_size_bytes, is_active, created_at'
     )
     .order('created_at', { ascending: false })
 
@@ -75,7 +75,7 @@ export default async function DocumentosPage() {
                         </p>
                       ) : null}
                       <p className="text-ink/45 mt-1 text-xs">
-                        {formatearFecha(doc.created_at)}
+                        {doc.category} · {formatearFecha(doc.created_at)}
                         {formatearPeso(doc.file_size_bytes)
                           ? ` · ${formatearPeso(doc.file_size_bytes)}`
                           : ''}

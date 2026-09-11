@@ -43,7 +43,7 @@ Limpio, editorial, con motion design cuidado y rendimiento como prioridad.
 | Tipografía Display | **Bebas Neue** (headings, H1, badges) |
 | Tipografía Body | **Plus Jakarta Sans** (cuerpo de texto, metadatos) |
 | Editor CMS | **TipTap** (JSON como formato de almacenamiento de `content`) |
-| Correo | **Resend**, para `/contacto` y el aviso de `/jugadores` |
+| Correo | **Resend**, para `/contacto` y los avisos de `/inscripciones` |
 | Paquetes | pnpm |
 | Lenguaje | TypeScript estricto |
 | Calidad | ESLint + Prettier |
@@ -255,7 +255,7 @@ Regla general: si el logo necesita que le hagan lugar, está mal ubicado.
 
 Decidido antes de la Etapa 1.
 La fuente configuraba la barra desde la tabla `categories` (`nav_label`, `show_in_navbar`) porque tenía nueve secciones que no cabían.
-Acá los enlaces de la barra son páginas fijas (Historia, Documentos, Jugadores, Contacto), no categorías, y son 4 o 5.
+Acá los enlaces de la barra son páginas fijas (Historia, Documentos, Inscripciones, Convenios, Contacto), no categorías.
 Se ahorran las dos columnas, `NavbarPreview` y toda la maquinaria de medición.
 `categories` queda solo para clasificar noticias.
 
@@ -283,9 +283,9 @@ Sin ninguna destacada, la principal pasa a ser la más reciente: degradación na
 ### Qué se sumó
 
 - Tabla `documents` con sus 4 políticas RLS y un bucket de Storage para PDFs.
-- Páginas `/historia`, `/documentos`, `/jugadores`, `/contacto`.
-- Sección Documentos y Jugadores en el CMS.
-- Tabla `players` para quienes buscan equipo.
+- Páginas `/historia`, `/documentos`, `/inscripciones`, `/convenios`, `/contacto`.
+- Sección Documentos, Jugadores, Equipos y Convenios en el CMS.
+- Tabla `players` para quienes buscan equipo, tabla `teams` para equipos que quieren sumarse a la Liga, y tabla `benefits` para el seguro médico y los convenios de `/convenios`.
 
 ### La firma anónima no dice "Equipo HDB"
 
@@ -355,33 +355,42 @@ Esa sección se queda, con un estado vacío explícito, porque una portada de un
 El `h1` de la portada es `sr-only`.
 La portada de un medio no tiene titular propio, y el nombre de la Liga ya está dicho en letras de tres metros en el video: escribirlo encima sería decirlo dos veces y pelearle el centro a la imagen.
 
-### Los formularios: contacto manda correo, jugadores además se guardan
+### Los formularios: contacto manda correo, inscripciones además se guardan
 
 `/contacto` sigue el circuito original: manda un correo con Resend y no escribe en ninguna tabla.
 No hay bandeja de mensajes en el CMS.
 
-`/jugadores` es la excepción deliberada.
-Era `/inscribete` y pedía un equipo; ahora es para quien quiere jugar y no tiene club.
-Guarda la ficha en `players` **y** manda un aviso por correo.
-La fila es la fuente de verdad: si Resend falla, la inscripción igual queda y se ve en `/admin/jugadores`.
-`/inscribete` redirige 301 a `/jugadores`.
+`/inscripciones` es la excepción deliberada, y tiene dos formularios independientes en una sola página: uno para jugadores sueltos y otro para equipos.
+La página fue `/inscribete` (pedía un equipo), después `/jugadores` (pasó a ser solo para quien quiere jugar y no tiene club) y ahora vuelve a cubrir los dos casos, con cada uno en su propia tabla.
+Los dos formularios guardan su ficha (`players` o `teams`) **y** mandan un aviso por correo.
+La fila es la fuente de verdad: si Resend falla, la inscripción igual queda y se ve en `/admin/jugadores` o `/admin/equipos`.
+`/inscribete` y `/jugadores` redirigen 301 a `/inscripciones`.
 
-El alta no la hace `anon`.
+Las dos secciones conviven en la misma página como pestañas de verdad (`InscripcionesTabs`, con `Tabs` de `radix-ui`): se ve un solo formulario a la vez, elegido por el botón que se apriete.
+La primera versión los apilaba a los dos con anclas para que la página funcionara sin JavaScript, pero mostrar los dos formularios juntos se sentía como demasiada información en pantalla, así que se cambió a pestañas.
+Sin JavaScript se ve solo la pestaña por defecto (jugador): Radix renderiza en el servidor únicamente el `Tabs.Content` activo, así que quien navega sin JS puede completar ese formulario igual, aunque no pueda cambiar de pestaña.
+Es la misma degradación que ya acepta este codebase para el `Dialog` del menú lateral, que tampoco abre sin JavaScript.
+
+El alta no la hace `anon`, ni para jugadores ni para equipos.
 La Server Action inserta con `SUPABASE_SECRET_KEY` (bypassea RLS) después de las trampas antispam.
 Si `anon` pudiera insertar, un bot publicaría filas directo contra el REST y se saltaría el formulario.
-Por eso las políticas de INSERT y UPDATE de `players` están declaradas en `false` para `authenticated`: nadie escribe por RLS, y el listado del CMS solo lee y borra.
+Por eso las políticas de INSERT y UPDATE de `players` y `teams` están declaradas en `false` para `authenticated`: nadie escribe por RLS, y el listado del CMS solo lee y borra.
 
 El RUT no se publica en el sitio.
 Solo lo ve el equipo autenticado.
 
-El formulario pide **nombre y apellido por separado**, más edad, RUT, posición y bio.
+El formulario de jugador pide **nombre y apellido por separado**, más edad, RUT, posición y bio.
 También **correo** (obligatorio) y **teléfono** (opcional).
 Sin un dato de contacto la ficha no sirve: la Liga no tiene otro canal para devolverle la llamada.
 El campo de apellido se llama `apellido` a propósito: `apellido_materno` es la trampa antispam, y si se mezclan un envío real se descarta como bot.
 
+El formulario de equipo pide lo básico: nombre del equipo, cantidad de jugadores, año de fundación, una bio corta, nombre de quien inscribe y correo de contacto.
+Sin RUT ni teléfono: no se pidieron, y `teams` no tiene ningún dato sensible que justifique el mismo cuidado que el RUT de un jugador.
+El nombre de quien inscribe se agregó sobre el pedido original (que solo pedía el correo): un correo solo no dice con quién se está hablando del otro lado, y el formulario de jugador ya pide nombre y apellido por la misma razón.
+
 Tres variables de entorno para el correo, todas server-only: `RESEND_API_KEY`, `CORREO_DESTINO` y `CORREO_REMITENTE`.
 Si falta alguna de las dos primeras, `/contacto` **lo dice en pantalla** en vez de fingir que salió.
-`/jugadores` no: guarda igual y registra el fallo del correo en el log.
+`/inscripciones` no: guarda igual y registra el fallo del correo en el log.
 
 **El remitente es el punto delicado.** Resend exige que el dominio del `from` esté verificado en su panel.
 Mientras la Liga no tenga dominio, `CORREO_REMITENTE` va vacía y el código cae en `onboarding@resend.dev`, que Resend permite sin verificar nada **pero solo entrega a la casilla dueña de la cuenta de Resend**.
@@ -426,6 +435,22 @@ Lo que revisa el navegador en `revisarPdf` es una cortesía para avisar temprano
 La consecuencia a tener presente: **`DocumentForm` necesita JavaScript**, a diferencia del resto de los formularios del CMS.
 Es una herramienta interna detrás de sesión, así que el costo es aceptable; la alternativa era un tope de peso que la Liga no controla.
 
+### Los documentos tienen categoría, y una de ellas es Tribunal
+
+`lib/documentos-categorias.ts` fija cuatro categorías: Reglamentos, Actas, Formularios y Tribunal.
+Igual que `POSICIONES` en `lib/jugadores.ts`: el selector del CMS, la validación de la Server Action y el CHECK de `documents.category` se corrigen juntos si la Liga quiere otra lista.
+
+**Tribunal cubre parte de lo que se discutió para un apartado propio de Tribunal** (publicar semanalmente jugadores o DTs sancionados, información de disciplina y arbitraje): en vez de un tipo de contenido nuevo, una resolución se sube a `/documentos` categorizada como Tribunal.
+Esto resuelve publicar las resoluciones en sí, pero **no** reemplaza una lista estructurada de sanciones vigentes si la Liga la termina pidiendo; eso seguiría siendo una tabla y una pantalla aparte.
+
+El filtro por categoría en `/documentos` son chips en memoria, igual que el buscador de texto y el filtro de `/noticias`: no hay páginas de categoría para documentos tampoco.
+Los dos filtros (texto y categoría) se aplican juntos, en AND.
+
+**Las categorías viven en su propio módulo, separado de `lib/documentos.ts`, y no es un capricho de organización.**
+`lib/documentos.ts` importa `supabasePublic`, que trae `server-only`: si `CATEGORIAS_DOCUMENTO` viviera ahí, el filtro público y el selector del CMS -los dos componentes cliente que la necesitan- arrastrarían todo ese módulo al bundle del navegador y el build fallaría contra el guard, aunque ninguno de los dos llame nunca a `getDocumentos()`.
+Probado primero sacando el `import 'server-only'` de `lib/documentos.ts` en vez de separar el archivo: no alcanzó, porque el build igual arrastra el módulo entero por el import de `supabasePublic`, no por lo que el componente cliente use de él.
+`ListaDocumentos` sí sigue importando el tipo `Documento` desde `lib/documentos.ts`, y eso no arrastra nada: es un import solo de tipo (`import type`), que se borra entero en la compilación y nunca llega al bundle del navegador.
+
 ### Nota: React vacía el formulario al terminar la acción
 
 Un `<form action={accion}>` se resetea solo cuando la acción termina: los campos no controlados vuelven a su valor por defecto.
@@ -458,6 +483,28 @@ Si llega una versión más larga o corregida del documento, este es el archivo a
 `lib/jugadores.ts` ofrece las cinco de la cancha (Base, Escolta, Alero, Ala-pívot, Pívot) más "Varias".
 El selector se arma desde ahí, la validación del servidor también, y la columna `players.position` tiene el mismo CHECK.
 Si la Liga quiere otra lista, se corrigen los tres lugares.
+
+### Los rangos del formulario de equipos
+
+`lib/equipos.ts` fija cantidad de jugadores (5 a 30) y año de fundación (desde 1900, nunca en el futuro).
+La base solo valida el año contra un rango estático (1900-2100): que no sea futuro se revisa en la Server Action, para no depender de si un CHECK con una función de fecha se re-evalúa como se espera.
+Si la Liga quiere otro rango de jugadores, se corrige `lib/equipos.ts` y el CHECK de `teams.player_count` en una migración nueva.
+
+### `/convenios` es `sponsors` con otro contenido
+
+`benefits` es una copia casi literal de `sponsors` -misma forma de tabla, mismas cuatro políticas RLS, mismo reparto de permisos- con dos diferencias que vienen de qué es cada cosa.
+
+**`description` es obligatoria y `logo_url`/`link_url` son opcionales**, al revés que en `sponsors`.
+Un logo de auspiciador se explica solo; un convenio no, así que ahí el texto es lo que importa.
+Y a diferencia de un sponsor, que siempre tiene marca y sitio propios, el seguro médico de la Liga -la primera fila de `benefits`, no un tipo de contenido aparte- puede no tener ninguno de los dos: no hay "partner" que ponga un logo, y no necesariamente hay una página externa a la que mandar.
+`BenefitCard` por eso tiene una rama sin `<a>` cuando falta `link_url`, y un ícono genérico (`HeartHandshake`) cuando falta `logo_url`.
+
+**El logo va a `sponsor-logos/benefits/`, no a un bucket propio.**
+Agregar un bucket nuevo obliga a reescribir las cuatro políticas de Storage, que hoy listan los cuatro buckets existentes por nombre (ver la nota de `lib/admin/storage.ts` sobre `Bucket`).
+`sponsors` y `benefits` comparten dueño (todo el equipo) y permisos, así que entran en el mismo bucket con una subcarpeta -el mismo criterio que ya usan los PDF de `/documentos` dentro de `documents/` y las portadas de nota dentro de `article-covers/`.
+
+**`/convenios` tiene página propia en la barra**, a diferencia de la sección de sponsors que solo vive embebida en la portada.
+Es contenido con texto propio (nombre, descripción, a veces un link), no solo logos: no entraba en el mismo tratamiento visual que `SponsorCard`.
 
 ## 5. CMS / Admin (`/admin`)
 
@@ -568,14 +615,19 @@ Tocar cookies saca a la ruta del render estático: una sola llamada en un layout
 | `posts` | Solo los suyos (crear, editar, borrar) | Todos |
 | `profiles` | Solo el suyo, sin poder cambiarse el rol | Todos, incluido el rol |
 | `sponsors` | Todo | Todo |
-| `categories` | Solo lectura | Todo |
+| `categories` | Solo lectura | Solo lectura |
 | `documents` | Todo | Todo |
 | `players` | Lectura y borrar | Lectura y borrar |
+| `teams` | Lectura y borrar | Lectura y borrar |
+| `benefits` | Todo | Todo |
 
 El criterio: lo estructural es del admin, el resto lo trabaja el equipo.
+`categories` es la excepción a ese criterio: no hay pantalla `/admin/categorias` para ningún rol, ni siquiera admin.
+La edición de nombre y reordenamiento que existía ahí se sacó del CMS a pedido de la Liga; para cambiar una categoría hoy hace falta una migración SQL, igual que para crearla (nunca se pudo desde el CMS).
 `documents` sigue el reparto de `sponsors`: borrar un documento es reversible (se vuelve a subir el PDF), a diferencia de borrar la nota de otra persona.
-`players` igual: sacar a alguien de la lista es reversible (se vuelve a inscribir).
-El alta de `players` no la hace el CMS: viene del formulario público, con la clave secreta.
+`players` y `teams` igual: sacar a alguien de la lista es reversible (se vuelve a inscribir).
+El alta de `players` y `teams` no la hace el CMS: viene del formulario público, con la clave secreta.
+`benefits` sigue el reparto de `sponsors` al pie de la letra, porque es la misma tabla con otro contenido: convenios y beneficios en vez de logos de auspiciadores.
 `posts` es la excepción deliberada: corregir un logo mal cargado es reversible, borrar la nota publicada de otra persona no.
 
 ### Sistema de claves

@@ -111,7 +111,7 @@ export default async function Portada() {
         {/*
           El formulario de jugadores cierra la portada.
 
-          Es el mismo `JugadorForm` de `/jugadores`, sin duplicar nada: la
+          Es el mismo `JugadorForm` de `/inscripciones`, sin duplicar nada: la
           Server Action, la validacion y el antispam son los de alla. Lo unico
           que cambia es el envoltorio, porque aca no van los tres pasos ni el
           encabezado de pagina.
@@ -122,7 +122,7 @@ export default async function Portada() {
         */}
         <section aria-labelledby="jugadores-titulo" className="mt-20">
           {/*
-            Sin enlace a `/jugadores`, a diferencia del encabezado de noticias.
+            Sin enlace a `/inscripciones`, a diferencia del encabezado de noticias.
 
             Alla el "Ver todas" lleva a algo que no esta en la portada. Aca el
             formulario completo esta justo debajo, asi que el enlace mandaba a

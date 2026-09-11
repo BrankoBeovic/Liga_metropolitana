@@ -3,6 +3,29 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: categorías (noticias y documentos), inscripción de equipos, convenios y beneficios, CMS sin pantalla de categorías
+
+### Hecho
+
+- Nueva categoría de noticias **Otras Actividades**, junto a Novedades e Institucional.
+  Una fila en `categories`, sin cambios de código: el sistema ya era genérico.
+- `/jugadores` pasa a ser **`/inscripciones`**, con dos formularios en una sola página, uno visible a la vez detrás de pestañas (`InscripcionesTabs`, con `Tabs` de `radix-ui`): el de siempre para jugadores sueltos, y uno nuevo para equipos que quieren sumarse a la Liga.
+  `/jugadores` y `/inscribete` redirigen 301 a `/inscripciones`.
+- Tabla `teams` (nombre, cantidad de jugadores, año de fundación, bio, responsable, correo), mismo circuito que `players`: alta por Server Action con la clave secreta, RLS que solo deja leer y borrar al equipo autenticado.
+- `/admin/equipos`, junto a `/admin/jugadores`, con su entrada propia en `AdminNav` y su tarjeta en el dashboard.
+- Se sacó `/admin/categorias` del CMS por completo, para todos los roles: la edición de nombre y el reordenamiento que había ahí ahora requieren una migración SQL, igual que crear una categoría (nunca se pudo desde el CMS).
+- Los documentos de `/documentos` tienen categoría: Reglamentos, Actas, Formularios o Tribunal (`documents.category`, backfill de las 4 filas que ya existían).
+  Filtro por chips en `/documentos`, selector en el formulario del CMS, y la categoría se ve en cada tarjeta y en el listado del CMS.
+  `Tribunal` cubre parte de lo que se había discutido para un apartado de Tribunal: resoluciones de disciplina como PDF categorizado, no una lista estructurada de sanciones.
+- Página nueva **`/convenios`** (Convenios y Beneficios), con enlace propio en la barra.
+  Tabla `benefits`, copia de `sponsors` con `description` obligatoria y `logo_url`/`link_url` opcionales -el seguro médico de la Liga es la primera fila, sin partner ni link necesariamente.
+  El logo va a una subcarpeta del bucket `sponsor-logos` existente, para no tener que reescribir las cuatro políticas de Storage.
+  `/admin/convenios` sigue el mismo patrón que `/admin/sponsors`.
+
+### Pendiente conocido, no es un bug
+
+- No se pudo probar en un navegador real el formulario de equipos en `/inscripciones`, el filtro de categoría en `/documentos`, ni el alta de un convenio en `/admin/convenios`: la extensión de Chrome no estaba conectada en esta sesión.
+
 ## Cambio: correo de contacto real y video del hero más liviano
 
 ### Hecho

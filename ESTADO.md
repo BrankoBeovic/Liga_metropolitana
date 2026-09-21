@@ -15,6 +15,7 @@ El detalle de cada decisión vive en `CLAUDE.md`.
 - Mismo nombre "Sponsors | Colaboradores" reflejado en el CMS: `titulo` de `AdminShell` y `metadata.title` en `/admin/sponsors`, y la tarjeta del dashboard.
   En `AdminNav` el label pasó por tres versiones: nombre completo (empujaba "Mi perfil" fuera de la vista inicial), "Sponsors" a secas (no alcanza, la sección también admite colaboradores sin relación comercial) y la que quedó, "Sponsors/Colab.". Sin poder verificar en un navegador real esta sesión tampoco: si sigue empujando "Mi perfil", falta acortar más.
 - Textos de `/admin/sponsors` simplificados: "Agregar sponsor" (heading y botón) pasó a "Agregar", y "Sponsors cargados" a "Cargados". El título de la pantalla ya dice "Sponsors | Colaboradores"; repetir "sponsor" en cada subtítulo era redundante.
+- El canal de YouTube que se había usado era el equivocado. El correcto es `youtube.com/@ligametrotv` ("Liga Metropolitana TV"). Ese handle no sirve para armar el feed RSS (pide `channel_id=UC...`), así que el ID real (`UCchLJWZ-XWqfw9hnukQ_8_Q`) se resolvió a mano contra el `<link rel="canonical">` de la página del canal y se confirmó bajando el feed real antes de tocar el código. `YOUTUBE_URL` y `YOUTUBE_CHANNEL_ID` en `lib/navigation.ts` son el único lugar que hubo que tocar (footer y carrusel salen de ahí).
 
 ### Verificado
 

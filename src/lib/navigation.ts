@@ -64,10 +64,16 @@ export const INSTAGRAM_HANDLE = '@ligametromaxibasquet'
  * Enlace del footer y fuente del `channel_id` que alimenta el carrusel de
  * videos de la portada (`lib/youtube.ts`).
  */
-export const YOUTUBE_URL =
-  'https://www.youtube.com/channel/UCa1vVmhF0qyuZqerQjhnicw/videos?view=0&sort=dd&shelf_id=0'
+export const YOUTUBE_URL = 'https://www.youtube.com/@ligametrotv'
 
-export const YOUTUBE_CHANNEL_ID = 'UCa1vVmhF0qyuZqerQjhnicw'
+/**
+ * El `channel_id` no sale del handle de arriba: `@ligametrotv` no sirve para
+ * armar el feed RSS de `lib/youtube.ts` (que pide `channel_id=UC...`), asi
+ * que se resolvio una vez a mano contra el `<link rel="canonical">` de la
+ * pagina del canal. Si el canal vuelve a cambiar de handle, este ID no se ve
+ * afectado; si cambia de canal (otra cuenta), hay que resolverlo de nuevo.
+ */
+export const YOUTUBE_CHANNEL_ID = 'UCchLJWZ-XWqfw9hnukQ_8_Q'
 
 /**
  * Firma para las notas marcadas como anonimas.

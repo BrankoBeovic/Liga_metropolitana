@@ -5,12 +5,14 @@ import { JugadorForm } from '@/components/forms/JugadorForm'
 import { Hero } from '@/components/home/Hero'
 import { Legado } from '@/components/home/Legado'
 import { ReelsCarousel } from '@/components/multimedia/ReelsCarousel'
+import { VideosCarousel } from '@/components/multimedia/VideosCarousel'
 import { SponsorsSection } from '@/components/sponsors/SponsorsSection'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { getReelsInstagram, REELS_EN_PORTADA } from '@/lib/instagram'
 import { INSTAGRAM_HANDLE, SITE_NAME, SITE_TAGLINE } from '@/lib/navigation'
 import { getHeroPosts } from '@/lib/posts'
+import { getVideosYoutube } from '@/lib/youtube'
 
 /**
  * Revalidacion cada 5 minutos.
@@ -25,18 +27,22 @@ export const revalidate = 300
 /** Cuantas notas entran en el bloque destacado: 1 grande + 3 en la barra. */
 const DESTACADAS = 4
 
+/** Los ultimos tres videos del canal de YouTube. */
+const VIDEOS_EN_PORTADA = 3
+
 /**
  * Portada.
  *
  * El orden de los bloques es una decision editorial y no el orden en que se
  * fueron escribiendo: hero, quienes somos, lo que publicamos a diario, las
- * noticias, quienes nos apoyan y recien al final el llamado a jugadores sin
- * equipo. Primero se explica la Liga y despues se le pide algo a quien llego.
+ * noticias, el llamado a jugadores sin equipo y recien al final quienes
+ * apoyan a la Liga.
  */
 export default async function Portada() {
-  const [destacadas, reels] = await Promise.all([
+  const [destacadas, reels, videos] = await Promise.all([
     getHeroPosts(DESTACADAS),
     getReelsInstagram(REELS_EN_PORTADA),
+    getVideosYoutube(),
   ])
 
   return (
@@ -76,6 +82,19 @@ export default async function Portada() {
           </section>
         ) : null}
 
+        {/*
+          Sin placeholder cuando esta vacia, a diferencia de Reels: aca no hay
+          un token pendiente que explique el hueco, solo un feed de YouTube
+          que a veces no responde (`lib/youtube.ts`), y es un caso raro y
+          transitorio.
+        */}
+        {videos.length > 0 ? (
+          <section aria-labelledby="videos-titulo" className="mt-16">
+            <SectionHeading id="videos-titulo" title="En" accent="YouTube" />
+            <VideosCarousel videos={videos.slice(0, VIDEOS_EN_PORTADA)} />
+          </section>
+        ) : null}
+
         <section
           id="noticias"
           aria-labelledby="destacadas-titulo"
@@ -104,21 +123,13 @@ export default async function Portada() {
           )}
         </section>
 
-        <div className="mt-20">
-          <SponsorsSection />
-        </div>
-
         {/*
-          El formulario de jugadores cierra la portada.
+          El formulario de jugadores va antes que sponsors.
 
           Es el mismo `JugadorForm` de `/inscripciones`, sin duplicar nada: la
           Server Action, la validacion y el antispam son los de alla. Lo unico
           que cambia es el envoltorio, porque aca no van los tres pasos ni el
           encabezado de pagina.
-
-          Va ultimo a proposito: pedirle a alguien que deje su ficha tiene
-          sentido despues de haberle mostrado que es la Liga, que publica y
-          quien la apoya, no antes.
         */}
         <section aria-labelledby="jugadores-titulo" className="mt-20">
           {/*
@@ -180,6 +191,10 @@ export default async function Portada() {
             <JugadorForm />
           </div>
         </section>
+
+        <div className="mt-20">
+          <SponsorsSection />
+        </div>
       </div>
     </>
   )

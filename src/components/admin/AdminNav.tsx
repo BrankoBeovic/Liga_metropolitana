@@ -20,7 +20,15 @@ const ENLACES = [
   { href: '/admin/dashboard', label: 'Inicio', soloAdmin: false },
   { href: '/admin/noticias', label: 'Noticias', soloAdmin: false },
   // Sponsors no es exclusivo del admin: lo administra todo el equipo.
-  { href: '/admin/sponsors', label: 'Sponsors', soloAdmin: false },
+  //
+  // "Sponsors" solo no alcanza: la seccion tambien admite colaboradores sin
+  // relacion comercial, y decir solo una de las dos palabras deja afuera la
+  // otra. El nombre completo es "Sponsors | Colaboradores" (titulo de la
+  // pantalla y tarjeta del dashboard), pero entero no entra aca: la barra ya
+  // tiene siete enlaces mas "Mi perfil", y el ancho extra lo empujaba fuera
+  // de la vista inicial. "Colab." es la forma abreviada mas reconocible sin
+  // ambiguedad (a diferencia de "Col.", que podria leerse "Colombia").
+  { href: '/admin/sponsors', label: 'Sponsors/Colab.', soloAdmin: false },
   { href: '/admin/convenios', label: 'Convenios', soloAdmin: false },
   // Los PDFs de /documentos. Tambien los administra todo el equipo.
   { href: '/admin/documentos', label: 'Documentos', soloAdmin: false },

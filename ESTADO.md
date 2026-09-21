@@ -3,6 +3,25 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: partners en el footer, "Legado" como línea de tiempo y carrusel de YouTube en la portada
+
+### Hecho
+
+- Footer: fila de links de partners (FECHIMAX, FEBACHILE, NBN23, Hablemos de Básquet, FIMBA, FIBA) debajo de la grilla de navegación, `target="_blank"`. Lista fija en `PARTNER_LINKS` (`lib/navigation.ts`), igual que `NAV_LINKS`: no hay logo ni tabla que administrar, solo nombre y link.
+  Se probó primero con los logos de `sponsors` (tabla existente, con `SponsorCard` variant `compact`), pero el pedido real era esta lista de partners sin logo, así que ese camino se revirtió (`SponsorCard` volvió a su forma original, sin `variant`; `refrescarSitio()` en `admin/sponsors/actions.ts` volvió a `revalidatePath('/')` a secas).
+- "Nuestro Legado" en la portada: reemplazado el resumen en texto (`RESUMEN`, eliminado) por una mini línea de tiempo horizontal con los 5 hitos de `HITOS` (año + título), cada uno linkeado a `/historia#<id>`. `Hito` ganó un campo `id` para el ancla; el `<li>` de cada hito en `/historia` lleva `id` y `scroll-mt-28`.
+- Carrusel de videos de YouTube debajo de Reels en la portada: `lib/youtube.ts` (RSS del canal, sin clave ni cuota, con reintentos), `VideoCard`/`VideosCarousel` sobre el mismo `Carousel` genérico. `YOUTUBE_CHANNEL_ID` en `lib/navigation.ts`. Miniaturas de `i.ytimg.com` agregadas a `remotePatterns`, sin `unoptimized` (la URL ya es estable, a diferencia de la de Instagram). Detalle completo en `CLAUDE.md` sección 4.
+- Orden de la portada invertido: el formulario de jugadores va antes, y sponsors cierra la página (antes era al revés). Título de la sección de sponsors cambiado de "Con el apoyo de" a "Sponsors | Colaboradores".
+- Mismo nombre "Sponsors | Colaboradores" reflejado en el CMS: `titulo` de `AdminShell` y `metadata.title` en `/admin/sponsors`, y la tarjeta del dashboard.
+  En `AdminNav` el label pasó por tres versiones: nombre completo (empujaba "Mi perfil" fuera de la vista inicial), "Sponsors" a secas (no alcanza, la sección también admite colaboradores sin relación comercial) y la que quedó, "Sponsors/Colab.". Sin poder verificar en un navegador real esta sesión tampoco: si sigue empujando "Mi perfil", falta acortar más.
+- Textos de `/admin/sponsors` simplificados: "Agregar sponsor" (heading y botón) pasó a "Agregar", y "Sponsors cargados" a "Cargados". El título de la pantalla ya dice "Sponsors | Colaboradores"; repetir "sponsor" en cada subtítulo era redundante.
+
+### Verificado
+
+- `pnpm exec tsc --noEmit` y `pnpm lint` sin errores, en las dos vueltas (sponsors en el footer, y despues los partners).
+- HTML servido por `next dev` inspeccionado con curl: las 5 anclas a `/historia#<id>` presentes, las 5 anclas correspondientes existen en `/historia`, los 6 partners se repiten en el footer de `/noticias` (no solo en la portada) y la fila de sponsors ya no aparece ahí, y el carrusel de YouTube trajo 3 videos reales del canal via RSS sin errores en el servidor. La miniatura de YouTube se sirve bien a través de `/_next/image` (confirma el `remotePattern` nuevo).
+- **Pendiente**: verificación visual en navegador real (la extensión de Claude in Chrome no estaba conectada en esta sesión). Falta mirar el layout de la línea de tiempo en mobile, el hover de las tarjetas de YouTube y el wrap de la fila de partners en pantallas chicas.
+
 ## Cambio: YouTube en el footer, intro de Historia en dos columnas y menú flotante que recortaba "Contacto"
 
 ### Hecho

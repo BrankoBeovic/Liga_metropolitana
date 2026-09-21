@@ -45,24 +45,19 @@ export const ACTA = {
 export const BAJADA =
   'Desde el 16 de mayo de 1989, treinta y siete años de básquetbol, comunidad y evolución.'
 
-/**
- * El resumen que se muestra en el bloque "Legado" de la portada.
- *
- * Vive en este archivo y no al lado del componente para que TODO el texto de
- * historia -el largo y el corto- se reemplace en un solo lugar el dia que
- * llegue el de verdad.
- */
-export const RESUMEN = [
-  'El 16 de mayo de 1989, en la sede de Unión Española, ocho instituciones -Estadio Español de Las Condes, Estadio Italiano, Estadio Israelita-Macabbi, Unión Española, Club Internacional, Banco Central, Universidad de Chile y YMCA- fundaron la Liga Metropolitana de Maxibásquetbol. Desde entonces, generaciones de jugadores, dirigentes, entrenadores y árbitros han mantenido vivo un mismo principio: el básquetbol puede acompañar a las personas durante toda la vida.',
-  'Hoy la Liga reúne a más de cincuenta equipos y varios cientos de jugadores, y en 2023 fue distinguida como Sports League of the Year en los South America Prestige Awards. Pero su patrimonio más grande sigue siendo el mismo de siempre: la comunidad que se forma cada vez que alguien vuelve a entrar a una cancha.',
-] as const
-
 export const INTRO = [
   'El 16 de mayo de 1989, en la sede del Club Unión Española, nació la Liga Metropolitana de Maxibásquetbol. La fundaron ocho instituciones -Estadio Español de Las Condes, Estadio Italiano, Estadio Israelita-Macabbi, Unión Española, Club Internacional, Banco Central, Universidad de Chile y YMCA- que buscaban un espacio para que los basquetbolistas siguieran jugando de manera organizada y competitiva. Desde aquella primera temporada han pasado generaciones completas de jugadores, dirigentes, entrenadores, árbitros y clubes, y sigue intacta la misma pasión por volver a entrar a una cancha.',
   'Los primeros treinta años, bajo la presidencia de Noé Méndez, se construyeron las bases: continuidad, pertenencia y una relación profunda entre jugadores e instituciones. Desde 2019, con la llegada de una nueva directiva, la Liga entró en un proceso de modernización, tecnología y profesionalización que en 2023 la llevó a ser distinguida internacionalmente como la mejor liga del año. Esta es la línea de tiempo de esas casi cuatro décadas.',
 ] as const
 
 export type Hito = {
+  /**
+   * Ancla estable para linkear directo a este hito desde afuera de
+   * `/historia` (el bloque "Legado" de la portada, `components/home/Legado`).
+   * No sale de `anio`: un rango como "1989 - 2019" no es un id legible, y
+   * desacoplar los dos deja mover el texto del año sin romper el enlace.
+   */
+  id: string
   anio: string
   titulo: string
   texto: string
@@ -70,30 +65,35 @@ export type Hito = {
 
 export const HITOS: readonly Hito[] = [
   {
+    id: 'fundacion',
     anio: '1989',
     titulo: 'Nace la Liga Metropolitana',
     texto:
       'Ocho instituciones fundan la Liga en la sede de Unión Española: Estadio Español de Las Condes, Estadio Italiano, Estadio Israelita-Macabbi, Unión Española, Club Internacional, Banco Central, Universidad de Chile y YMCA. La competencia arranca con unos 10 a 12 equipos, concentrada en clubes y estadios de colonia de la zona oriente de Santiago.',
   },
   {
+    id: 'noe-mendez',
     anio: '1989 - 2019',
     titulo: 'Treinta años de Noé Méndez',
     texto:
       'El primer presidente de la Liga conduce la institución durante tres décadas, en las que se construyen sus bases: continuidad, pertenencia y una relación profunda entre jugadores e instituciones. En ese mismo período participa también en la creación de FECHIMAX, la federación nacional del maxibásquetbol.',
   },
   {
+    id: 'nueva-directiva',
     anio: '2019',
     titulo: 'Una nueva etapa',
     texto:
       'Con la llegada de una nueva directiva encabezada por Rodrigo Gajardo Zavala, comienza un proceso de crecimiento, modernización y profesionalización. La Liga incorpora las planillas digitales de NBN23 -pionera en Latinoamérica, según los South America Prestige Awards- y amplía sus categorías hasta reunir más de 50 equipos y varios cientos de jugadores.',
   },
   {
+    id: 'premio-2023',
     anio: '2023',
     titulo: 'Sports League of the Year',
     texto:
       'Los South America Prestige Awards distinguen a la Liga Metropolitana como la mejor liga del año, destacando la modernización de su gestión, la incorporación de tecnología y el crecimiento de sus comunicaciones y transmisiones. La publicación la describe además como la liga de maxibásquetbol más antigua de Chile.',
   },
   {
+    id: 'presente',
     anio: '2026',
     titulo: 'Treinta y siete años y sigue',
     texto:

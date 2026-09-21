@@ -259,6 +259,10 @@ Acá los enlaces de la barra son páginas fijas (Historia, Documentos, Inscripci
 Se ahorran las dos columnas, `NavbarPreview` y toda la maquinaria de medición.
 `categories` queda solo para clasificar noticias.
 
+Los partners del footer (`PARTNER_LINKS` en `lib/navigation.ts`) siguen el mismo criterio: federaciones y organizaciones externas (FECHIMAX, FEBACHILE, NBN23, Hablemos de Básquet, FIMBA, FIBA), no contenido del CMS, así que van como lista fija y no como una tabla con panel de administración.
+Es una decisión distinta de la de `sponsors`: ahí sí hay logo que administrar y sí vale la pena una tabla con su propia pantalla en `/admin/sponsors`.
+Los partners son solo nombre y link, y no cambian con la frecuencia suficiente como para justificar esa maquinaria.
+
 ### Las notas van a una sola columna
 
 No hay publicidad lateral (el 160x600 de la fuente) ni la grilla de tres columnas que la acompañaba.
@@ -276,7 +280,6 @@ Sin ninguna destacada, la principal pasa a ser la más reciente: degradación na
 ### Qué se dejó afuera del traspaso
 
 - `media_items` y `newsletter_subscribers`: nunca se usaron en la fuente.
-- YouTube entero: `lib/youtube.ts`, `VideoCard`, `VideosCarousel`, la extensión de TipTap se evalúa al copiar el editor.
 - `/nosotros`, `/multimedia`, `/categoria/[slug]`.
 - `CategoryColumns` y el bloque "Otras secciones".
 
@@ -346,14 +349,38 @@ Vale la pena releerlo antes de escribir cualquier componente que arranque una an
 
 ### La portada, en orden
 
-Hero a pantalla casi completa (video + bajada), legado, Reels, "Solo noticias" (destacada a media columna mas tres laterales), sponsors y al cierre el formulario de jugadores ("¿Quieres jugar pero no tienes equipo?").
+Hero a pantalla casi completa (video + bajada), legado (línea de tiempo), Reels, videos de YouTube, "Solo noticias" (destacada a media columna mas tres laterales), el formulario de jugadores ("¿Quieres jugar pero no tienes equipo?") y al cierre sponsors.
 
-Las secciones de Reels y sponsors desaparecen si no tienen contenido.
+Las secciones de Reels, YouTube y sponsors desaparecen si no tienen contenido.
 Sin token de Instagram la de Reels igual se dibuja, con piezas de muestra, para poder mostrar el carrusel.
 Esa sección se queda, con un estado vacío explícito, porque una portada de un medio sin ni un hueco donde diga "acá van las noticias" parece rota.
+La de YouTube no tiene ese mismo cuidado: no depende de ningún token pendiente, solo de un feed que a veces no responde, así que si la lista llega vacía la sección entera no se dibuja (ver la nota de `lib/youtube.ts` más abajo).
 
 El `h1` de la portada es `sr-only`.
 La portada de un medio no tiene titular propio, y el nombre de la Liga ya está dicho en letras de tres metros en el video: escribirlo encima sería decirlo dos veces y pelearle el centro a la imagen.
+
+### Nota: el bloque "Legado" es una línea de tiempo, no un resumen en texto
+
+Al principio `Legado` mostraba dos párrafos de resumen (`RESUMEN`, en `historia/contenido.ts`).
+Se reemplazó por una mini línea de tiempo horizontal: año + título de cada hito de `HITOS` -la misma lista que arma la línea de tiempo completa de `/historia`, sin duplicar contenido- y cada hito es un link a `/historia#<id>`.
+
+`Hito` ganó un campo `id` para eso, separado de `anio`: un rango como "1989 - 2019" no sirve de ancla, y desacoplar los dos deja corregir el texto del año sin romper el enlace.
+El `<li>` de cada hito en `/historia` lleva `scroll-mt-28`, el mismo número que el `pt-28` del contenedor de la página: sin eso, llegar por ancla deja el hito tapado detrás de la barra flotante.
+
+### Nota: el carrusel de YouTube usa el RSS del canal, no la Data API
+
+Mismo criterio que el feed de `lib/youtube.ts` en la fuente: sin clave, sin cuota, sin token que renovar.
+A cambio solo trae los últimos 15 videos, que para una hilera de portada de 3 es de sobra.
+`YOUTUBE_CHANNEL_ID` vive en `lib/navigation.ts`, al lado de `YOUTUBE_URL`.
+
+El feed contesta a medias -fallos intermitentes 404/500 que se resuelven solos segundos después-, así que `pedirFeed` reintenta hasta 4 veces con backoff antes de darse por vencido.
+Sin esto, una regeneración de portada de cada dos se quedaba sin la sección por un problema que no era permanente.
+
+La miniatura (`i.ytimg.com/vi/{id}/hqdefault.jpg`) es una URL estable por video, a diferencia de la de Instagram: no hace falta el proxy propio que usan los Reels (`/api/reel-thumb/[id]`) para que `next/image` acierte contra su cache, alcanza con declarar el host en `remotePatterns`.
+
+`VideoCard` no lleva `unoptimized`, a diferencia de como quedó en la fuente.
+Ahí fue una salida de emergencia del 2026-09-13/14 por el cupo de transformaciones de Vercel (documentada en el `CLAUDE.md` de la fuente, sección "el plan Hobby de Vercel agotó su cupo de verdad"), aplicada parejo a Reels, YouTube, portadas y sponsors, no una decisión específica de YouTube.
+Acá la URL estable ya cachea bien sin ese parche.
 
 ### Nota: las miniaturas de Reels pasan por una ruta propia, no por la URL de Instagram
 
@@ -518,7 +545,7 @@ Y a diferencia de un sponsor, que siempre tiene marca y sitio propios, el seguro
 Agregar un bucket nuevo obliga a reescribir las cuatro políticas de Storage, que hoy listan los cuatro buckets existentes por nombre (ver la nota de `lib/admin/storage.ts` sobre `Bucket`).
 `sponsors` y `benefits` comparten dueño (todo el equipo) y permisos, así que entran en el mismo bucket con una subcarpeta -el mismo criterio que ya usan los PDF de `/documentos` dentro de `documents/` y las portadas de nota dentro de `article-covers/`.
 
-**`/convenios` tiene página propia en la barra**, a diferencia de la sección de sponsors que solo vive embebida en la portada.
+**`/convenios` tiene página propia en la barra**, a diferencia de sponsors, que solo vive embebido en la portada, sin ruta propia.
 Es contenido con texto propio (nombre, descripción, a veces un link), no solo logos: no entraba en el mismo tratamiento visual que `SponsorCard`.
 
 ## 5. CMS / Admin (`/admin`)

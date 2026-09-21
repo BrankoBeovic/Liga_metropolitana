@@ -89,8 +89,13 @@ export default function HistoriaPage() {
           <ol className="border-ink/15 border-l pl-8">
             {HITOS.map((hito) => (
               <li
-                key={hito.anio}
-                className="relative mt-10 before:absolute before:top-2 before:-left-[calc(2rem+5px)] before:size-2.5 before:rounded-full before:bg-[var(--color-accent)] first:mt-8"
+                key={hito.id}
+                id={hito.id}
+                // `scroll-mt-28` iguala el `pt-28` del contenedor de la
+                // pagina: es lo que reserva el espacio de la barra flotante
+                // (documentado mas arriba). Sin esto, llegar por ancla desde
+                // "Legado" deja el hito tapado detras de la barra.
+                className="relative mt-10 scroll-mt-28 before:absolute before:top-2 before:-left-[calc(2rem+5px)] before:size-2.5 before:rounded-full before:bg-[var(--color-accent)] first:mt-8"
               >
                 <p className="font-display text-accent text-2xl tracking-wide">
                   {hito.anio}

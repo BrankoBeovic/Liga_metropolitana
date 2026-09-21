@@ -28,6 +28,21 @@ function supabaseImagePatterns() {
 }
 
 /**
+ * Miniaturas del carrusel de YouTube (`lib/youtube.ts`).
+ *
+ * A diferencia de Instagram, `i.ytimg.com/vi/{id}/hqdefault.jpg` es una URL
+ * estable por video: no rota una firma, asi que no hace falta el mismo proxy
+ * propio que usan los Reels (`/api/reel-thumb/[id]`) para que `next/image`
+ * acierte contra su cache. No depende de ninguna variable de entorno, asi que
+ * va separado de `supabaseImagePatterns`.
+ */
+const YOUTUBE_IMAGE_PATTERN = /** @type {const} */ ({
+  protocol: 'https',
+  hostname: 'i.ytimg.com',
+  pathname: '/vi/**',
+})
+
+/**
  * Cuanto conserva Next las copias optimizadas: 31 dias.
  *
  * Una vez que una miniatura de Reel se bajo bien, se sigue sirviendo desde
@@ -112,7 +127,7 @@ const nextConfig = {
     minimumCacheTTL: CACHE_IMAGENES_SEGUNDOS,
     deviceSizes: DEVICE_SIZES,
     imageSizes: IMAGE_SIZES,
-    remotePatterns: supabaseImagePatterns(),
+    remotePatterns: [...supabaseImagePatterns(), YOUTUBE_IMAGE_PATTERN],
   },
   async redirects() {
     return [

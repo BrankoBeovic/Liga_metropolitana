@@ -29,7 +29,7 @@ export async function SponsorsSection() {
         id="sponsors-titulo"
         className="font-display text-ink/60 text-center text-xs tracking-[0.2em] uppercase"
       >
-        Con el apoyo de
+        Sponsors | Colaboradores
       </h2>
 
       <ul className="mt-8 grid grid-cols-2 items-center gap-3 sm:grid-cols-3 lg:grid-cols-5">

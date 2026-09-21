@@ -32,6 +32,23 @@ export const NAV_LINKS: readonly NavLink[] = [
 ]
 
 /**
+ * Partners de la Liga, para el footer.
+ *
+ * Lista fija en el codigo, igual que `NAV_LINKS`: son sitios externos, no
+ * contenido del CMS, y no hay ninguna tabla que los deba administrar el
+ * equipo. Federaciones y organizaciones del maxibasquetbol/basquetbol, mas
+ * un medio y un partner tecnologico.
+ */
+export const PARTNER_LINKS: readonly NavLink[] = [
+  { href: 'https://fechimax.cl', label: 'FECHIMAX' },
+  { href: 'https://febachile.cl', label: 'FEBACHILE' },
+  { href: 'https://nbn23.com', label: 'NBN23' },
+  { href: 'https://hablemosdebasquet.cl', label: 'Hablemos de Básquet' },
+  { href: 'https://fimba.net', label: 'FIMBA' },
+  { href: 'https://fiba.basketball', label: 'FIBA' },
+]
+
+/**
  * Cuenta oficial de Instagram.
  *
  * Es la fuente del carrusel de Reels de la landing, via la API de Graph
@@ -44,12 +61,13 @@ export const INSTAGRAM_HANDLE = '@ligametromaxibasquet'
 /**
  * Canal oficial de YouTube.
  *
- * Solo enlace en el footer, no alimenta ningun carrusel (esa maquinaria se
- * descarto entera al copiar la fuente, ver CLAUDE.md seccion "Que se dejo
- * afuera del traspaso").
+ * Enlace del footer y fuente del `channel_id` que alimenta el carrusel de
+ * videos de la portada (`lib/youtube.ts`).
  */
 export const YOUTUBE_URL =
   'https://www.youtube.com/channel/UCa1vVmhF0qyuZqerQjhnicw/videos?view=0&sort=dd&shelf_id=0'
+
+export const YOUTUBE_CHANNEL_ID = 'UCa1vVmhF0qyuZqerQjhnicw'
 
 /**
  * Firma para las notas marcadas como anonimas.

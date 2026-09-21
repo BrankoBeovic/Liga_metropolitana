@@ -91,7 +91,7 @@ export default async function DashboardPage() {
         */}
         <Tarjeta titulo="Reels en portada" valor={reels.length} />
         <Tarjeta
-          titulo="Sponsors"
+          titulo="Sponsors | Colaboradores"
           valor={sponsors.count}
           href="/admin/sponsors"
         />

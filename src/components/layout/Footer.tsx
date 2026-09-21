@@ -7,6 +7,7 @@ import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   NAV_LINKS,
+  PARTNER_LINKS,
   SITE_NAME,
   SITE_TAGLINE,
   YOUTUBE_URL,
@@ -135,7 +136,37 @@ export function Footer() {
           </div>
         </div>
 
+        {/*
+          Partners de la Liga: federaciones y organizaciones afines,
+          enlazadas a su sitio oficial. Lista fija (`PARTNER_LINKS` en
+          `lib/navigation.ts`), no sale del CMS: no hay logo que administrar,
+          solo el nombre y el link.
+        */}
         <div className="mt-16 border-t border-white/10 pt-8">
+          <p className="font-display text-ink/60 text-xs tracking-[0.2em] uppercase">
+            Partners
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {PARTNER_LINKS.map((partner) => (
+              <li key={partner.href}>
+                <a
+                  href={partner.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-ink/75 hover:text-ink focus-visible:ring-accent flex min-h-11 items-center rounded-full px-3 text-sm ring-1 ring-white/15 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  {partner.label}
+                  <span className="sr-only">
+                    {' '}
+                    (se abre en una pestaña nueva)
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-8 border-t border-white/10 pt-8">
           <p className="text-ink/60 text-xs">
             © {year} {SITE_NAME}. Hecho en Chile.
           </p>

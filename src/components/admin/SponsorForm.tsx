@@ -178,7 +178,7 @@ function Guardar({ nuevo }: { nuevo: boolean }) {
       disabled={pending}
       className="bg-accent font-display h-11 rounded-lg px-5 text-sm font-bold text-white transition-opacity disabled:opacity-60"
     >
-      {pending ? 'Guardando...' : nuevo ? 'Agregar sponsor' : 'Guardar cambios'}
+      {pending ? 'Guardando...' : nuevo ? 'Agregar' : 'Guardar cambios'}
     </button>
   )
 }

@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 
 import { alternarSponsor, borrarSponsor } from './actions'
 
-export const metadata: Metadata = { title: 'Sponsors' }
+export const metadata: Metadata = { title: 'Sponsors | Colaboradores' }
 export const dynamic = 'force-dynamic'
 
 export default async function SponsorsPage() {
@@ -29,19 +29,19 @@ export default async function SponsorsPage() {
   return (
     <AdminShell
       sesion={sesion}
-      titulo="Sponsors"
-      descripcion="Los logos que aparecen en la sección de sponsors de la portada. Se muestran los visibles, en su orden."
+      titulo="Sponsors | Colaboradores"
+      descripcion="Los logos que aparecen en esa sección de la portada. Se muestran los visibles, en su orden."
     >
       <section className="rounded-xl p-6 ring-1 ring-black/5">
         <h2 className="font-display text-ink mb-4 text-base font-bold tracking-tight">
-          Agregar sponsor
+          Agregar
         </h2>
         <SponsorForm />
       </section>
 
       <section className="mt-8">
         <h2 className="font-display text-ink mb-4 text-base font-bold tracking-tight">
-          Sponsors cargados
+          Cargados
         </h2>
 
         {sponsors && sponsors.length > 0 ? (

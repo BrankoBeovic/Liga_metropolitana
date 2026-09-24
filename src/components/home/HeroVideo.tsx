@@ -247,7 +247,7 @@ export function HeroVideo() {
   return (
     <video
       ref={ref}
-      poster="/hero-poster.jpg"
+      poster="/hero-poster.webp"
       muted
       loop
       playsInline
@@ -272,14 +272,10 @@ export function HeroVideo() {
         con la PRIMERA fuente cuyo `media` coincide, asi que la version liviana
         tiene que ir arriba.
 
-        `hero-mobile.mp4` es el mismo clip a 1280x720 y CRF 26: 1,45 MB contra
-        3,0 MB, o sea la mitad de datos moviles antes de que el Hero se mueva.
-        No es un recorte de calidad visible: medido, su SSIM contra el archivo
-        grande da 0,9848, y en un telefono en vertical el video ya se amplia mas
-        del doble por `object-cover`, asi que los pixeles que se descartan no
-        llegaban a verse. La alternativa de mantener 1080p bajando el bitrate
-        pesaba 1,9 MB para un SSIM de 0,9857: 33% mas de peso por una diferencia
-        de nueve diezmilesimos.
+        `hero-mobile.mp4` es el mismo clip a 1280x720 en H.264: 1,0 MB. En un
+        telefono en vertical el video ya se amplia mas del doble por
+        `object-cover`, asi que los pixeles que se descartan no llegaban a
+        verse.
 
         El corte va en 820px y no en 768: apunta a telefonos y tablets en
         vertical, que son los que navegan con datos.
@@ -288,11 +284,34 @@ export function HeroVideo() {
         Es correcto para lo que se busca -nadie pasa de telefono a escritorio a
         mitad de visita- y de todas formas el archivo chico aguanta bien
         estirado.
+
+        **En escritorio hay tres archivos de la misma calidad, uno por codec.**
+        El H.264 a 2,3 MB que habia se veia blando en un monitor: VMAF 90 de
+        promedio contra el original y 78 en el peor cuadro, con la textura del
+        marmol y los bordes del vidrio lavados. En un telefono esos mismos
+        defectos miden un par de milimetros y no se notan; en 27 pulgadas si.
+
+        Los tres quedan en VMAF ~96,7 (el peor cuadro, sobre 90), que es la
+        banda donde no se distingue del original:
+
+        - AV1, 2,5 MB: Chrome, Edge, Firefox y Safari con decodificador AV1.
+        - HEVC, 3,4 MB: el resto de Safari, que es casi todo Mac sin chip M3.
+        - H.264, 5,8 MB: el respaldo para lo que no sepa ninguno de los dos.
+
+        El navegador se queda con la primera fuente cuyo `type` sabe
+        reproducir, asi que el orden es de liviano a pesado. El `codecs` es lo
+        que le deja decidir sin bajar nada: sin el, "video/mp4" dice que si a
+        todo y despues falla al decodificar.
       */}
       <source
         src="/hero-mobile.mp4"
         type="video/mp4"
         media="(max-width: 820px)"
+      />
+      <source src="/hero-av1.mp4" type='video/mp4; codecs="av01.0.08M.08"' />
+      <source
+        src="/hero-hevc.mp4"
+        type='video/mp4; codecs="hvc1.1.6.L120.90"'
       />
       <source src="/hero.mp4" type="video/mp4" />
     </video>

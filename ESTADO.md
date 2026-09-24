@@ -3,6 +3,23 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: video del Hero en alta calidad para escritorio (2026-09-24)
+
+### Hecho
+
+- El equipo reportó el Hero blando en escritorio y bien en el teléfono.
+  Medido con VMAF contra el original: el H.264 CRF 28 de 2,3 MB daba 90 de promedio y 78 en el peor cuadro.
+- Escritorio pasa a tres fuentes de la misma calidad (VMAF ~96,7): `hero-av1.mp4` (2,5 MB), `hero-hevc.mp4` (3,4 MB) y `hero.mp4` en H.264 (5,8 MB), elegidas por `codecs`.
+- Póster rehecho desde el primer cuadro del AV1, en WebP (`hero-poster.webp`, 104 KB); se borró `hero-poster.jpg`.
+- `hero-mobile.mp4` no se tocó.
+
+### Verificado
+
+- Chrome en escritorio: baja solo el póster y `hero-av1.mp4`, reproduce a 1920x1080, 1 cuadro perdido de 173.
+- A 390px baja solo `hero-mobile.mp4`.
+- HEVC y H.264 decodifican pedidos directo; el póster coincide con el primer cuadro (diferencia media bajo 0,3/255).
+- **No probado**: Safari real (HEVC) y Firefox, por no tenerlos a mano.
+
 ## Cambio: hackeo del WordPress antiguo, dominio conectado a Vercel y formularios en producción (2026-09-24)
 
 ### Hecho

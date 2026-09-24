@@ -147,19 +147,37 @@ El caso especial es el texto del Hero, que va sobre el video: ahí se midió el 
 
 ### Nota: el hero de la landing lleva video
 
-La pieza original (`ligamefinaled.mp4`, 1920x1080, 10,3 s) pesaba 25,7 MB y traía pista de audio.
-En `public/hero.mp4` va la versión que se sirve: H.264 CRF 28, sin audio, `+faststart`, **2,3 MB**.
+La pieza original (`ligamefinaled.mp4`, 1920x1080, 10,3 s, en `Downloads` de esta máquina) pesaba 25,7 MB y traía pista de audio.
+Todas las versiones que se sirven van sin audio, con `+faststart` y etiquetadas BT.709.
 El clip cierra donde abre, así que el `loop` no tiene costura.
 
-Se revisó de nuevo en la Etapa 7 para que cargara más liviano en todos los dispositivos, midiendo SSIM contra el original en cada paso: CRF 25 (la versión anterior, 3,0 MB) daba 0,9879; CRF 27 (2,5 MB) 0,9859; CRF 28 (2,3 MB) 0,9847; CRF 29 (2,0 MB) 0,9834.
-Se eligió CRF 28 por quedar en la misma banda de SSIM que ya tenía aceptada `hero-mobile.mp4` (ver abajo), un cuarto menos de peso que la versión anterior por una diferencia que sigue sin notarse.
+**En escritorio hay tres archivos de la misma calidad, uno por codec**, y el navegador toma el primero cuyo `codecs` sabe reproducir:
 
-`public/hero-poster.jpg` es el primer cuadro **del archivo ya comprimido**, no del original: así el póster y el primer frame del video son el mismo píxel y no hay salto al arrancar.
+| Archivo | Codec | Peso | VMAF promedio / peor cuadro | Quién lo recibe |
+|---|---|---|---|---|
+| `hero-av1.mp4` | AV1 (SVT-AV1 preset 3, CRF 28) | 2,5 MB | 96,7 / 91,3 | Chrome, Edge, Firefox, Safari con AV1 |
+| `hero-hevc.mp4` | HEVC (x265 slow, CRF 22, `hvc1`) | 3,4 MB | 96,6 / 90,5 | El resto de Safari (Mac sin M3) |
+| `hero.mp4` | H.264 (x264 veryslow, CRF 20, `aq-mode 3`) | 5,8 MB | 96,8 / 91,5 | Respaldo |
+
+Hasta el 2026-09-24 había un solo H.264 CRF 28 de 2,3 MB, elegido en la Etapa 7 midiendo SSIM.
+**El SSIM no veía el problema y el monitor sí**: medido con VMAF daba 90 de promedio y 78 en el peor cuadro, con la textura del mármol y los bordes del vidrio lavados.
+El equipo lo reportó como "en desktop se ve en baja calidad, en el celular mejor": en un teléfono esos defectos miden milímetros, en 27 pulgadas no.
+La vara ahora es VMAF (el filtro `libvmaf` del ffmpeg de esta máquina) con ~96,7 de promedio, y todos los codecs a la misma altura para que nadie vea un video peor que otro.
+El piso de ~91 en los peores cuadros es del métrico, no de la imagen: comparados a ojo contra el original en el cuadro 232 no se distinguen.
+
+El `codecs` del `type` es lo que deja elegir sin bajar nada: `av01.0.08M.08` (Main, nivel 4.0, 8 bits) y `hvc1.1.6.L120.90` (Main, nivel 4.0).
+Si se re-encodea con otro nivel, hay que corregir la cadena, que se lee con `ffprobe -show_entries stream=profile,level`.
+Verificado en Chrome a 1779px: baja el póster y `hero-av1.mp4` y nada más; los otros dos también decodifican si se los pide directo.
+
+`public/hero-poster.webp` es el primer cuadro **de `hero-av1.mp4`**, no del original: así el póster y el primer frame del video que ve casi todo el mundo son el mismo píxel y no hay salto al arrancar.
+Medido en el navegador contra el cuadro del video: diferencia media bajo 0,3/255 por canal.
+Es WebP q90 y no JPEG porque, pesando lo mismo (104 KB), conserva más detalle (SSIM 0,994 contra 0,991); el póster es lo que mide el LCP, así que el peso no podía subir.
 
 **En teléfono se sirve otro archivo.**
-`public/hero-mobile.mp4` es el mismo clip a 1280x720 con CRF 29: **1,0 MB** contra 2,3 MB, menos de la mitad de datos móviles antes de que el Hero se mueva.
+`public/hero-mobile.mp4` es el mismo clip a 1280x720 en H.264 CRF 29: **1,0 MB**.
 Va como primer `<source>` con `media="(max-width: 820px)"`, y el orden importa: el navegador se queda con la primera fuente cuyo `media` coincide.
-Verificado en el navegador que baja una sola de las dos: a 375px pide `hero-mobile.mp4` y a 1280px pide `hero.mp4`, nunca las dos.
+Verificado en el navegador que baja una sola: a 390px pide `hero-mobile.mp4` y en escritorio `hero-av1.mp4`, nunca dos.
+Se quedó en H.264 a propósito: el equipo lo ve bien en el teléfono, y AV1 en un Android de gama baja se decodifica por software, que es batería.
 
 Bajar la resolución en vez del bitrate está medido.
 Revisado de nuevo en la Etapa 7 junto con `hero.mp4`, esta vez midiendo SSIM contra el original y no contra el archivo de escritorio: 720p con CRF 29 pesa 1,0 MB con un SSIM de 0,9817, la misma diferencia (0,0017) que ya se había aceptado como imperceptible al elegir CRF 25 sobre CRF 23 para el desktop en la Etapa 5.
@@ -233,7 +251,7 @@ En este sitio no hay otro; si algún día hace falta sobre claro, hay que pedir 
 |---|---|
 | `public/escudo.png` | Escudo completo, 900x554, con alfa. Header y footer. |
 | `public/og.jpg` | 1200x630 para compartir: el escudo centrado sobre el canvas. |
-| `public/hero.mp4`, `public/hero-poster.jpg` | El video del hero y su póster. |
+| `public/hero-av1.mp4`, `public/hero-hevc.mp4`, `public/hero.mp4`, `public/hero-poster.webp` | El video del hero en tres codecs y su póster. |
 | `public/hero-mobile.mp4` | El mismo clip a 720p, para pantallas de hasta 820px. |
 | `src/app/icon.png` | Favicon, 256x256, con las esquinas transparentes. |
 | `src/app/apple-icon.png` | 180x180, cuadrado y opaco: iOS aplica su propia máscara. |

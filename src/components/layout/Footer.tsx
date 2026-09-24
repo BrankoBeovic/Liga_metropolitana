@@ -168,7 +168,19 @@ export function Footer() {
 
         <div className="mt-8 border-t border-white/10 pt-8">
           <p className="text-ink/60 text-xs">
-            © {year} {SITE_NAME}. Hecho en Chile.
+            © {year} {SITE_NAME}. Hecho en Chile. Powered by{' '}
+            {/* El `py-3` agranda el area tactil sin mover la linea: en un
+                elemento inline el padding vertical no empuja el layout. */}
+            <a
+              href="https://zoralabs.cl"
+              target="_blank"
+              rel="noopener"
+              className="text-ink/75 hover:text-ink focus-visible:ring-accent rounded-sm py-3 underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-current focus-visible:ring-2 focus-visible:outline-none"
+            >
+              Zoralabs
+              <span className="sr-only"> (se abre en una pestaña nueva)</span>
+            </a>
+            .
           </p>
         </div>
       </div>

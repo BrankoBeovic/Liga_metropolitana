@@ -147,7 +147,7 @@ export async function enviarJugador(
       bio,
       '',
       '--',
-      'Enviado desde el formulario de jugadores de ligametropolitana.cl',
+      'Enviado desde el formulario de jugadores de www.maxibasquetbol.cl',
     ]
       .filter((l) => l !== null)
       .join('\n'),
@@ -155,7 +155,10 @@ export async function enviarJugador(
 
   if (!resultado.ok) {
     // La fila ya esta. El correo es el aviso, no el registro.
-    console.error(`Jugador ${rut} guardado, pero el correo no salio.`)
+    // Sin RUT: los logs de Vercel los lee cualquiera con acceso al proyecto.
+    console.error(
+      `Jugador ${nombre} ${apellido} guardado, pero el correo no salio.`
+    )
   }
 
   return exito('Inscripción recibida. La Liga se va a contactar contigo.')
@@ -254,7 +257,7 @@ export async function enviarEquipo(
       bio,
       '',
       '--',
-      'Enviado desde el formulario de inscripciones de ligametropolitana.cl',
+      'Enviado desde el formulario de inscripciones de www.maxibasquetbol.cl',
     ].join('\n'),
   })
 

@@ -3,6 +3,39 @@
 Bitácora corta para retomar en otra sesión sin releer todo.
 El detalle de cada decisión vive en `CLAUDE.md`.
 
+## Cambio: hackeo del WordPress antiguo, dominio conectado a Vercel y formularios en producción (2026-09-24)
+
+### Hecho
+
+- Hosting antiguo (cPanel): borrado todo el WordPress (`website/`, `2023/`, las dos bases, el cron, la cuenta FTP `websmart@`), con la evidencia guardada en `/home/wsmaxi/evidencia-hackeo-2026-09/`.
+  Eliminado el reenviador de `contacto@` al Gmail del atacante (`successdee54@gmail.com`).
+  No se tocaron las casillas ni los otros reenviadores.
+- DNS: `mail` pasó a ser un registro A propio y el MX apunta a él, así el sitio pudo irse a Vercel sin llevarse el correo.
+  Dominio y `www` apuntan a Vercel, con certificados Let's Encrypt válidos.
+- Vercel: `NEXT_PUBLIC_SITE_URL=https://www.maxibasquetbol.cl` (Config).
+  Recargadas las cinco Secret que no llegaban al runtime (`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `REVALIDATION_SECRET`, `CORREO_DESTINO`, `CORREO_REMITENTE`).
+  `CORREO_DESTINO` apunta a `hugo.munoz@` y `ligamaxibasquetbol@gmail.com`, sin `contacto@` (ver `CLAUDE.md`).
+- Código: respaldo de `lib/site.ts` a `https://www.maxibasquetbol.cl`, `/store/*` con 410 y pie de los correos con el dominio real.
+  El log de un jugador cuyo aviso no salió ya no escribe el RUT.
+
+### Verificado
+
+- En producción: canónica, `og:url`, `robots.txt` y `sitemap.xml` con `www.maxibasquetbol.cl`.
+- Formulario de contacto de punta a punta: `delivered` en Resend para los dos destinatarios.
+- Formulario de equipo: guarda sin errores en el log.
+  Queda la fila "PRUEBA Claude - borrar" en `/admin/equipos` para borrar a mano.
+- Local, con el build: `/store`, `/store/sitemap-aop-index.xml` y `/store/product/...` responden 410 `noindex`, y `/contacto` responde 200.
+  `tsc`, `lint`, `prettier` y `build` sin errores.
+- **No probado**: el formulario de jugador, porque pide RUT; usa el mismo camino que el de equipo.
+
+### Pendiente
+
+- Deploy del cambio de código (410, respaldo del dominio y RUT fuera del log).
+- Google Search Console: verificar el dominio, mandar el sitemap nuevo, pedir la eliminación de `/store/` y revisar que no esté marcado como peligroso.
+- Pedirle al hosting los registros de acceso desde fines de agosto: los de errores no muestran el ataque.
+  Lo más probable es el plugin `justified-image-grid` con TimThumb (actividad el 4 y 5 de septiembre).
+- Sacar el correo del hosting (Workspace, 365 o Zoho), pasar el DNS a un lugar controlado por la Liga y recién ahí cancelar el hosting.
+
 ## Cambio: partners en el footer, "Legado" como línea de tiempo y carrusel de YouTube en la portada
 
 ### Hecho

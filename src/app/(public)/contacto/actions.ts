@@ -70,7 +70,7 @@ export async function enviarContacto(
       mensaje,
       '',
       '--',
-      'Enviado desde el formulario de contacto de ligametropolitana.cl',
+      'Enviado desde el formulario de contacto de www.maxibasquetbol.cl',
     ]
       .filter((l) => l !== null)
       .join('\n'),

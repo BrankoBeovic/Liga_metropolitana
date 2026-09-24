@@ -4,27 +4,27 @@
  * La necesitan el sitemap, los canonical, el `metadataBase` del layout y todo
  * el JSON-LD, que exige URLs absolutas.
  *
- * **El dominio de la Liga todavia no esta conectado.** Hasta que lo este, el
- * respaldo es el dominio que se espera usar, y no `localhost`: una URL de
- * localhost publicada en un sitemap o en una etiqueta canonica es peor que una
- * URL equivocada, porque le pide a Google que indexe una direccion que no
- * existe para nadie.
+ * En produccion la define `NEXT_PUBLIC_SITE_URL` (Vercel, tipo Config). Es una
+ * variable `NEXT_PUBLIC_`, asi que se congela en el build: cambiarla exige
+ * volver a desplegar, no alcanza con editarla.
  *
- * Al conectar el dominio real hay que definir `NEXT_PUBLIC_SITE_URL` en el
- * entorno de produccion. Es una variable `NEXT_PUBLIC_`, asi que se congela en
- * el build: cambiarla exige volver a desplegar, no alcanza con editarla.
+ * El respaldo es el dominio real y no `localhost`: si un deploy sale sin la
+ * variable, una URL de localhost en el sitemap o en la canonica le pediria a
+ * Google que indexe una direccion que no existe para nadie. Va con `www`
+ * porque Vercel redirige el dominio desnudo a `www` con un 308, y la canonica
+ * tiene que ser la URL final, no una que redirige.
  */
 /**
  * `||` y no `??`: la variable existe pero esta vacia.
  *
- * `.env.example` la trae declarada sin valor -el dominio todavia no se
- * conecta- asi que `.env.local` define `NEXT_PUBLIC_SITE_URL=`, que llega como
+ * `.env.example` la trae declarada sin valor, asi que `.env.local` define
+ * `NEXT_PUBLIC_SITE_URL=`, que llega como
  * cadena vacia y no como `undefined`. Con `??` el respaldo no se aplicaba,
  * `new URL('')` tiraba `ERR_INVALID_URL` y el build moria al recolectar la
  * portada, con un error que no nombra la variable por ningun lado.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://ligametropolitana.cl'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.maxibasquetbol.cl'
 ).replace(/\/$/, '')
 
 export function urlAbsoluta(ruta: string): string {

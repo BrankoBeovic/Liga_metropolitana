@@ -14,8 +14,9 @@ Varias decisiones PARECEN errores y no lo son: buscar acá antes de "arreglar" n
 Bajada: "El maxibásquetbol chileno desde 1989".
 
 - Instagram: [@ligametromaxibasquet](https://www.instagram.com/ligametromaxibasquet/)
-- Dominio: pendiente, se conecta después.
-- Correo para formularios: llega a `hugo.munoz@maxibasquetbol.cl` y `contacto@maxibasquetbol.cl`.
+- Dominio: `www.maxibasquetbol.cl`, conectado a Vercel el 2026-09-24 (ver "El dominio y el hosting antiguo" en la sección 4).
+  El dominio desnudo redirige a `www` con un 308.
+- Correo para formularios: llega a `hugo.munoz@maxibasquetbol.cl` y `ligamaxibasquetbol@gmail.com`, **no** a `contacto@` (ver "Por qué los avisos no van a `contacto@`" en la sección 4).
   `CORREO_DESTINO` admite varias direcciones separadas por coma, sin tocar código.
 - Token de la API de Instagram: cargado y definitivo en `INSTAGRAM_ACCESS_TOKEN`. Dura 60 días y hay que refrescarlo antes de que venza, porque vencido no se puede refrescar y hay que rehacer la autorización desde cero. Sin él, la portada cae a Reels de muestra (recortes del video de marca); con él puesto, esa rama no corre.
 
@@ -294,6 +295,59 @@ Sin ninguna destacada, la principal pasa a ser la más reciente: degradación na
 
 `posts.is_anonymous` firma como "Equipo Liga Metropolitana".
 
+### El dominio y el hosting antiguo
+
+`maxibasquetbol.cl` vivía en un hosting cPanel (`server034.workserverdc.com`, IP `38.18.230.11`) con un WordPress que fue hackeado en septiembre de 2026: una tienda falsa con cloaking, visible solo para Google, en `/store/`.
+El 2026-09-24 se borró todo el WordPress (archivos, las dos bases, el cron y la cuenta FTP de la agencia anterior) y el dominio pasó a Vercel.
+La evidencia (logs de errores, `robots.txt` y `.htaccess` infectados, la caché de TimThumb) quedó en `/home/wsmaxi/evidencia-hackeo-2026-09/`, fuera de `public_html`.
+
+**El hosting NO se dio de baja, porque todavía tiene el DNS y el correo.**
+Los nameservers son `ns1/ns2.netspace.work` y las casillas `@maxibasquetbol.cl` viven en ese servidor.
+Cancelarlo sin mover antes las dos cosas deja a la Liga sin correo y al dominio sin DNS.
+
+**El MX apunta a `mail.maxibasquetbol.cl`, no al dominio desnudo, y eso es lo que permitió mover el sitio sin romper el correo.**
+Antes el MX era `maxibasquetbol.cl` y `mail` era un CNAME a ese mismo nombre, así que cambiar el registro A del dominio a Vercel habría mandado el correo a Vercel.
+Ahora `mail` es un A propio a `38.18.230.11`.
+Quien tenga el correo configurado con servidor `maxibasquetbol.cl` a secas tiene que cambiarlo a `mail.maxibasquetbol.cl`.
+
+| Registro | Valor |
+|---|---|
+| `maxibasquetbol.cl` A | `216.198.79.1` (Vercel) |
+| `www` CNAME | `7811b860d0890341.vercel-dns-017.com.` |
+| `mail` A | `38.18.230.11` |
+| MX | `0 mail.maxibasquetbol.cl.` |
+
+Los SRV de calendario y contactos (`_caldav`, `_carddav`) siguen apuntando al dominio desnudo, o sea a Vercel.
+Solo afecta a quien sincronice calendario o contactos de cPanel en el teléfono; si alguien lo usa, se les cambia el destino a `mail.maxibasquetbol.cl`.
+
+### `/store/*` responde 410
+
+Es la ruta de la tienda falsa: 22.014 páginas y veinte sitemaps que Google indexó bajo el dominio de la Liga.
+`app/(public)/store/[[...ruta]]/route.ts` responde 410 con `X-Robots-Tag: noindex`.
+Un 404 le dice a Google "no está ahora" y vuelve a pasar varias veces; un 410 le dice "se borró a propósito" y la saca del índice más rápido.
+El paso que falta es de afuera del código: pedir la eliminación de `/store/` en Google Search Console.
+
+### Por qué los avisos no van a `contacto@`
+
+`contacto@` reenvía a `ligamaxibasquetbol@gmail.com` desde el hosting, y el filtro de spam de salida del hosting (`outboundspamprotection`, cuenta `mb33596`) clasifica ese reenvío como spam y lo rechaza con un 550.
+Resend registra el rechazo como rebote, pone a `contacto@` en su lista de supresión, y desde ahí **ningún** aviso sale, tampoco para los demás destinatarios.
+Pasó dos veces, el 2026-09-03 y el 2026-09-24.
+El 2026-09-03 `contacto@` además reenviaba a un Gmail del atacante (`successdee54@gmail.com`), ya eliminado.
+
+Por eso `CORREO_DESTINO` apunta directo al Gmail al que llegaba el reenvío, sin pasar por el hosting.
+Les llega a las mismas personas y la fila en `players`/`teams` sigue siendo la fuente de verdad.
+Cuando el correo salga del hosting (Google Workspace, Microsoft 365 o Zoho), `contacto@` puede volver a la lista; antes hay que sacarla de las supresiones de Resend.
+
+### Nota: las variables Secret de Vercel pueden estar y no llegar
+
+El 2026-09-24 los formularios fallaban con "Falta RESEND_API_KEY" y "falta SUPABASE_SECRET_KEY", aunque las dos variables aparecían en el panel de Vercel desde agosto.
+Tampoco llegaba `REVALIDATION_SECRET`, pero sí `INSTAGRAM_ACCESS_TOKEN`.
+Se volvieron a cargar desde `.env.local` con `vercel env add ... --sensitive --force` y con eso se arregló.
+La causa exacta no se pudo ver, porque Vercel no muestra el valor de una Secret.
+
+La prueba rápida de que las secretas llegan al runtime sin mandar nada: `POST /api/revalidate` sin encabezado debe responder **401**.
+Si responde **503 "No configurado"**, a la función no le está llegando ninguna.
+
 ### La nota pública vive en `/noticia/[slug]`
 
 La fuente la tenía en `/articulo/`.
@@ -318,9 +372,16 @@ Este sitio no tiene páginas de categoría, así que la miga del medio se dibuja
 En el JSON-LD eso es un `ListItem` sin `item`, que es válido y describe exactamente lo que pasa: un escalón de la jerarquía que no tiene página propia.
 Enlazarla a una ruta inexistente sería peor que no tenerla.
 
-### Nota: `NEXT_PUBLIC_SITE_URL` está declarada pero vacía
+### Nota: `NEXT_PUBLIC_SITE_URL` vacía en local, y con el respaldo correcto
 
-El dominio todavía no se conecta, así que `.env.local` la define sin valor.
+En producción vale `https://www.maxibasquetbol.cl` (Vercel, tipo **Config**).
+Tiene que ser Config y no Secret: Vercel rechaza guardar como Secret una variable con prefijo `NEXT_PUBLIC_`, porque ese prefijo la manda al navegador.
+Y como se congela en el build, cambiarla no sirve de nada sin un redeploy.
+
+El respaldo de `lib/site.ts` es el mismo dominio con `www`, porque la canónica tiene que ser la URL final y no una que redirige.
+Hasta la conexión del dominio el respaldo era `ligametropolitana.cl`, un dominio que no es de la Liga, y el primer deploy con el dominio real salió con esas canónicas y ese sitemap.
+
+`.env.local` la sigue definiendo sin valor, así que en local cae en el respaldo.
 Eso llega al código como cadena vacía, **no** como `undefined`: con `??` el respaldo no se aplicaba, `new URL('')` tiraba `ERR_INVALID_URL` y el build moría al recolectar la portada, con un error que no nombra la variable por ningún lado.
 `lib/site.ts` usa `||`.
 
@@ -435,8 +496,12 @@ Si falta alguna de las dos primeras, `/contacto` **lo dice en pantalla** en vez 
 `/inscripciones` no: guarda igual y registra el fallo del correo en el log.
 
 **El remitente es el punto delicado.** Resend exige que el dominio del `from` esté verificado en su panel.
-Mientras la Liga no tenga dominio, `CORREO_REMITENTE` va vacía y el código cae en `onboarding@resend.dev`, que Resend permite sin verificar nada **pero solo entrega a la casilla dueña de la cuenta de Resend**.
-Sirve para probar el circuito completo; no sirve para producción con otra dirección.
+`maxibasquetbol.cl` está verificado desde el 2026-09-03 (DKIM en `resend._domainkey`, SPF delegado en los CNAME `send` y `rsend`, que apuntan a `forge.rmta.net`), y `CORREO_REMITENTE` es `Liga Metropolitana <notificaciones.web@maxibasquetbol.cl>`.
+Si la variable quedara vacía, el código cae en `onboarding@resend.dev`, que Resend permite sin verificar nada **pero solo entrega a la casilla dueña de la cuenta de Resend**.
+
+**"Guardado bien" en la pantalla no prueba que el aviso llegó.** Resend acepta el envío aunque después no lo entregue, así que la acción no se entera.
+Lo que manda es el `last_event` en Resend: `delivered` es lo único que confirma entrega.
+`suppressed` significa que algún destinatario está en su lista de supresión por un rebote anterior, y en ese caso el aviso no sale para ninguno de los destinatarios.
 
 El correo de quien escribe va en `replyTo` y nunca en `from`: mandar con el dominio de otro es exactamente lo que SPF y DMARC existen para frenar.
 Los mensajes se arman en texto plano, no en HTML: el cuerpo lo escribe un desconocido y en texto plano no existe la posibilidad de inyectar markup.
